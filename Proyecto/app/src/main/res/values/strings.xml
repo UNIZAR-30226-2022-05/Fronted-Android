@@ -6,4 +6,5 @@
     <string name="nombre">Nombre de usuario</string>
     <string name="con_bis">Repite la contraseña</string>
     <string name="register">Registrarse</string>
+    <string name="ErrorContrasegnas">Las contraseñas no coinciden</string>
 </resources>

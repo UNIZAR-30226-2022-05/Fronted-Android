@@ -17,7 +17,7 @@
             android:text="@string/correo" />
 
         <EditText
-            android:id="@+id/Correo"
+            android:id="@+id/correo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -44,7 +44,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/registro"
+        android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#2EC322"
