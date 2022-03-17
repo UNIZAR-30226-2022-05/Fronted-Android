@@ -6,45 +6,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/registro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/correo" />
-
-        <EditText
-            android:id="@+id/Correo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:focusable="false" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/contrasegna" />
-
-        <EditText
-            android:id="@+id/contrasenna"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:focusable="false" />
-
-    </LinearLayout>
+        android:backgroundTint="#2EC322"
+        android:text="@string/register"
+        android:textColor="@color/white"
+        app:rippleColor="#1A2351" />
 
     <Button
-        android:id="@+id/add_new_product"
+        android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#2EC322"
