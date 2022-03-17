@@ -3,7 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+<<<<<<< Updated upstream
         <entry key="..\:/Users/ivanp/Documents/Repositorios proyecto Software/Frontend-Android/Proyecto/app/src/main/res/layout/activity_main.xml" value="0.13405797101449277" />
+=======
+        <entry key="..\:/Users/Usuario/Desktop/Frontend-Android/Proyecto/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/Usuario/Desktop/Frontend-Android/Proyecto/app/src/main/res/layout/register.xml" value="0.25" />
+>>>>>>> Stashed changes
       </map>
     </option>
   </component>

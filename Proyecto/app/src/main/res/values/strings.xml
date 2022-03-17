@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">UnoForAll</string>
+    <string name="correo">Correo</string>
+    <string name="contrasegna">Contraseña</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="nombre">Nombre de usuario</string>
+    <string name="con_bis">Repite la contraseña</string>
+    <string name="register">Registrarse</string>
 </resources>
