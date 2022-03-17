@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/registro"
+        android:id="@+id/botonRegistro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#2EC322"
@@ -16,7 +16,7 @@
         app:rippleColor="#1A2351" />
 
     <Button
-        android:id="@+id/login"
+        android:id="@+id/botonLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#2EC322"
