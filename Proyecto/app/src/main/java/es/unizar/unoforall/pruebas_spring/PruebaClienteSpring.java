@@ -100,15 +100,5 @@ public class PruebaClienteSpring {
 
         Gson gson = new Gson();
         client.send("/app/hello", gson.toJson(new Empleado("a", "b", 555), Empleado.class)).subscribe();
-
-
-
-        //Mirar esto:
-        //https://stackoverflow.com/questions/24346068/set-up-a-stomp-client-in-android-with-spring-framework-in-server-side/37224168#37224168
-        //https://stackoverflow.com/questions/42367533/stomp-client-with-spring-server
-
-        //Menos útil
-        //https://www.pubnub.com/blog/java-websocket-programming-with-android-and-spring-boot/
-        //https://www.google.com/search?q=spring+websockets+on+android&rlz=1C1CHWL_esES900ES900&ei=6hE1Yp7_Ns6dlwTk246YBw&ved=0ahUKEwienJrF5ND2AhXOzoUKHeStA3MQ4dUDCA4&uact=5&oq=spring+websockets+on+android&gs_lcp=Cgdnd3Mtd2l6EAM6BggAEAcQHjoECAAQHjoGCAAQCBAeOgYIABAFEB46CAgAEAcQBRAeOggIABAHEB4QEzoKCAAQBxAFEB4QEzoICAAQCBAeEBM6BggAEA0QHjoKCAAQCBANEAoQHkoECEEYAEoECEYYAFAAWO8eYP4faABwAXgAgAG2AYgB-Q6SAQQxLjEzmAEAoAEBwAEB&sclient=gws-wiz
     }
 }
