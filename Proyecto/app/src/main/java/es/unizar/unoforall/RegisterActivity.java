@@ -21,7 +21,6 @@ public class RegisterActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setTitle(R.string.register);
 
         userNameText = (EditText) findViewById(R.id.nombre);
