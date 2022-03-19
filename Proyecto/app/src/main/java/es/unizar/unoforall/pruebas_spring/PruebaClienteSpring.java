@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -13,6 +14,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import es.unizar.unoforall.api.RestAPI;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
@@ -28,6 +30,11 @@ public class PruebaClienteSpring {
             nombre = n;
             apellido = a;
             sueldo = s;
+        }
+
+        @Override
+        public String toString(){
+            return nombre + " " + apellido + " " + sueldo;
         }
     }
 
@@ -54,8 +61,23 @@ public class PruebaClienteSpring {
         //          jcenter()
         //          maven { url "https://jitpack.io" }
 
-        probarRestAPI();
+        //probarRestAPI();
+        probarRestAPI2();
         probarWebSockets();
+    }
+
+    private static void probarRestAPI2(){
+        RestAPI api = new RestAPI("/empleados");
+        try{
+            api.openConnection();
+            Empleado[] empleados = api.receiveObject(Empleado[].class);
+            for(Empleado empleado : empleados){
+                System.out.println(empleado);
+            }
+            api.close();
+        }catch(IOException ex){
+        }
+
     }
 
     private static void probarRestAPI(){
@@ -65,17 +87,19 @@ public class PruebaClienteSpring {
                 URL githubEndpoint = new URL("http://192.168.1.100/api/empleados");
 
                 // Create connection
-                HttpURLConnection myConnection =
-                        (HttpURLConnection) githubEndpoint.openConnection();
-                if (myConnection.getResponseCode() == 200) {
+                HttpURLConnection conexion = (HttpURLConnection) githubEndpoint.openConnection();
+                conexion.setDoOutput(true);
+                conexion.setChunkedStreamingMode(128);
+
+                if (conexion.getResponseCode() == 200) {
                     // Success
                     // Further processing here
-                    InputStream responseBody = myConnection.getInputStream();
+                    InputStream responseBody = conexion.getInputStream();
                     InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
                     Gson gson = new Gson();
                     Empleado[] empleados = gson.fromJson(responseBodyReader, Empleado[].class);
                     for(Empleado e : empleados){
-                        System.out.println(e.nombre + " " + e.apellido + " " + e.sueldo);
+                        System.out.println(e);
                     }
                 } else {
                     // Error handling code goes here
@@ -100,5 +124,7 @@ public class PruebaClienteSpring {
 
         Gson gson = new Gson();
         client.send("/app/hello", gson.toJson(new Empleado("a", "b", 555), Empleado.class)).subscribe();
+
+
     }
 }
