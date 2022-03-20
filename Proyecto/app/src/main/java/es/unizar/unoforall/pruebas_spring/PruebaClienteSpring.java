@@ -72,19 +72,15 @@ public class PruebaClienteSpring {
 
     private static void probarRestAPI2(){
         AsyncTask.execute(() -> {
-            RestAPI api = new RestAPI("/api/empleados", false);
-            try{
-                api.openConnection();
-                Empleado[] empleados = api.receiveObject(Empleado[].class);
-                for(Empleado empleado : empleados){
-                    System.out.println(empleado);
-                }
-                api.close();
-            }catch(IOException ex){
-                Log.e("REST_API_ERROR_BEGIN", "");
-                ex.printStackTrace();
-                Log.e("REST_API_ERROR_END", "");
+            RestAPI api = new RestAPI("/api/empleados");
+            api.addParameter("param1", "valor1");
+            api.addParameter("param2", new Empleado("Pepe", "García", 5000));
+            api.openConnection();
+            Empleado[] empleados = api.receiveObject(Empleado[].class);
+            for(Empleado empleado : empleados){
+                System.out.println(empleado);
             }
+            api.close();
         });
     }
 

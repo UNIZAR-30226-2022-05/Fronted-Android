@@ -1,24 +1,30 @@
 package es.unizar.unoforall.api;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
-public class RestAPI {
+import com.google.gson.Gson;
+
+public class RestAPI{
     private static final String SERVER_IP = "http://192.168.1.100";
     private static final int HTTP_OK = 200;
     private static final int CONNECTION_TIMEOUT_MS = 3000;
 
+    private final Map<String, String> parameters;
     private String fullIP;
-    private boolean isPOST;
     private HttpURLConnection conexion;
     private boolean closed;
+    private Consumer<Exception> onError = ex -> {ex.printStackTrace(); close();};
 
     private Gson gson = null;
     private Gson getGson(){
@@ -28,40 +34,80 @@ public class RestAPI {
         return gson;
     }
 
-    public RestAPI(String seccion, boolean isPOST){
+    public RestAPI(String seccion){
+        parameters = new HashMap<>();
         fullIP = SERVER_IP + seccion;
-        this.isPOST = isPOST;
         conexion = null;
         closed = false;
     }
 
-    public void openConnection() throws IOException {
-        URL url = new URL(fullIP);
-        conexion = (HttpURLConnection) url.openConnection();
-        conexion.setConnectTimeout(CONNECTION_TIMEOUT_MS);
-        if(isPOST){
+    public void setOnError(Consumer<Exception> onError){
+        this.onError = onError;
+    }
+
+    public <T> void addParameter(String key, T value){
+        parameters.put(key, getGson().toJson(value));
+    }
+
+    private static String getDataString(Map<String, String> params) throws UnsupportedEncodingException{
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : params.entrySet()){
+            if (first)
+                first = false;
+            else
+                result.append("&");
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+        return result.toString();
+    }
+
+    public void openConnection(){
+        if(closed){
+            return;
+        }
+        try{
+            String data = getDataString(parameters);
+            System.out.println(data);
+
+            URL url = new URL(fullIP);
+            conexion = (HttpURLConnection) url.openConnection();
+            conexion.setRequestMethod( "POST" );
+            conexion.setConnectTimeout(CONNECTION_TIMEOUT_MS);
             conexion.setDoOutput(true);
-        }
-        conexion.setChunkedStreamingMode(128);
 
-        if(conexion.getResponseCode() != HTTP_OK){
-            conexion.disconnect();
-            throw new IOException(String.format("Obtained response code %d while connecting to %s",
-                    conexion.getResponseCode(),
-                    fullIP));
+            conexion.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            OutputStream output = conexion.getOutputStream();
+            OutputStreamWriter writer = new OutputStreamWriter(output, "UTF-8");
+            writer.write(data);
+            writer.flush();
+
+            if(conexion.getResponseCode() != HTTP_OK){
+                conexion.disconnect();
+                throw new IOException(String.format("Obtained response code %d while connecting to %s",
+                        conexion.getResponseCode(),
+                        fullIP));
+            }
+        }catch(IOException ex){
+            onError.accept(ex);
         }
     }
 
-    public <T> T receiveObject(Class<T> requestedClass) throws IOException {
-        InputStream responseBody = conexion.getInputStream();
-        InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
-        return getGson().fromJson(responseBodyReader, requestedClass);
-    }
-
-    public <T> void sendObject(T object) throws IOException {
-        OutputStream output = conexion.getOutputStream();
-        OutputStreamWriter writer = new OutputStreamWriter(output, "UTF-8");
-        writer.write(getGson().toJson(object));
+    public <T> T receiveObject(Class<T> requestedClass){
+        if(closed){
+            return null;
+        }
+        try {
+            InputStream responseBody = conexion.getInputStream();
+            InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
+            return getGson().fromJson(responseBodyReader, requestedClass);
+        }catch(IOException ex){
+            onError.accept(ex);
+            return null;
+        }
     }
 
     public void close(){
@@ -83,6 +129,7 @@ public class RestAPI {
         closed = true;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
