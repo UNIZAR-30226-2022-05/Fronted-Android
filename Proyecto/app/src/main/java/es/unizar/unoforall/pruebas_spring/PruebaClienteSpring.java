@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import es.unizar.unoforall.api.RestAPI;
+import es.unizar.unoforall.api.WebSocketAPI;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
@@ -61,23 +62,30 @@ public class PruebaClienteSpring {
         //          jcenter()
         //          maven { url "https://jitpack.io" }
 
+        // Las versiones 2 son versiones mejoradas con respecto a las originales
+
         //probarRestAPI();
         probarRestAPI2();
-        probarWebSockets();
+        //probarWebSockets();
+        probarWebSockets2();
     }
 
     private static void probarRestAPI2(){
-        RestAPI api = new RestAPI("/empleados");
-        try{
-            api.openConnection();
-            Empleado[] empleados = api.receiveObject(Empleado[].class);
-            for(Empleado empleado : empleados){
-                System.out.println(empleado);
+        AsyncTask.execute(() -> {
+            RestAPI api = new RestAPI("/api/empleados", false);
+            try{
+                api.openConnection();
+                Empleado[] empleados = api.receiveObject(Empleado[].class);
+                for(Empleado empleado : empleados){
+                    System.out.println(empleado);
+                }
+                api.close();
+            }catch(IOException ex){
+                Log.e("REST_API_ERROR_BEGIN", "");
+                ex.printStackTrace();
+                Log.e("REST_API_ERROR_END", "");
             }
-            api.close();
-        }catch(IOException ex){
-        }
-
+        });
     }
 
     private static void probarRestAPI(){
@@ -111,6 +119,20 @@ public class PruebaClienteSpring {
         });
     }
 
+
+    private static void probarWebSockets2(){
+        WebSocketAPI api = new WebSocketAPI();
+        api.setOnError((t, errorType) -> {
+            System.err.println("Se ha producido un error: " + errorType);
+            t.printStackTrace();
+        });
+        api.openConnection();
+        api.subscribe("/topic/greetings", Empleado.class, e -> {
+            System.out.println(e);
+            api.close();
+        });
+        api.sendObject("/app/hello", new Empleado("a", "b", 555));
+    }
     private static void probarWebSockets(){
         StompClient client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://192.168.1.100/gs-guide-websocket");
         client.connect();
@@ -124,7 +146,5 @@ public class PruebaClienteSpring {
 
         Gson gson = new Gson();
         client.send("/app/hello", gson.toJson(new Empleado("a", "b", 555), Empleado.class)).subscribe();
-
-
     }
 }
