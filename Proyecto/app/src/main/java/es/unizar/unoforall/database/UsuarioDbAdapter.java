@@ -56,7 +56,7 @@ public class UsuarioDbAdapter {
      *
      * @param correo El correo del usuario (distinto de null)
      * @param hashContrasenna El hash de la contraseña (distinto de null)
-     * @return El ID del nuevo producto o -1 si falla
+     * @return El ID del nuevo usuario o -1 si falla
      */
     public long createUsuario(String correo, String hashContrasenna) {
         Objects.requireNonNull(correo);
