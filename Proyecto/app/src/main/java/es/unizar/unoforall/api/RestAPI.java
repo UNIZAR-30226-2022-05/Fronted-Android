@@ -46,7 +46,11 @@ public class RestAPI{
     }
 
     public <T> void addParameter(String key, T value){
-        parameters.put(key, getGson().toJson(value));
+        if(value instanceof String){
+            parameters.put(key, (String) value);
+        }else{
+            parameters.put(key, getGson().toJson(value));
+        }
     }
 
     private static String getDataString(Map<String, String> params) throws UnsupportedEncodingException{
