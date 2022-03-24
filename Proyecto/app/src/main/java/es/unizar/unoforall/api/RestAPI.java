@@ -70,7 +70,6 @@ public class RestAPI{
         }
         try{
             String data = getDataString(parameters);
-            System.out.println(data);
 
             URL url = new URL(fullIP);
             conexion = (HttpURLConnection) url.openConnection();
