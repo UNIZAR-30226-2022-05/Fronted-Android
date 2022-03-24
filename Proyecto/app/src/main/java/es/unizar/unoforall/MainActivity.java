@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle(R.string.app_name);
-        PruebaClienteSpring.test();
 
         Button botonRegistro = (Button)findViewById(R.id.botonRegistro);
         Button botonLogin = (Button)findViewById(R.id.botonLogin);
