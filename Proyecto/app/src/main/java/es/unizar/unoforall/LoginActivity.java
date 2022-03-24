@@ -58,8 +58,8 @@ public class LoginActivity extends AppCompatActivity{
             setResult(RESULT_OK);
             //envio de los datos al servidor
             RestAPI api = new RestAPI("/api/login");
-            api.addParameter("Valor1", mail);
-            api.addParameter("Valor2", contrasennaHash);
+            api.addParameter("correo", mail);
+            api.addParameter("contrasenna", contrasennaHash);
             api.openConnection();
 
             //recepcion de los datos y actuar en consecuencia
