@@ -51,24 +51,26 @@ public class RegisterActivity extends AppCompatActivity{
             }
             //envio de los datos al servidor
 
-            RestAPI api = new RestAPI("/api/registerStepOne");
+            RestAPI api = new RestAPI(this, "/api/registerStepOne");
             api.addParameter("correo", mail);
             api.addParameter("contrasenna", contrasennaHash);
             api.addParameter("nombre", userName);
             api.openConnection();
-            //recepcion de los datos y actuar en consecuencia
 
-            String resp = api.receiveObject(String.class);
-            if (resp.equals(null)){
-                //Usuario registrado y cambiamos a la pantalla de confirmacion
-                Intent i = new Intent(this, ConfirmEmailActivity.class);
-                i.putExtra("correo", mail);
-                i.putExtra("contrasenna", contrasennaHash);
-                startActivity(i);
-            } else {
-                Toast.makeText(RegisterActivity.this, resp, Toast.LENGTH_SHORT).show();
-                return;
-            }
+            //recepcion de los datos y actuar en consecuencia
+            api.setOnObjectReceived(String.class, resp -> {
+                if (resp.equals(null)){
+                    //Usuario registrado y cambiamos a la pantalla de confirmacion
+                    Intent i = new Intent(this, ConfirmEmailActivity.class);
+                    i.putExtra("correo", mail);
+                    i.putExtra("contrasenna", contrasennaHash);
+                    startActivity(i);
+                } else {
+                    Toast.makeText(RegisterActivity.this, resp, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            });
+
             //finish();
         });
     }

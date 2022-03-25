@@ -1,5 +1,9 @@
 package es.unizar.unoforall.api;
 
+import android.app.Activity;
+import android.app.AsyncNotedAppOp;
+import android.os.AsyncTask;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +24,7 @@ public class RestAPI{
     private static final int HTTP_OK = 200;
     private static final int CONNECTION_TIMEOUT_MS = 3000;
 
+    private final Activity activity;
     private final Map<String, String> parameters;
     private String fullIP;
     private HttpURLConnection conexion;
@@ -34,7 +39,8 @@ public class RestAPI{
         return gson;
     }
 
-    public RestAPI(String seccion){
+    public RestAPI(Activity activity, String seccion){
+        this.activity = activity;
         parameters = new HashMap<>();
         fullIP = SERVER_IP + seccion;
         conexion = null;
@@ -69,67 +75,82 @@ public class RestAPI{
     }
 
     public void openConnection(){
-        if(closed){
-            return;
-        }
-        try{
-            String data = getDataString(parameters);
-
-            URL url = new URL(fullIP);
-            conexion = (HttpURLConnection) url.openConnection();
-            conexion.setRequestMethod( "POST" );
-            conexion.setConnectTimeout(CONNECTION_TIMEOUT_MS);
-            conexion.setDoOutput(true);
-
-            conexion.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-            OutputStream output = conexion.getOutputStream();
-            OutputStreamWriter writer = new OutputStreamWriter(output, "UTF-8");
-            writer.write(data);
-            writer.flush();
-
-            if(conexion.getResponseCode() != HTTP_OK){
-                conexion.disconnect();
-                throw new IOException(String.format("Obtained response code %d while connecting to %s",
-                        conexion.getResponseCode(),
-                        fullIP));
+        AsyncTask.execute(() -> {
+            if(closed){
+                return;
             }
-        }catch(IOException ex){
-            onError.accept(ex);
-        }
+            try{
+                String data = getDataString(parameters);
+
+                URL url = new URL(fullIP);
+                conexion = (HttpURLConnection) url.openConnection();
+                conexion.setRequestMethod( "POST" );
+                conexion.setConnectTimeout(CONNECTION_TIMEOUT_MS);
+                conexion.setDoOutput(true);
+
+                conexion.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+                OutputStream output = conexion.getOutputStream();
+                OutputStreamWriter writer = new OutputStreamWriter(output, "UTF-8");
+                writer.write(data);
+                writer.flush();
+
+                if(conexion.getResponseCode() != HTTP_OK){
+                    conexion.disconnect();
+                    throw new IOException(String.format("Obtained response code %d while connecting to %s",
+                            conexion.getResponseCode(),
+                            fullIP));
+                }
+            }catch(IOException ex){
+                onError.accept(ex);
+            }
+        });
     }
 
-    public <T> T receiveObject(Class<T> requestedClass){
-        if(closed){
-            return null;
-        }
-        try {
-            InputStream responseBody = conexion.getInputStream();
-            InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
-            return getGson().fromJson(responseBodyReader, requestedClass);
-        }catch(IOException ex){
-            onError.accept(ex);
-            return null;
-        }
+    public <T> void setOnObjectReceived(Class<T> requestedClass, Consumer<T> consumer){
+        setOnObjectReceived(requestedClass, consumer, true);
+    }
+    public <T> void setOnObjectReceived(Class<T> requestedClass, Consumer<T> consumer, boolean autoClose){
+        AsyncTask.execute(() -> {
+            if(closed){
+                return;
+            }
+            try {
+                InputStream responseBody = conexion.getInputStream();
+                InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
+                T dato = getGson().fromJson(responseBodyReader, requestedClass);
+                activity.runOnUiThread(() -> {
+                    consumer.accept(dato);
+                    if(autoClose){
+                        close();
+                    }
+                });
+            }catch(IOException ex){
+                onError.accept(ex);
+                return;
+            }
+        });
     }
 
     public void close(){
-        if(closed){
-            return;
-        }
+        AsyncTask.execute(() -> {
+            if(closed){
+                return;
+            }
 
-        try{
-            conexion.getInputStream().close();
-        }catch(Exception ex){}
-        try{
-            conexion.getOutputStream().close();
-        }catch(Exception ex){}
-        try{
-            conexion.disconnect();
-        }catch(Exception ex){}
+            try{
+                conexion.getInputStream().close();
+            }catch(Exception ex){}
+            try{
+                conexion.getOutputStream().close();
+            }catch(Exception ex){}
+            try{
+                conexion.disconnect();
+            }catch(Exception ex){}
 
-        gson = null;
-        closed = true;
+            gson = null;
+            closed = true;
+        });
     }
 
     @SuppressWarnings("deprecation")

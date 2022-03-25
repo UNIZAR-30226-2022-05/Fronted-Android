@@ -45,33 +45,32 @@ public class ConfirmEmailActivity extends AppCompatActivity {
             String email = this.getIntent().getStringExtra("correo");
             String contrasennaHash = this.getIntent().getStringExtra("contrasenna");
 
-            RestAPI api = new RestAPI("/api/registerStepTwo");
+            RestAPI api = new RestAPI(this, "/api/registerStepTwo");
             api.addParameter("correo", email);
             api.addParameter("codigo", codigo);
             api.openConnection();
 
             //recepcion de los datos y actuar en consecuencia
-            String resp = api.receiveObject(String.class);
-            if(resp.equals(null)){
-                mRowId = mDbHelper.createUsuario(email, contrasennaHash);
-            } else {
-                Toast.makeText(this, resp, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            api.close();
+            api.setOnObjectReceived(String.class, resp -> {
+                if(resp.equals(null)){
+                    mRowId = mDbHelper.createUsuario(email, contrasennaHash);
+                } else {
+                    Toast.makeText(this, resp, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            });
 
-            api = new RestAPI("/api/login");
+
+            api = new RestAPI(this, "/api/login");
             api.addParameter("correo", email);
             api.addParameter("contrasenna", contrasennaHash);
             api.openConnection();
 
-            RespuestaLogin sesion = api.receiveObject(RespuestaLogin.class);
-            //chequeo por si acaso
-            api.close();
-
-            Intent i = new Intent(this, PantallaPrincipalActivity.class);
-            i.putExtra("sesionID", sesion.sesionID);
-            startActivity(i);
+            api.setOnObjectReceived(RespuestaLogin.class, sesion -> {
+                Intent i = new Intent(this, PantallaPrincipalActivity.class);
+                i.putExtra("sesionID", sesion.sesionID);
+                startActivity(i);
+            });
         });
 
     }

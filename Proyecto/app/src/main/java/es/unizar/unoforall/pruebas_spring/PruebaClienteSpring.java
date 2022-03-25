@@ -71,7 +71,7 @@ public class PruebaClienteSpring {
     }
 
     private static void probarRestAPI2(){
-        AsyncTask.execute(() -> {
+        /*AsyncTask.execute(() -> {
             RestAPI api = new RestAPI("/api/empleados");
             api.addParameter("param1", "valor1");
             api.addParameter("param2", new Empleado("Pepe", "García", 5000));
@@ -81,7 +81,7 @@ public class PruebaClienteSpring {
                 System.out.println(empleado);
             }
             api.close();
-        });
+        });*/
     }
 
     private static void probarRestAPI(){

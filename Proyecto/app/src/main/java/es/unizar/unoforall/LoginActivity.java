@@ -47,25 +47,27 @@ public class LoginActivity extends AppCompatActivity{
         confirmLogin.setOnClickListener(view -> {
             setResult(RESULT_OK);
             //envio de los datos al servidor
-            RestAPI api = new RestAPI("/api/login");
+            RestAPI api = new RestAPI(this,"/api/login");
             api.addParameter("correo", mail);
             api.addParameter("contrasenna", contrasennaHash);
             api.openConnection();
 
             //recepcion de los datos y actuar en consecuencia
-            RespuestaLogin resp = api.receiveObject(RespuestaLogin.class);
-            if(resp.exito){
-                mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
+            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
+                if(resp.exito){
+                    mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
 
-                Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                i.putExtra("sesionID", resp.sesionID);
-                api.close();
-                startActivity(i);
+                    Intent i = new Intent(this, PantallaPrincipalActivity.class);
+                    i.putExtra("sesionID", resp.sesionID);
+                    api.close();
+                    startActivity(i);
 
-            } else {
-                Toast.makeText(LoginActivity.this, resp.errorInfo, Toast.LENGTH_SHORT).show();
-                return;
-            }
+                } else {
+                    Toast.makeText(LoginActivity.this, resp.errorInfo, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            });
+
             //finish();
         });
     }
