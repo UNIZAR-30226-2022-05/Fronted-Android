@@ -4,6 +4,7 @@ import static es.unizar.unoforall.utils.HashUtils.cifrarContrasenna;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
+import es.unizar.unoforall.modelo.RespuestaLogin;
 
 import java.util.UUID;
 
@@ -22,18 +24,6 @@ public class LoginActivity extends AppCompatActivity{
     private EditText passwordText;
     private UsuarioDbAdapter mDbHelper;
     private Long mRowId;
-
-    private class RespuestaLogin {
-        public boolean exito;
-        public String errorInfo;
-        public UUID sesionID;
-
-        public RespuestaLogin(boolean exito, String errorInfo, UUID sessionID) {
-            this.exito = exito;
-            this.errorInfo = errorInfo;
-            this.sesionID = sessionID;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +56,12 @@ public class LoginActivity extends AppCompatActivity{
             RespuestaLogin resp = api.receiveObject(RespuestaLogin.class);
             if(resp.exito){
                 mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
-                //satamos a la pantalla de menu principal del juego
+
+                Intent i = new Intent(this, PantallaPrincipalActivity.class);
+                i.putExtra("sesionID", resp.sesionID);
+                api.close();
+                startActivity(i);
+
             } else {
                 Toast.makeText(LoginActivity.this, resp.errorInfo, Toast.LENGTH_SHORT).show();
                 return;

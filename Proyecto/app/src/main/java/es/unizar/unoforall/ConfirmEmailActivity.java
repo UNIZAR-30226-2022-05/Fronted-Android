@@ -1,0 +1,78 @@
+package es.unizar.unoforall;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import es.unizar.unoforall.api.RestAPI;
+import es.unizar.unoforall.database.UsuarioDbAdapter;
+import es.unizar.unoforall.modelo.RespuestaLogin;
+
+public class ConfirmEmailActivity extends AppCompatActivity {
+
+    private EditText codigoEditText;
+    private UsuarioDbAdapter mDbHelper;
+    private Integer codigo;
+    private Long mRowId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_confirm_email);
+        setTitle(R.string.confirmarEmail);
+
+        mDbHelper = new UsuarioDbAdapter(this);
+        mDbHelper.open();
+
+        codigoEditText = (EditText) findViewById(R.id.codigoConfirmacion);
+
+        Button confirmCodigo = (Button) findViewById(R.id.confirmCode);
+
+        confirmCodigo.setOnClickListener(view -> {
+            setResult(RESULT_OK);
+            //recoleccion de datos
+            String codigoString = codigoEditText.getText().toString();
+            if(codigoString.length() == 6){
+                codigo = Integer.parseInt(codigoString);
+            } else {
+                Toast.makeText(this, "Codigo incorrecto" , Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String email = this.getIntent().getStringExtra("correo");
+            String contrasennaHash = this.getIntent().getStringExtra("contrasenna");
+
+            RestAPI api = new RestAPI("/api/registerStepTwo");
+            api.addParameter("correo", email);
+            api.addParameter("codigo", codigo);
+            api.openConnection();
+
+            //recepcion de los datos y actuar en consecuencia
+            String resp = api.receiveObject(String.class);
+            if(resp.equals(null)){
+                mRowId = mDbHelper.createUsuario(email, contrasennaHash);
+            } else {
+                Toast.makeText(this, resp, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            api.close();
+
+            api = new RestAPI("/api/login");
+            api.addParameter("correo", email);
+            api.addParameter("contrasenna", contrasennaHash);
+            api.openConnection();
+
+            RespuestaLogin sesion = api.receiveObject(RespuestaLogin.class);
+            //chequeo por si acaso
+            api.close();
+
+            Intent i = new Intent(this, PantallaPrincipalActivity.class);
+            i.putExtra("sesionID", sesion.sesionID);
+            startActivity(i);
+        });
+
+    }
+}
