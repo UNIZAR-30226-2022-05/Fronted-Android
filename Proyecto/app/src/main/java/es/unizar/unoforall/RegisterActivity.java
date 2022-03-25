@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import static es.unizar.unoforall.utils.HashUtils.cifrarContrasenna;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -28,10 +26,10 @@ public class RegisterActivity extends AppCompatActivity{
         setContentView(R.layout.register);
         setTitle(R.string.register);
 
-        userNameText = (EditText) findViewById(R.id.nombre);
-        mailText = (EditText) findViewById(R.id.correo);
-        passwordText = (EditText) findViewById(R.id.contrasenna);
-        passBisText = (EditText) findViewById(R.id.contrasennabis);
+        userNameText = (EditText) findViewById(R.id.nombreEditTextRegistro);
+        mailText = (EditText) findViewById(R.id.correoEditTextRegistro);
+        passwordText = (EditText) findViewById(R.id.contrasennaEditTextRegistro);
+        passBisText = (EditText) findViewById(R.id.contrasennabisEditTextRegistro);
 
         String userName = userNameText.getText().toString();
         String mail = mailText.getText().toString();
@@ -59,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity{
 
             //recepcion de los datos y actuar en consecuencia
             api.setOnObjectReceived(String.class, resp -> {
-                if (resp.equals(null)){
+                if (resp == null){
                     //Usuario registrado y cambiamos a la pantalla de confirmacion
                     Intent i = new Intent(this, ConfirmEmailActivity.class);
                     i.putExtra("correo", mail);

@@ -19,7 +19,7 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
 
         //Revisar esta conversion
         miSesionID = (UUID) this.getIntent().getSerializableExtra("sesionID");
-        Toast.makeText(this, "miSesionID", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "miSesionID: " + miSesionID, Toast.LENGTH_SHORT).show();
 
         Button vuelta = (Button) findViewById(R.id.volver);
 

@@ -16,7 +16,7 @@
             android:text="@string/nombre" />
 
         <EditText
-            android:id="@+id/nombre"
+            android:id="@+id/nombreEditTextRegistro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
@@ -34,7 +34,7 @@
             android:text="@string/correo" />
 
         <EditText
-            android:id="@+id/correo"
+            android:id="@+id/correoEditTextRegistro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
@@ -51,7 +51,7 @@
             android:text="@string/contrasegna" />
 
         <EditText
-            android:id="@+id/contrasenna"
+            android:id="@+id/contrasennaEditTextRegistro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -70,7 +70,7 @@
             android:text="@string/con_bis" />
 
         <EditText
-            android:id="@+id/contrasennabis"
+            android:id="@+id/contrasennabisEditTextRegistro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
