@@ -13,6 +13,9 @@
         android:theme="@style/Theme.UnoForAll"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".CrearSalaActivity"
+            android:exported="false" />
+        <activity
             android:name=".PantallaPrincipalActivity"
             android:exported="false" />
         <activity

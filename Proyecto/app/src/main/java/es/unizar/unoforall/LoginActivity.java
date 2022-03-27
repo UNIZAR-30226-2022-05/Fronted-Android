@@ -1,7 +1,5 @@
 package es.unizar.unoforall;
 
-import static es.unizar.unoforall.utils.HashUtils.cifrarContrasenna;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -12,7 +10,7 @@ import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
-import es.unizar.unoforall.modelo.RespuestaLogin;
+import es.unizar.unoforall.model.RespuestaLogin;
 
 public class LoginActivity extends AppCompatActivity{
 
@@ -49,15 +47,15 @@ public class LoginActivity extends AppCompatActivity{
 
             //recepcion de los datos y actuar en consecuencia
             api.setOnObjectReceived(RespuestaLogin.class, resp -> {
-                if(resp.exito){
+                if(resp.isExito()){
                     mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
 
                     Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                    i.putExtra("sesionID", resp.sesionID);
+                    i.putExtra("sesionID", resp.getSesionID());
                     startActivity(i);
 
                 } else {
-                    Toast.makeText(LoginActivity.this, resp.errorInfo, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
                     return;
                 }
             });

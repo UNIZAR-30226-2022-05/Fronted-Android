@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">UnoForAll</string>
+
     <string name="correo">Correo</string>
     <string name="contrasegna">Contraseña</string>
     <string name="login">Iniciar Sesión</string>
+
     <string name="nombre">Nombre de usuario</string>
     <string name="con_bis">Repite la contraseña</string>
     <string name="register">Registrarse</string>
@@ -10,4 +12,28 @@
     <string name="confirmarEmail">Confirmar Correo</string>
     <string name="mensajeConfirmar">Por favor introduzca el codigo que le ha llegado a su correo</string>
     <string name="codigo">Código</string>
+
+    <string name="crearSala">Crear Sala</string>
+    <string name="confirmarSala">Confirmar Sala</string>
+    <string name="participantes">Participantes</string>
+    <string name="dos">2</string>
+    <string name="tres">3</string>
+    <string name="cuatro">4</string>
+    <string name="publica">Publica</string>
+    <string name="esPublica">Pulsa para hacerla pública</string>
+    <string name="eleccionCartasEspeciales">Pulsa para añadir cartas especiales</string>
+    <string name="activarRayosX">RayosX</string>
+    <string name="activarIntercambio">Intercambio</string>
+    <string name="activarx2">x2</string>
+    <string name="elegirModoJuego">Elige un modo de juego</string>
+    <string-array name="modo_juego_array">
+        <item>Clásico</item>
+        <item>Attack</item>
+        <item>Por Parejas</item>
+    </string-array>
+    <string name="activarReglasEspeciales">Elige reglas adicionales</string>
+    <string name="activarEncadenar_2_4">Acumular efecto de +2 y +4</string>
+    <string name="activarRedirigir_2_4">Redirigir efecto de +2 y +4</string>
+    <string name="activarJugar_varias_cartas">Permite escalera y jugar varias del mismo número</string>
+    <string name="activarPenalizacion_4_color">Penaliza si última carta es +4 o cambio de color</string>
 </resources>

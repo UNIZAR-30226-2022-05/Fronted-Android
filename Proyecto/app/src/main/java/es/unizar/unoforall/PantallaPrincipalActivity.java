@@ -10,19 +10,26 @@ import android.widget.Toast;
 
 public class PantallaPrincipalActivity extends AppCompatActivity {
 
-    private UUID miSesionID;
+    private static UUID miSesionID;
+
+    public static UUID getMiSesionID(){
+        return miSesionID;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pantalla_principal);
 
-        //Revisar esta conversion
         miSesionID = (UUID) this.getIntent().getSerializableExtra("sesionID");
         Toast.makeText(this, "miSesionID: " + miSesionID, Toast.LENGTH_SHORT).show();
 
-        Button vuelta = (Button) findViewById(R.id.volver);
 
-        vuelta.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+        Button crearSalaButton = findViewById(R.id.crearSalaButton);
+        crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));
+    }
+
+    @Override
+    public void onBackPressed(){
     }
 }

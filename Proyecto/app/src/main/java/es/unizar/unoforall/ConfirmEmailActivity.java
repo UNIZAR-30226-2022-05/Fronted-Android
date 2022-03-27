@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
-import es.unizar.unoforall.modelo.RespuestaLogin;
+import es.unizar.unoforall.model.RespuestaLogin;
 
 public class ConfirmEmailActivity extends AppCompatActivity {
 
