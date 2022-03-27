@@ -19,7 +19,8 @@
             android:id="@+id/nombreEditTextRegistro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:singleLine="true" />
 
     </LinearLayout>
 
@@ -35,9 +36,10 @@
 
         <EditText
             android:id="@+id/correoEditTextRegistro"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:maxLines="1"
+            android:singleLine="true" />
     </LinearLayout>
 
     <LinearLayout
