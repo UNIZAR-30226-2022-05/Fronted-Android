@@ -33,7 +33,6 @@ public class ConfirmEmailActivity extends AppCompatActivity {
         Button confirmCodigo = (Button) findViewById(R.id.confirmCode);
 
         confirmCodigo.setOnClickListener(view -> {
-            setResult(RESULT_OK);
             //recoleccion de datos
             String codigoString = codigoEditText.getText().toString();
             if(codigoString.length() == 6){
@@ -52,7 +51,7 @@ public class ConfirmEmailActivity extends AppCompatActivity {
 
             //recepcion de los datos y actuar en consecuencia
             api.setOnObjectReceived(String.class, resp -> {
-                if(resp.equals(null)){
+                if(resp == null){
                     mRowId = mDbHelper.createUsuario(email, contrasennaHash);
                 } else {
                     Toast.makeText(this, resp, Toast.LENGTH_SHORT).show();
@@ -66,9 +65,9 @@ public class ConfirmEmailActivity extends AppCompatActivity {
             api.addParameter("contrasenna", contrasennaHash);
             api.openConnection();
 
-            api.setOnObjectReceived(RespuestaLogin.class, sesion -> {
+            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
                 Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                i.putExtra("sesionID", sesion.sesionID);
+                i.putExtra("sesionID", resp.getSesionID());
                 startActivity(i);
             });
         });

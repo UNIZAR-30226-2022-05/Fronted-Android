@@ -1,11 +1,16 @@
 package es.unizar.unoforall;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
@@ -28,11 +33,63 @@ public class LoginActivity extends AppCompatActivity{
         mDbHelper = new UsuarioDbAdapter(this);
         mDbHelper.open();
 
-        mailText = (EditText) findViewById(R.id.correoEditTextLogin);
-        passwordText = (EditText) findViewById(R.id.contrasennaEditTextLogin);
+        mailText = findViewById(R.id.correoEditTextLogin);
+        passwordText = findViewById(R.id.contrasennaEditTextLogin);
 
-        Button confirmLogin = (Button) findViewById(R.id.login);
+        ListView listaUsuarios = findViewById(R.id.listaUsuarios);
 
+        Cursor usuariosCursor = mDbHelper.listarUsuarios();
+        String[] from = new String[] { UsuarioDbAdapter.KEY_CORREO };
+        int[] to = new int[] { R.id.usuario };
+        SimpleCursorAdapter notes =
+                new SimpleCursorAdapter(this, R.layout.usuarios_row, usuariosCursor, from, to);
+        listaUsuarios.setAdapter(notes);
+
+        listaUsuarios.setOnItemClickListener((adapterView, view, pos, id) -> {
+            String correo = ((TextView) view).getText().toString();
+            Cursor cursor = mDbHelper.buscarUsuario(correo);
+            startManagingCursor(cursor);
+            String contrasennaHash = cursor.getString(2);
+
+            cursor.close();
+
+            RestAPI api = new RestAPI(this,"/api/login");
+            api.addParameter("correo", correo);
+            api.addParameter("contrasenna", contrasennaHash);
+            api.openConnection();
+
+            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
+                if(resp.isExito()){
+
+                    Intent i = new Intent(this, PantallaPrincipalActivity.class);
+                    i.putExtra("sesionID", resp.getSesionID());
+                    startActivity(i);
+
+                } else {
+                    Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            });
+        });
+
+        listaUsuarios.setOnItemLongClickListener((adapterView, view, pos, id) -> {
+            String correo = ((TextView) view).getText().toString();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Borrar usuario");
+            builder.setMessage("¿Quieres borrar al usuario " + correo + " ?");
+            builder.setPositiveButton("Aceptar", (dialog, which) ->  {
+                mDbHelper.deleteUsuario(correo);
+                listaUsuarios.removeViewAt(pos);
+                Toast.makeText(this, "El usuario " + correo + " ha sido borrado", Toast.LENGTH_SHORT).show();
+            });
+            builder.setNegativeButton("Cancelar", (dialog, which) -> {
+               dialog.dismiss();
+            });
+            builder.create().show();
+            return true;
+        });
+
+        Button confirmLogin = findViewById(R.id.login);
         confirmLogin.setOnClickListener(view -> {
             String mail = mailText.getText().toString();
             String contrasenna = passwordText.getText().toString();

@@ -2,8 +2,6 @@ package es.unizar.unoforall;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import static es.unizar.unoforall.utils.HashUtils.cifrarContrasenna;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -11,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
+import es.unizar.unoforall.utils.HashUtils;
 
 
 public class RegisterActivity extends AppCompatActivity{
@@ -31,23 +30,20 @@ public class RegisterActivity extends AppCompatActivity{
         passwordText = (EditText) findViewById(R.id.contrasennaEditTextRegistro);
         passBisText = (EditText) findViewById(R.id.contrasennabisEditTextRegistro);
 
-        String userName = userNameText.getText().toString();
-        String mail = mailText.getText().toString();
-
-        String contrasenna = passwordText.getText().toString();
-        String contrasennaHash = cifrarContrasenna(contrasenna);
-
         Button confirmRegister = (Button) findViewById(R.id.register);
 
         confirmRegister.setOnClickListener(view -> {
-            setResult(RESULT_OK);
+            String userName = userNameText.getText().toString();
+            String mail = mailText.getText().toString();
             String password = passwordText.getText().toString();
             String passBis = passBisText.getText().toString();
+
             if(!password.equals(passBis)){
                 Toast.makeText(RegisterActivity.this, getString(R.string.ErrorContrasegnas), Toast.LENGTH_SHORT).show();
                 return;
             }
             //envio de los datos al servidor
+            String contrasennaHash = HashUtils.cifrarContrasenna(password);
 
             RestAPI api = new RestAPI(this, "/api/registerStepOne");
             api.addParameter("correo", mail);

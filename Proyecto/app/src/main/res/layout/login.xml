@@ -51,4 +51,10 @@
         android:textColor="@color/white"
         app:rippleColor="#1A2351" />
 
+    <ListView
+        android:id="@+id/listaUsuarios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
 </LinearLayout>
