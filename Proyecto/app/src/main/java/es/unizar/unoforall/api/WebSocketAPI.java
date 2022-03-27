@@ -1,13 +1,10 @@
 package es.unizar.unoforall.api;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;

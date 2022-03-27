@@ -132,7 +132,7 @@ public class UsuarioDbAdapter {
      */
     public Cursor buscarUsuario(String correo) throws SQLException {
         Cursor cursor = miDb.query(true, DATABASE_TABLE, null,
-                KEY_CORREO + "=" + correo,
+                KEY_CORREO + "=" + "'" + correo + "'",
                 null,
                 null,
                 null,

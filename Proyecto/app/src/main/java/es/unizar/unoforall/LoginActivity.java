@@ -51,8 +51,6 @@ public class LoginActivity extends AppCompatActivity{
             startManagingCursor(cursor);
             String contrasennaHash = cursor.getString(2);
 
-            cursor.close();
-
             RestAPI api = new RestAPI(this,"/api/login");
             api.addParameter("correo", correo);
             api.addParameter("contrasenna", contrasennaHash);

@@ -2,6 +2,7 @@ package es.unizar.unoforall;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -90,14 +91,14 @@ public class CrearSalaActivity extends AppCompatActivity {
             api.addParameter("configuracion", configSala);
             api.openConnection();
 
-            api.setOnObjectReceived(UUID.class, idSala -> {
-                Toast.makeText(this, "idSala: " + idSala, Toast.LENGTH_SHORT).show();
-            });
+            api.setOnObjectReceived(UUID.class, idSala ->
+                Toast.makeText(this, "idSala: " + idSala, Toast.LENGTH_SHORT).show());
             //Ir a la pantalla de vista de sala
         });
 
     }
 
+    @SuppressLint("NonConstantResourceId")
     public void onRadioButtonClicked(View view) {
         boolean checked = ((RadioButton) view).isChecked();
 
