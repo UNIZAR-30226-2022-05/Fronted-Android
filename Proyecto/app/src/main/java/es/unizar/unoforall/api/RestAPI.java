@@ -1,12 +1,10 @@
 package es.unizar.unoforall.api;
 
 import android.app.Activity;
-import android.app.AsyncNotedAppOp;
 import android.os.AsyncTask;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -16,8 +14,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import com.google.gson.Gson;
 
 public class RestAPI{
     private static final String SERVER_IP = "http://192.168.1.100";
@@ -30,14 +26,6 @@ public class RestAPI{
     private HttpURLConnection conexion;
     private boolean closed;
     private Consumer<Exception> onError = ex -> {ex.printStackTrace(); close();};
-
-    private Gson gson = null;
-    private Gson getGson(){
-        if(gson == null){
-            gson = new Gson();
-        }
-        return gson;
-    }
 
     public RestAPI(Activity activity, String seccion){
         this.activity = activity;
@@ -55,7 +43,7 @@ public class RestAPI{
         if(value instanceof String){
             parameters.put(key, (String) value);
         }else{
-            parameters.put(key, getGson().toJson(value));
+            parameters.put(key, Serializar.serializar(value));
         }
     }
 
@@ -101,7 +89,7 @@ public class RestAPI{
                             conexion.getResponseCode(),
                             fullIP));
                 }
-            }catch(IOException ex){
+            }catch(Exception ex){
                 onError.accept(ex);
             }
         });
@@ -117,17 +105,15 @@ public class RestAPI{
             }
             try {
                 InputStream responseBody = conexion.getInputStream();
-                InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
-                T dato = getGson().fromJson(responseBodyReader, requestedClass);
+                T dato = Serializar.deserializar(responseBody, requestedClass);
                 activity.runOnUiThread(() -> {
                     consumer.accept(dato);
                     if(autoClose){
                         close();
                     }
                 });
-            }catch(IOException ex){
+            }catch(Exception ex){
                 onError.accept(ex);
-                return;
             }
         });
     }
@@ -148,7 +134,6 @@ public class RestAPI{
                 conexion.disconnect();
             }catch(Exception ex){}
 
-            gson = null;
             closed = true;
         });
     }

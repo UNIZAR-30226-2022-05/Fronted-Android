@@ -1,7 +1,5 @@
 package es.unizar.unoforall.api;
 
-import com.google.gson.Gson;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -33,20 +31,12 @@ public class WebSocketAPI {
         this.onError = onError;
     }
 
-    private Gson gson = null;
-    private Gson getGson(){
-        if(gson == null){
-            gson = new Gson();
-        }
-        return gson;
-    }
-
     public WebSocketAPI(){
         suscripciones = new HashMap<>();
         compositeDisposable = new CompositeDisposable();
         client = null;
         closed = false;
-        onError = (t, i) -> t.printStackTrace();
+        onError = (t, i) -> {t.printStackTrace(); close();};
     }
 
     public void openConnection(){
@@ -64,7 +54,7 @@ public class WebSocketAPI {
     public <T> void subscribe(String topic, Class<T> expectedClass, Consumer<T> consumer){
         Disposable suscripcion = client.topic(topic).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(topicMessage -> {
-            T t = getGson().fromJson(topicMessage.getPayload(), expectedClass);
+            T t = Serializar.deserializar(topicMessage.getPayload(), expectedClass);
             consumer.accept(t);
         }, t -> onError.accept(t, SUBSCRIPTION_ERROR));
         suscripciones.put(topic, suscripcion);
@@ -79,7 +69,8 @@ public class WebSocketAPI {
     }
 
     public <T> void sendObject(String seccion, T object){
-        client.send(seccion, getGson().toJson(object)).subscribe(() -> {}, t -> onError.accept(t, GLOBAL_ERROR));
+        client.send(seccion, Serializar.serializar(object))
+                .subscribe(() -> {}, t -> onError.accept(t, GLOBAL_ERROR));
     }
 
     public void close(){
@@ -89,7 +80,6 @@ public class WebSocketAPI {
 
         client.disconnect();
         compositeDisposable.dispose();
-        gson = null;
         closed = true;
     }
 
