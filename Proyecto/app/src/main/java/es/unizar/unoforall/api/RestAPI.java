@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class RestAPI{
-    private static final String SERVER_IP = "http://192.168.1.100";
+    private static final String SERVER_IP = "http://192.168.1.133";
     private static final int HTTP_OK = 200;
     private static final int CONNECTION_TIMEOUT_MS = 3000;
 

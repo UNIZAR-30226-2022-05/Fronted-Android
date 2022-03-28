@@ -19,6 +19,7 @@ import es.unizar.unoforall.model.RespuestaLogin;
 
 public class LoginActivity extends AppCompatActivity{
 
+    private TextView linkText;
     private EditText mailText;
     private EditText passwordText;
     private UsuarioDbAdapter mDbHelper;
@@ -86,6 +87,9 @@ public class LoginActivity extends AppCompatActivity{
             builder.create().show();
             return true;
         });
+
+        linkText = findViewById(R.id.textoMarcableLogin);
+        linkText.setOnClickListener(v -> startActivity(new Intent(this, RecuperarContrasennaActivity.class)));
 
         Button confirmLogin = findViewById(R.id.login);
         confirmLogin.setOnClickListener(view -> {
