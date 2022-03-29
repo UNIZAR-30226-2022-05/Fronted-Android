@@ -104,6 +104,14 @@ public class UsuarioDbAdapter {
     }
 
     /**
+     * Devuelve el número de usuarios presentes en la base de datos
+     * @return El número de usuarios
+     */
+    public int getNumUsuarios() {
+        return listarUsuarios().getCount();
+    }
+
+    /**
      * Devuelve un cursor apuntando al usuario con un ID concreto
      *
      * @param idUsuario ID del usuario a buscar
