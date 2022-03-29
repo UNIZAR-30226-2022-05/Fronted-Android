@@ -117,7 +117,7 @@ public class PruebaClienteSpring {
 
 
     private static void probarWebSockets2(){
-        WebSocketAPI api = new WebSocketAPI();
+        WebSocketAPI api = new WebSocketAPI(null);
         api.setOnError((t, errorType) -> {
             System.err.println("Se ha producido un error: " + errorType);
             t.printStackTrace();

@@ -38,7 +38,8 @@ public class RestAPI{
         this.onError = ex -> {
             ex.printStackTrace();
             close();
-            Toast.makeText(activity, "RestAPI: Se ha producido un error de conexión", Toast.LENGTH_LONG).show();
+            activity.runOnUiThread(() ->
+                    Toast.makeText(activity, "RestAPI: Se ha producido un error de conexión", Toast.LENGTH_LONG).show());
         };
     }
 
