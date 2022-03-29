@@ -1,6 +1,7 @@
 package es.unizar.unoforall.utils;
 
 import android.app.Activity;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.widget.EditText;
 
@@ -12,12 +13,15 @@ import es.unizar.unoforall.R;
 //Fuente: https://stackoverflow.com/a/29048271
 
 public class CodeConfirmDialogBuilder {
-    private EditText codeEditText;
-    private AlertDialog.Builder builder;
+    private static final int MAX_CODE_LENGTH = 6;
+
+    private final EditText codeEditText;
+    private final AlertDialog.Builder builder;
 
     public CodeConfirmDialogBuilder(Activity activity){
         this.codeEditText = new EditText(activity);
         this.codeEditText.setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
+        this.codeEditText.setFilters(new InputFilter[] { new InputFilter.LengthFilter(MAX_CODE_LENGTH) });
 
         this.builder = new AlertDialog.Builder(activity);
         this.builder.setTitle("Confirmación de código");
