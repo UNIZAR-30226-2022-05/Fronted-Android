@@ -9,30 +9,16 @@ public class ConfigSala {
 	private int maxParticipantes;
 	private boolean esPublica;
 	
+	public ConfigSala() {
+		
+	}
+	
 	public ConfigSala(ModoJuego modoJuego, ReglasEspeciales reglas, 
 			int maxParticipantes, boolean esPublica) {
 		super();
 		this.modoJuego = modoJuego;
 		this.reglas = reglas;
 		this.maxParticipantes = maxParticipantes;
-		this.esPublica = esPublica;
-	}
-
-	public ConfigSala() {}
-
-	public void setModoJuego(ModoJuego modoJuego) {
-		this.modoJuego = modoJuego;
-	}
-
-	public void setReglas(ReglasEspeciales reglas) {
-		this.reglas = reglas;
-	}
-
-	public void setMaxParticipantes(int maxParticipantes) {
-		this.maxParticipantes = maxParticipantes;
-	}
-
-	public void setEsPublica(boolean esPublica) {
 		this.esPublica = esPublica;
 	}
 

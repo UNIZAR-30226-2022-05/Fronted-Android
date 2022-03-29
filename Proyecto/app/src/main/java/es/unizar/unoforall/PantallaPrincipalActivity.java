@@ -8,7 +8,11 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 
+import es.unizar.unoforall.api.WebSocketAPI;
+
 public class PantallaPrincipalActivity extends AppCompatActivity {
+
+    private static WebSocketAPI wsAPI;
 
     private static UUID miSesionID;
 

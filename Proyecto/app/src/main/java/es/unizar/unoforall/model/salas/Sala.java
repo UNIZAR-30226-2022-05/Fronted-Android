@@ -7,6 +7,9 @@ import java.util.UUID;
 import es.unizar.unoforall.model.UsuarioVO;
 
 public class Sala {	
+	//Para devolver una sala que no existe
+	private boolean noExiste;
+	
 	private ConfigSala configuracion;
 	
 	private boolean enPartida;
@@ -16,14 +19,17 @@ public class Sala {
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantes_listos;
 	
-	
-	public Sala(ConfigSala configuracion) {
-		super();
-		this.configuracion = configuracion;
-		this.setEnPartida(false);
-		
+	public Sala() {
 		participantes = new HashMap<>();
 		participantes_listos = new HashMap<>();
+		noExiste = true;
+	}
+	
+	public Sala(ConfigSala configuracion) {
+		this();
+		this.configuracion = configuracion;
+		this.setEnPartida(false);
+		this.noExiste = false;
 	}
 
 	public ConfigSala getConfiguracion() {
@@ -61,6 +67,15 @@ public class Sala {
 		}
 	}
 	
+	// Devuelve un hashmap con el  usuarioID - UsuarioVO
+	public boolean hayParticipante(UUID usuarioID) {
+		if (participantes.containsKey(usuarioID)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	// Devuelve un hashmap con el VO de cada usuario relacionado con si está o no preparado
 	public HashMap<UsuarioVO, Boolean> getParticipantes() {
 		HashMap<UsuarioVO, Boolean> result = new HashMap<>();
@@ -74,11 +89,11 @@ public class Sala {
 	
 	public boolean puedeUnirse() {
 		if (getConfiguracion().isEsPublica()
-				|| numParticipantes() == getConfiguracion().getMaxParticipantes() 
-				|| isEnPartida()) {
-			return false;
-		} else {
+				&& numParticipantes() < getConfiguracion().getMaxParticipantes() 
+				&& !isEnPartida()) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -87,5 +102,9 @@ public class Sala {
 	public String toString() {
 		return "Sala [configuracion=" + configuracion + ", enPartida=" + enPartida + ", participantes=" + participantes
 				+ "]";
+	}
+
+	public boolean isNoExiste() {
+		return noExiste;
 	}
 }

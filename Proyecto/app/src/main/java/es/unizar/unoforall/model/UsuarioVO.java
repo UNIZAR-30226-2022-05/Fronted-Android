@@ -8,7 +8,7 @@ import java.util.UUID;
  * 
  */
 public class UsuarioVO {	
-	private final UUID id;
+	private UUID id;
 	private String correo;
 	private String nombre;
 	private String contrasenna;
@@ -16,6 +16,9 @@ public class UsuarioVO {
 	private int totalPartidas;
 	private int numVictorias;
 	
+	public UsuarioVO() {
+		
+	}
 	
 	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna, int puntos, int totalPartidas, int numVictorias) {
 		if(id == null) {
@@ -30,8 +33,11 @@ public class UsuarioVO {
 		this.numVictorias = numVictorias;
 	}
 	
-	public UsuarioVO(String correo, String nombre, String contrasenna) {
-		this.id = UUID.randomUUID();
+	public UsuarioVO(UUID id, String correo, String nombre, String contrasenna) {
+		if(id == null) {
+			id = UUID.randomUUID();
+		}
+		this.id = id;
 		this.correo = correo;
 		this.nombre = nombre;
 		this.contrasenna = contrasenna;
