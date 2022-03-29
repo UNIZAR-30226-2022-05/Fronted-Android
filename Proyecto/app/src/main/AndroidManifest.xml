@@ -14,7 +14,7 @@
         android:theme="@style/Theme.UnoForAll"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ReestablecerContrasennaActivity"
+            android:name=".RestablecerContrasennaActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".CrearSalaActivity"

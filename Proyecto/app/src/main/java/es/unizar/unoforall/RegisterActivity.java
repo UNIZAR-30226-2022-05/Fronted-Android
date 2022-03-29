@@ -62,7 +62,6 @@ public class RegisterActivity extends AppCompatActivity{
                     startActivity(i);
                 } else {
                     Toast.makeText(RegisterActivity.this, resp, Toast.LENGTH_SHORT).show();
-                    return;
                 }
             });
 

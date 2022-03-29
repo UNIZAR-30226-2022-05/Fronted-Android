@@ -85,7 +85,7 @@ public class UsuarioDbAdapter {
      * @return true si se ha eliminado correctamente y false en caso contrario
      */
     public boolean deleteUsuario(String correo) {
-        return miDb.delete(DATABASE_TABLE, KEY_CORREO + "=" + correo, null) > 0;
+        return miDb.delete(DATABASE_TABLE, KEY_CORREO + "=" + "'" + correo + "'", null) > 0;
     }
 
     /**

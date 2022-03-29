@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Salir de UnoForAll");
         builder.setMessage("¿Quieres salir de UnoForAll?");
         builder.setPositiveButton("Sí", (dialog, which) -> {
-            System.exit(0);
+            finish();
         });
         builder.setNegativeButton("No", (dialog, which) -> {
            dialog.dismiss();

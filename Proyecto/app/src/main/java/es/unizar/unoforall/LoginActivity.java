@@ -24,7 +24,7 @@ import es.unizar.unoforall.utils.Vibration;
 
 public class LoginActivity extends AppCompatActivity{
 
-    private TextView linkText;
+    private ListView listaUsuarios;
     private EditText mailText;
     private EditText passwordText;
     private UsuarioDbAdapter mDbHelper;
@@ -42,8 +42,8 @@ public class LoginActivity extends AppCompatActivity{
         mailText = findViewById(R.id.correoEditTextLogin);
         passwordText = findViewById(R.id.contrasennaEditTextLogin);
 
-        linkText = findViewById(R.id.textoMarcableLogin);
-        linkText.setOnClickListener(v -> startActivity(new Intent(this, ReestablecerContrasennaActivity.class)));
+        TextView linkText = findViewById(R.id.textoMarcableLogin);
+        linkText.setOnClickListener(v -> startActivity(new Intent(this, RestablecerContrasennaActivity.class)));
         linkText.setOnTouchListener((view, event) -> {
             switch(event.getAction()){
                 case MotionEvent.ACTION_DOWN:
@@ -89,13 +89,8 @@ public class LoginActivity extends AppCompatActivity{
             return;
         }
 
-        ListView listaUsuarios = findViewById(R.id.listaUsuarios);
-        Cursor usuariosCursor = mDbHelper.listarUsuarios();
-        String[] from = new String[] { UsuarioDbAdapter.KEY_CORREO };
-        int[] to = new int[] { R.id.usuario };
-        SimpleCursorAdapter notes =
-                new SimpleCursorAdapter(this, R.layout.usuarios_row, usuariosCursor, from, to);
-        listaUsuarios.setAdapter(notes);
+        listaUsuarios = findViewById(R.id.listaUsuarios);
+        filldata();
 
         listaUsuarios.setOnItemClickListener((adapterView, view, pos, id) -> {
             Vibration.vibrate(this, 40);
@@ -130,7 +125,7 @@ public class LoginActivity extends AppCompatActivity{
             builder.setMessage("¿Quieres borrar al usuario " + correo + " ?");
             builder.setPositiveButton("Aceptar", (dialog, which) ->  {
                 mDbHelper.deleteUsuario(correo);
-                listaUsuarios.removeViewAt(pos);
+                filldata();
                 Toast.makeText(this, "El usuario " + correo + " ha sido borrado", Toast.LENGTH_SHORT).show();
             });
             builder.setNegativeButton("Cancelar", (dialog, which) -> {
@@ -139,5 +134,14 @@ public class LoginActivity extends AppCompatActivity{
             builder.create().show();
             return true;
         });
+    }
+
+    private void filldata(){
+        Cursor usuariosCursor = mDbHelper.listarUsuarios();
+        String[] from = new String[] { UsuarioDbAdapter.KEY_CORREO };
+        int[] to = new int[] { R.id.usuario };
+        SimpleCursorAdapter usuariosAdapter =
+                new SimpleCursorAdapter(this, R.layout.usuarios_row, usuariosCursor, from, to);
+        listaUsuarios.setAdapter(usuariosAdapter);
     }
 }

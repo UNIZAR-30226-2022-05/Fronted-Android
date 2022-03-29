@@ -44,8 +44,8 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         builder.setPositiveButton("Sí", (dialog, which) -> {
             //wsAPI.close();
             Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-            finish();
         });
         builder.setNegativeButton("No", (dialog, which) -> {
             dialog.dismiss();

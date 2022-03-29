@@ -9,16 +9,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
-import es.unizar.unoforall.model.RespuestaLogin;
 
-public class ReestablecerContrasennaActivity extends AppCompatActivity {
+public class RestablecerContrasennaActivity extends AppCompatActivity {
 
     private EditText emailConfirmarText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recuperar_contrasenna);
+        setContentView(R.layout.activity_restablecer_contrasenna);
         setTitle(R.string.recuperarContraseña);
 
         emailConfirmarText = findViewById(R.id.correoConfirmacion);
@@ -38,7 +37,6 @@ public class ReestablecerContrasennaActivity extends AppCompatActivity {
 
                 } else {
                     Toast.makeText(this, resp, Toast.LENGTH_SHORT).show();
-                    return;
                 }
             });
         });

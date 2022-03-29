@@ -39,7 +39,7 @@
             android:id="@+id/correoEditTextRegistro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailSubject"
+            android:inputType="textEmailAddress"
             android:singleLine="true" />
     </LinearLayout>
 
