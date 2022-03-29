@@ -16,6 +16,7 @@ import android.widget.Toast;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
+import es.unizar.unoforall.utils.Vibration;
 
 public class LoginActivity extends AppCompatActivity{
 
@@ -28,7 +29,7 @@ public class LoginActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
+        setContentView(R.layout.activity_login);
         setTitle(R.string.login);
 
         mDbHelper = new UsuarioDbAdapter(this);
@@ -47,6 +48,8 @@ public class LoginActivity extends AppCompatActivity{
         listaUsuarios.setAdapter(notes);
 
         listaUsuarios.setOnItemClickListener((adapterView, view, pos, id) -> {
+            Vibration.vibrate(this, 40);
+
             String correo = ((TextView) view).getText().toString();
             Cursor cursor = mDbHelper.buscarUsuario(correo);
             startManagingCursor(cursor);
@@ -72,6 +75,8 @@ public class LoginActivity extends AppCompatActivity{
         });
 
         listaUsuarios.setOnItemLongClickListener((adapterView, view, pos, id) -> {
+            Vibration.vibrate(this, 100);
+
             String correo = ((TextView) view).getText().toString();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Borrar usuario");
