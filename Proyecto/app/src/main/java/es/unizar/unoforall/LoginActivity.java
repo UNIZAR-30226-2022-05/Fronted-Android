@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -39,8 +40,43 @@ public class LoginActivity extends AppCompatActivity{
         mailText = findViewById(R.id.correoEditTextLogin);
         passwordText = findViewById(R.id.contrasennaEditTextLogin);
 
-        ListView listaUsuarios = findViewById(R.id.listaUsuarios);
+        linkText = findViewById(R.id.textoMarcableLogin);
+        linkText.setOnClickListener(v -> startActivity(new Intent(this, ReestablecerContrasennaActivity.class)));
 
+        Button confirmLogin = findViewById(R.id.login);
+        confirmLogin.setOnClickListener(view -> {
+            String mail = mailText.getText().toString();
+            String contrasenna = passwordText.getText().toString();
+            String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
+
+            //envio de los datos al servidor
+            RestAPI api = new RestAPI(this,"/api/login");
+            api.addParameter("correo", mail);
+            api.addParameter("contrasenna", contrasennaHash);
+            api.openConnection();
+
+            //recepcion de los datos y actuar en consecuencia
+            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
+                if(resp.isExito()){
+                    mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
+
+                    Intent i = new Intent(this, PantallaPrincipalActivity.class);
+                    i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, resp.getClaveInicio());
+                    startActivity(i);
+
+                } else {
+                    Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        if(mDbHelper.getNumUsuarios() <= 0){
+            TextView tituloListaUsuarios = findViewById(R.id.textViewTituloListaUsuarios);
+            tituloListaUsuarios.setVisibility(View.GONE);
+            return;
+        }
+
+        ListView listaUsuarios = findViewById(R.id.listaUsuarios);
         Cursor usuariosCursor = mDbHelper.listarUsuarios();
         String[] from = new String[] { UsuarioDbAdapter.KEY_CORREO };
         int[] to = new int[] { R.id.usuario };
@@ -89,36 +125,6 @@ public class LoginActivity extends AppCompatActivity{
             });
             builder.create().show();
             return true;
-        });
-
-        linkText = findViewById(R.id.textoMarcableLogin);
-        linkText.setOnClickListener(v -> startActivity(new Intent(this, RecuperarContrasennaActivity.class)));
-
-        Button confirmLogin = findViewById(R.id.login);
-        confirmLogin.setOnClickListener(view -> {
-            String mail = mailText.getText().toString();
-            String contrasenna = passwordText.getText().toString();
-            String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
-
-            //envio de los datos al servidor
-            RestAPI api = new RestAPI(this,"/api/login");
-            api.addParameter("correo", mail);
-            api.addParameter("contrasenna", contrasennaHash);
-            api.openConnection();
-
-            //recepcion de los datos y actuar en consecuencia
-            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
-                if(resp.isExito()){
-                    mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
-
-                    Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                    i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, resp.getClaveInicio());
-                    startActivity(i);
-
-                } else {
-                    Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
-                }
-            });
         });
     }
 }
