@@ -16,6 +16,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
@@ -25,8 +26,8 @@ import es.unizar.unoforall.utils.Vibration;
 public class LoginActivity extends AppCompatActivity{
 
     private ListView listaUsuarios;
-    private EditText mailText;
-    private EditText passwordText;
+    private EditText correoEditText;
+    private EditText contrasennaEditText;
     private UsuarioDbAdapter mDbHelper;
     private Long mRowId;
 
@@ -39,8 +40,8 @@ public class LoginActivity extends AppCompatActivity{
         mDbHelper = new UsuarioDbAdapter(this);
         mDbHelper.open();
 
-        mailText = findViewById(R.id.correoEditTextLogin);
-        passwordText = findViewById(R.id.contrasennaEditTextLogin);
+        correoEditText = findViewById(R.id.correoEditTextLogin);
+        contrasennaEditText = findViewById(R.id.contrasennaEditTextLogin);
 
         TextView linkText = findViewById(R.id.textoMarcableLogin);
         linkText.setOnClickListener(v -> startActivity(new Intent(this, RestablecerContrasennaActivity.class)));
@@ -58,29 +59,12 @@ public class LoginActivity extends AppCompatActivity{
 
         Button confirmLogin = findViewById(R.id.login);
         confirmLogin.setOnClickListener(view -> {
-            String mail = mailText.getText().toString();
-            String contrasenna = passwordText.getText().toString();
-            String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
+            String correo = correoEditText.getText().toString();
+            String contrasenna = contrasennaEditText.getText().toString();
 
             //envio de los datos al servidor
-            RestAPI api = new RestAPI(this,"/api/login");
-            api.addParameter("correo", mail);
-            api.addParameter("contrasenna", contrasennaHash);
-            api.openConnection();
-
-            //recepcion de los datos y actuar en consecuencia
-            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
-                if(resp.isExito()){
-                    mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
-
-                    Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                    i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, resp.getClaveInicio());
-                    startActivity(i);
-
-                } else {
-                    Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
-                }
-            });
+            BackendAPI api = new BackendAPI(this);
+            api.login(correo, HashUtils.cifrarContrasenna(contrasenna));
         });
 
         if(mDbHelper.getNumUsuarios() <= 0){
@@ -97,23 +81,10 @@ public class LoginActivity extends AppCompatActivity{
 
             String correo = ((TextView) view).getText().toString();
             Cursor cursor = mDbHelper.buscarUsuario(correo);
-            startManagingCursor(cursor);
             String contrasennaHash = cursor.getString(2);
 
-            RestAPI api = new RestAPI(this,"/api/login");
-            api.addParameter("correo", correo);
-            api.addParameter("contrasenna", contrasennaHash);
-            api.openConnection();
-
-            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
-                if(resp.isExito()){
-                    Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                    i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, resp.getClaveInicio());
-                    startActivity(i);
-                } else {
-                    Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
-                }
-            });
+            BackendAPI api = new BackendAPI(this);
+            api.login(correo, contrasennaHash);
         });
 
         listaUsuarios.setOnItemLongClickListener((adapterView, view, pos, id) -> {

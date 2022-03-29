@@ -21,21 +21,41 @@ public class Serializar {
         if(DEBUG){
             Log.d("Mensaje recibido", mensaje);
         }
-        return new Gson().fromJson(mensaje, expectedClass);
+
+        if(expectedClass.equals(String.class)){
+            if(mensaje.equals("null")){
+                return expectedClass.cast(null);
+            }else{
+                return expectedClass.cast(mensaje);
+            }
+        }else{
+            return new Gson().fromJson(mensaje, expectedClass);
+        }
     }
 
     public static <T> T deserializar(InputStream inputStream, Class<T> expectedClass) throws IOException {
         InputStreamReader responseReader;
-        if(DEBUG){
-            StringBuilder message = new StringBuilder();
+        if(DEBUG || expectedClass.equals(String.class)){
+            StringBuilder mensajeBuilder = new StringBuilder();
             byte[] buffer = new byte[1024];
             int bytesReaded;
             while((bytesReaded = inputStream.read(buffer)) > 0){
-                message.append(new String(buffer, 0, bytesReaded));
+                mensajeBuilder.append(new String(buffer, 0, bytesReaded));
             }
 
-            Log.d("Mensaje recibido", message.toString());
-            ByteArrayInputStream bais = new ByteArrayInputStream(message.toString().getBytes(StandardCharsets.UTF_8));
+            String mensaje = mensajeBuilder.toString();
+            if(DEBUG){
+                Log.d("Mensaje recibido", mensaje);
+            }
+            if(expectedClass.equals(String.class)){
+                if(mensaje.equals("null")){
+                    return expectedClass.cast(null);
+                }else{
+                    return expectedClass.cast(mensaje);
+                }
+            }
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(mensaje.getBytes(StandardCharsets.UTF_8));
             responseReader = new InputStreamReader(bais);
         }else{
             responseReader = new InputStreamReader(inputStream);

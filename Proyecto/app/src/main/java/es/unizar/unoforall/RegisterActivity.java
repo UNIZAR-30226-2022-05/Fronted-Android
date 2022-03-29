@@ -2,23 +2,29 @@ package es.unizar.unoforall;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
+import es.unizar.unoforall.api.Serializar;
 import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 
 
 public class RegisterActivity extends AppCompatActivity{
 
-    private EditText userNameText;
-    private EditText mailText;
-    private EditText passwordText;
-    private EditText passBisText;
+    private EditText nombreUsuarioEditText;
+    private EditText correoEditText;
+    private EditText contrasennaEditText;
+    private EditText contrasennaBisEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,53 +32,27 @@ public class RegisterActivity extends AppCompatActivity{
         setContentView(R.layout.activity_register);
         setTitle(R.string.register);
 
-        userNameText = (EditText) findViewById(R.id.nombreEditTextRegistro);
-        mailText = (EditText) findViewById(R.id.correoEditTextRegistro);
-        passwordText = (EditText) findViewById(R.id.contrasennaEditTextRegistro);
-        passBisText = (EditText) findViewById(R.id.contrasennabisEditTextRegistro);
+        nombreUsuarioEditText = (EditText) findViewById(R.id.nombreEditTextRegistro);
+        correoEditText = (EditText) findViewById(R.id.correoEditTextRegistro);
+        contrasennaEditText = (EditText) findViewById(R.id.contrasennaEditTextRegistro);
+        contrasennaBisEditText = (EditText) findViewById(R.id.contrasennabisEditTextRegistro);
 
         Button confirmRegister = (Button) findViewById(R.id.register);
 
         confirmRegister.setOnClickListener(view -> {
-            String userName = userNameText.getText().toString();
-            String mail = mailText.getText().toString();
-            String password = passwordText.getText().toString();
-            String passBis = passBisText.getText().toString();
+            String nombreUsuario = nombreUsuarioEditText.getText().toString();
+            String correo = correoEditText.getText().toString();
+            String contrasenna = contrasennaEditText.getText().toString();
+            String contrasennaBis = contrasennaBisEditText.getText().toString();
 
-            if(!password.equals(passBis)){
-                Toast.makeText(RegisterActivity.this, getString(R.string.ErrorContrasegnas), Toast.LENGTH_SHORT).show();
+            if(!contrasenna.equals(contrasennaBis)){
+                Toast.makeText(RegisterActivity.this, getString(R.string.errorContrasegnas), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             //envio de los datos al servidor
-            String contrasennaHash = HashUtils.cifrarContrasenna(password);
-
-            RestAPI api = new RestAPI(this, "/api/registerStepOne");
-            api.addParameter("correo", mail);
-            api.addParameter("contrasenna", contrasennaHash);
-            api.addParameter("nombre", userName);
-            api.openConnection();
-
-            //recepcion de los datos y actuar en consecuencia
-            api.setOnObjectReceived(String.class, resp -> {
-                if (resp == null){
-                    //Usuario registrado, se muestra el dialog para introducir el código
-                    CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(this);
-                    builder.setPositiveButton(codigo -> {
-                        //Abrir RestAPI para verificar el código
-                    });
-                    builder.setNegativeButton(() -> {
-                        //Cancelar el registro
-                    });
-                    builder.show();
-                    /*Intent i = new Intent(this, ConfirmEmailActivity.class);
-                    i.putExtra("correo", mail);
-                    i.putExtra("contrasenna", contrasennaHash);
-                    startActivity(i);*/
-                } else {
-                    Toast.makeText(RegisterActivity.this, resp, Toast.LENGTH_SHORT).show();
-                }
-            });
+            BackendAPI api = new BackendAPI(this);
+            api.register(nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna));
         });
     }
 

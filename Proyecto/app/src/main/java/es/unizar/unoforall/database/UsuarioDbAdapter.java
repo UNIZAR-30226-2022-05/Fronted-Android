@@ -135,7 +135,8 @@ public class UsuarioDbAdapter {
      * Devuelve un cursor apuntando al usuario con un correo concreto
      *
      * @param correo correo del usuario a buscar
-     * @return Cursor posicionado en el usuario solicitado, si existe
+     * @return Cursor posicionado en el usuario solicitado, si existe.
+     *              Devuelve null en caso contrario
      * @throws SQLException Si no se encuentra dicho usuario
      */
     public Cursor buscarUsuario(String correo) throws SQLException {
@@ -146,10 +147,11 @@ public class UsuarioDbAdapter {
                 null,
                 null,
                 null);
-        if(cursor != null) {
-            cursor.moveToFirst();
+        if(cursor != null && !cursor.moveToFirst()) {
+            return null;
+        }else{
+            return cursor;
         }
-        return cursor;
     }
 
     /**
