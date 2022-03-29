@@ -55,7 +55,7 @@ public class RegisterActivity extends AppCompatActivity{
             //recepcion de los datos y actuar en consecuencia
             api.setOnObjectReceived(String.class, resp -> {
                 if (resp == null){
-                    //Usuario registrado y cambiamos a la pantalla de confirmacion
+                    //Usuario registrado, se muestra el dialog para introducir el código
                     Intent i = new Intent(this, ConfirmEmailActivity.class);
                     i.putExtra("correo", mail);
                     i.putExtra("contrasenna", contrasennaHash);
@@ -64,8 +64,6 @@ public class RegisterActivity extends AppCompatActivity{
                     Toast.makeText(RegisterActivity.this, resp, Toast.LENGTH_SHORT).show();
                 }
             });
-
-            //finish();
         });
     }
 

@@ -12,7 +12,7 @@
     <string name="register">Registrarse</string>
     <string name="ErrorContrasegnas">Las contraseñas no coinciden</string>
     <string name="confirmarEmail">Confirmar Correo</string>
-    <string name="mensajeConfirmar">Por favor introduzca el codigo que le ha llegado a su correo</string>
+    <string name="mensajeConfirmar">Por favor introduzca el código que le ha llegado a su correo</string>
     <string name="codigo">Código</string>
 
     <string name="crearSala">Crear Sala</string>
