@@ -22,6 +22,22 @@ public class ConfigSala {
 		this.esPublica = esPublica;
 	}
 
+	public void setModoJuego(ModoJuego modoJuego) {
+		this.modoJuego = modoJuego;
+	}
+
+	public void setReglas(ReglasEspeciales reglas) {
+		this.reglas = reglas;
+	}
+
+	public void setMaxParticipantes(int maxParticipantes) {
+		this.maxParticipantes = maxParticipantes;
+	}
+
+	public void setEsPublica(boolean esPublica) {
+		this.esPublica = esPublica;
+	}
+
 	public ModoJuego getModoJuego() {
 		return modoJuego;
 	}

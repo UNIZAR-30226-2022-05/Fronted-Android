@@ -28,6 +28,34 @@ public class ReglasEspeciales {
 		this.cartaX2 = cartaX2;
 	}
 
+	public void setEncadenarRoboCartas(boolean encadenarRoboCartas) {
+		this.encadenarRoboCartas = encadenarRoboCartas;
+	}
+
+	public void setRedirigirRoboCartas(boolean redirigirRoboCartas) {
+		this.redirigirRoboCartas = redirigirRoboCartas;
+	}
+
+	public void setJugarVariasCartas(boolean jugarVariasCartas) {
+		this.jugarVariasCartas = jugarVariasCartas;
+	}
+
+	public void setEvitarEspecialFinal(boolean evitarEspecialFinal) {
+		this.evitarEspecialFinal = evitarEspecialFinal;
+	}
+
+	public void setCartaRayosX(boolean cartaRayosX) {
+		this.cartaRayosX = cartaRayosX;
+	}
+
+	public void setCartaIntercambio(boolean cartaIntercambio) {
+		this.cartaIntercambio = cartaIntercambio;
+	}
+
+	public void setCartaX2(boolean cartaX2) {
+		this.cartaX2 = cartaX2;
+	}
+
 	public boolean isEncadenarRoboCartas() {
 		return encadenarRoboCartas;
 	}
