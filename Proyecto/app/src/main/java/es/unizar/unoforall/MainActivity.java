@@ -1,5 +1,6 @@
 package es.unizar.unoforall;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -24,5 +25,17 @@ public class MainActivity extends AppCompatActivity {
         botonLogin.setOnClickListener(v->startActivity(new Intent(MainActivity.this, LoginActivity.class)));
     }
 
-
+    @Override
+    public void onBackPressed(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Salir de UnoForAll");
+        builder.setMessage("¿Quieres salir de UnoForAll?");
+        builder.setPositiveButton("Sí", (dialog, which) -> {
+            System.exit(0);
+        });
+        builder.setNegativeButton("No", (dialog, which) -> {
+           dialog.dismiss();
+        });
+        builder.create().show();
+    }
 }

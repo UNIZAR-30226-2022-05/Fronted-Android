@@ -16,6 +16,7 @@ import android.widget.Toast;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
+import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.Vibration;
 
 public class LoginActivity extends AppCompatActivity{
@@ -62,14 +63,11 @@ public class LoginActivity extends AppCompatActivity{
 
             api.setOnObjectReceived(RespuestaLogin.class, resp -> {
                 if(resp.isExito()){
-
                     Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                    i.putExtra("sesionID", resp.getSesionID());
+                    i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, resp.getClaveInicio());
                     startActivity(i);
-
                 } else {
                     Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
-                    return;
                 }
             });
         });
@@ -100,9 +98,8 @@ public class LoginActivity extends AppCompatActivity{
         confirmLogin.setOnClickListener(view -> {
             String mail = mailText.getText().toString();
             String contrasenna = passwordText.getText().toString();
-            String contrasennaHash = contrasenna;//cifrarContrasenna(contrasenna);
+            String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
 
-            setResult(RESULT_OK);
             //envio de los datos al servidor
             RestAPI api = new RestAPI(this,"/api/login");
             api.addParameter("correo", mail);
@@ -115,16 +112,13 @@ public class LoginActivity extends AppCompatActivity{
                     mRowId = mDbHelper.createUsuario(mail, contrasennaHash);
 
                     Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                    i.putExtra("sesionID", resp.getSesionID());
+                    i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, resp.getClaveInicio());
                     startActivity(i);
 
                 } else {
                     Toast.makeText(LoginActivity.this, resp.getErrorInfo(), Toast.LENGTH_SHORT).show();
-                    return;
                 }
             });
-
-            //finish();
         });
     }
 }

@@ -1,5 +1,6 @@
 package es.unizar.unoforall;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.UUID;
 
@@ -11,6 +12,8 @@ import android.widget.Toast;
 import es.unizar.unoforall.api.WebSocketAPI;
 
 public class PantallaPrincipalActivity extends AppCompatActivity {
+
+    public static final String KEY_CLAVE_INICIO = "claveInicio";
 
     private static WebSocketAPI wsAPI;
 
@@ -35,6 +38,18 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        super.onBackPressed();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cerrar sesión");
+        builder.setMessage("¿Quieres cerrar sesión?");
+        builder.setPositiveButton("Sí", (dialog, which) -> {
+            //wsAPI.close();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+        builder.setNegativeButton("No", (dialog, which) -> {
+            dialog.dismiss();
+        });
+        builder.create().show();
     }
 }

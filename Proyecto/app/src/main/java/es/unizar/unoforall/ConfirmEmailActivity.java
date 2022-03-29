@@ -53,22 +53,25 @@ public class ConfirmEmailActivity extends AppCompatActivity {
             api.setOnObjectReceived(String.class, resp -> {
                 if(resp == null){
                     mRowId = mDbHelper.createUsuario(email, contrasennaHash);
+
+                    RestAPI api2 = new RestAPI(this, "/api/login");
+                    api2.addParameter("correo", email);
+                    api2.addParameter("contrasenna", contrasennaHash);
+                    api2.openConnection();
+
+                    api2.setOnObjectReceived(RespuestaLogin.class, resp2 -> {
+                        if(resp2.isExito()){
+                            Intent i = new Intent(this, PantallaPrincipalActivity.class);
+                            i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, resp2.getClaveInicio());
+                            startActivity(i);
+                        }else{
+                            Toast.makeText(this, resp2.getErrorInfo(), Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
                 } else {
                     Toast.makeText(this, resp, Toast.LENGTH_SHORT).show();
-                    return;
                 }
-            });
-
-
-            api = new RestAPI(this, "/api/login");
-            api.addParameter("correo", email);
-            api.addParameter("contrasenna", contrasennaHash);
-            api.openConnection();
-
-            api.setOnObjectReceived(RespuestaLogin.class, resp -> {
-                Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                i.putExtra("sesionID", resp.getSesionID());
-                startActivity(i);
             });
         });
 

@@ -42,6 +42,7 @@ public class RegisterActivity extends AppCompatActivity{
                 Toast.makeText(RegisterActivity.this, getString(R.string.ErrorContrasegnas), Toast.LENGTH_SHORT).show();
                 return;
             }
+
             //envio de los datos al servidor
             String contrasennaHash = HashUtils.cifrarContrasenna(password);
 
