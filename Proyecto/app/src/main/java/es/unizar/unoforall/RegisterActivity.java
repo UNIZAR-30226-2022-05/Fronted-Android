@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
+import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 
 
@@ -56,10 +57,18 @@ public class RegisterActivity extends AppCompatActivity{
             api.setOnObjectReceived(String.class, resp -> {
                 if (resp == null){
                     //Usuario registrado, se muestra el dialog para introducir el código
-                    Intent i = new Intent(this, ConfirmEmailActivity.class);
+                    CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(this);
+                    builder.setPositiveButton(codigo -> {
+                        //Abrir RestAPI para verificar el código
+                    });
+                    builder.setNegativeButton(() -> {
+                        //Cancelar el registro
+                    });
+                    builder.show();
+                    /*Intent i = new Intent(this, ConfirmEmailActivity.class);
                     i.putExtra("correo", mail);
                     i.putExtra("contrasenna", contrasennaHash);
-                    startActivity(i);
+                    startActivity(i);*/
                 } else {
                     Toast.makeText(RegisterActivity.this, resp, Toast.LENGTH_SHORT).show();
                 }
