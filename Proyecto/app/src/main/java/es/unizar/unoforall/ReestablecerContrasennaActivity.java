@@ -11,7 +11,7 @@ import android.widget.Toast;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.model.RespuestaLogin;
 
-public class RecuperarContrasennaActivity extends AppCompatActivity {
+public class ReestablecerContrasennaActivity extends AppCompatActivity {
 
     private EditText emailConfirmarText;
 
