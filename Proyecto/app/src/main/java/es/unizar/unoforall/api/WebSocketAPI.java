@@ -1,5 +1,8 @@
 package es.unizar.unoforall.api;
 
+import android.app.Activity;
+import android.widget.Toast;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -21,6 +24,7 @@ public class WebSocketAPI {
     public static final int GLOBAL_ERROR = 0;
     public static final int SUBSCRIPTION_ERROR = 1;
 
+    private final Activity activity;
     private final Map<String, Disposable> suscripciones;
     private final CompositeDisposable compositeDisposable;
     private StompClient client;
@@ -31,12 +35,17 @@ public class WebSocketAPI {
         this.onError = onError;
     }
 
-    public WebSocketAPI(){
-        suscripciones = new HashMap<>();
-        compositeDisposable = new CompositeDisposable();
-        client = null;
-        closed = false;
-        onError = (t, i) -> {t.printStackTrace(); close();};
+    public WebSocketAPI(Activity activity){
+        this.activity = activity;
+        this.suscripciones = new HashMap<>();
+        this.compositeDisposable = new CompositeDisposable();
+        this.client = null;
+        this.closed = false;
+        this.onError = (t, i) -> {
+            t.printStackTrace();
+            close();
+            Toast.makeText(activity, "RestAPI: Se ha producido un error de conexión", Toast.LENGTH_LONG).show();
+        };
     }
 
     public void openConnection(){
