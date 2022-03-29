@@ -55,9 +55,11 @@
             android:id="@+id/textoMarcableLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="He olvidado mi contraseña"
+            android:text="@string/contrasennaOlvidada"
             android:textColor="@color/teal_200"
-            android:clickable="true">
+            android:clickable="true"
+            android:textSize="16sp"
+            android:layout_margin="10dp">
         </TextView>
 
     </LinearLayout>

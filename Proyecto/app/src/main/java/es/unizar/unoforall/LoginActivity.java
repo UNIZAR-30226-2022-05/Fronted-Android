@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +44,17 @@ public class LoginActivity extends AppCompatActivity{
 
         linkText = findViewById(R.id.textoMarcableLogin);
         linkText.setOnClickListener(v -> startActivity(new Intent(this, ReestablecerContrasennaActivity.class)));
+        linkText.setOnTouchListener((view, event) -> {
+            switch(event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    view.setBackgroundColor(Color.LTGRAY);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    view.setBackgroundColor(Color.WHITE);
+                    break;
+            }
+            return false;
+        });
 
         Button confirmLogin = findViewById(R.id.login);
         confirmLogin.setOnClickListener(view -> {
