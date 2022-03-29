@@ -14,7 +14,11 @@ public class Serializar {
     private static final boolean DEBUG = false;
 
     public static <T> String serializar(T dato){
-        return new Gson().toJson(dato);
+        if(dato instanceof String){
+            return (String) dato;
+        }else{
+            return new Gson().toJson(dato);
+        }
     }
 
     public static <T> T deserializar(String mensaje, Class<T> expectedClass){

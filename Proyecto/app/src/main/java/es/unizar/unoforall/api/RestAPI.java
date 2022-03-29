@@ -48,11 +48,7 @@ public class RestAPI{
     }
 
     public <T> void addParameter(String key, T value){
-        if(value instanceof String){
-            parameters.put(key, (String) value);
-        }else{
-            parameters.put(key, Serializar.serializar(value));
-        }
+        parameters.put(key, Serializar.serializar(value));
     }
 
     private static String getDataString(Map<String, String> params) throws UnsupportedEncodingException{
