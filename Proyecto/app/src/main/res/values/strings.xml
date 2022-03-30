@@ -51,5 +51,6 @@
     <string name="busquedaAvanzada">Búsqueda Avanzada</string>
     <string name="resultadosBusqueda">Resultados</string>
     <string name="busquedaDeSalas">Búsqueda de salas</string>
+    <string name="entrar">Entrar</string>
 
 </resources>

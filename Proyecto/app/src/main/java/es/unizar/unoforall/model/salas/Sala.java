@@ -10,7 +10,7 @@ public class Sala {
 	//Para devolver una sala que no existe
 	private boolean noExiste;
 	
-	private ConfigSala configuracion;
+	public ConfigSala configuracion;
 	
 	private boolean enPartida;
 	
