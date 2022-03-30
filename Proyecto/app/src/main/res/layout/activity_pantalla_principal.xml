@@ -15,4 +15,13 @@
         android:textColor="@color/white"
         app:rippleColor="#1A2351" />
 
+    <Button
+        android:id="@+id/buscarSalaPublicaButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#2EC322"
+        android:text="@string/buscarSala"
+        android:textColor="@color/white"
+        app:rippleColor="#1A2351" />
+
 </LinearLayout>

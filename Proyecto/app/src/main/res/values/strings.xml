@@ -47,4 +47,10 @@
                                                 un código de verificación</string>
     <string name="restablecerContrasenna">Restablecer contraseña</string>
 
+    <string name="buscarSala">Buscar Sala</string>
+    <string name="buscar">Buscar</string>
+    <string name="busquedaAvanzada">Búsqueda Avanzada</string>
+    <string name="resultadosBusqueda">Resultados</string>
+    <string name="busquedaDeSalas">Búsqueda de salas</string>
+
 </resources>

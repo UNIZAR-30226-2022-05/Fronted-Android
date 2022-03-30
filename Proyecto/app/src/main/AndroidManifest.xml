@@ -17,6 +17,9 @@
             android:name=".SalaActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".BuscarSalaActivity"
+            android:exported="false" />
+        <activity
             android:name=".RestablecerContrasennaActivity"
             android:screenOrientation="portrait" />
         <activity

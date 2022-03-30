@@ -17,6 +17,7 @@ import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
+import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.ResetPasswordDialogBuilder;
@@ -230,6 +231,13 @@ public class BackendAPI{
         if(wsAPI != null){
             wsAPI.close();
         }
+    }
+
+    public void obtenerSalasInicio(UUID sesionID, Consumer<RespuestaSalas> consumer){
+        RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
+        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("configuracion", null);
+        api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
     @Override
