@@ -24,7 +24,7 @@
     <string name="tres">3</string>
     <string name="cuatro">4</string>
     <string name="publica">Publica</string>
-    <string name="esPublica">Pulsa para hacerla pública</string>
+    <string name="esPublica">Pulsa para hacerla pública (si no será privada)</string>
     <string name="eleccionCartasEspeciales">Pulsa para añadir cartas especiales</string>
     <string name="activarRayosX">RayosX</string>
     <string name="activarIntercambio">Intercambio</string>
@@ -45,5 +45,11 @@
                                         que quiere recuperar para que le mandemos
                                                 un código de verificación</string>
     <string name="restablecerContrasenna">Restablecer contraseña</string>
+
+    <string name="buscarSala">Buscar Sala</string>
+    <string name="buscar">Buscar</string>
+    <string name="busquedaAvanzada">Búsqueda Avanzada</string>
+    <string name="resultadosBusqueda">Resultados</string>
+    <string name="busquedaDeSalas">Búsqueda de salas</string>
 
 </resources>

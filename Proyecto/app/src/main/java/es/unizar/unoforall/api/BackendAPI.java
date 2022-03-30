@@ -12,6 +12,7 @@ import es.unizar.unoforall.PantallaPrincipalActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.ResetPasswordDialogBuilder;
@@ -153,6 +154,13 @@ public class BackendAPI{
         api.addParameter("sessionID", sesionID.toString());
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, consumer);
+    }
+
+    public void obtenerSalasInicio(UUID sesionID, Consumer<RespuestaSalas> consumer){
+        RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
+        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("configuracion", null);
+        api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
     @Override

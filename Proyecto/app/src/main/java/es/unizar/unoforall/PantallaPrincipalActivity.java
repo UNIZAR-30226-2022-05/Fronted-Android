@@ -54,6 +54,9 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
 
         Button crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));
+
+        Button buscarSalaButton = findViewById(R.id.buscarSalaPublicaButton);
+        buscarSalaButton.setOnClickListener(v -> startActivity(new Intent(this, BuscarSalaActivity.class)));
     }
 
     @Override
