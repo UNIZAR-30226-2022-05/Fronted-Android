@@ -36,5 +36,6 @@ public class SalaActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         api.salirSala(salaID);
+        super.onBackPressed();
     }
 }

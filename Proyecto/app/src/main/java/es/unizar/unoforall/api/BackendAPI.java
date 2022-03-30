@@ -194,7 +194,7 @@ public class BackendAPI{
                 consumer.accept(sala);
             }
         });
-        wsAPI.sendObject("/app/salas/unirse", VACIO);
+        wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
     }
     public void listoSala(UUID salaID){
         wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);

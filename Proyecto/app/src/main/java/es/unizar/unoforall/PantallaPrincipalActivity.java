@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -37,20 +38,20 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pantalla_principal);
 
-        UUID claveIncio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
+        UUID claveInicio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
         wsAPI = new WebSocketAPI(this);
         wsAPI.openConnection();
-        wsAPI.subscribe("/topic/conectarse/" + claveIncio, UUID.class, sesionID -> {
-            wsAPI.unsubscribe("/topic/conectarse/");
-            PantallaPrincipalActivity.sesionID = sesionID;
 
+        wsAPI.subscribe("/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
+            wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
+            PantallaPrincipalActivity.sesionID = sesionID;
             BackendAPI api = new BackendAPI(this);
             api.obtenerUsuarioVO(sesionID, usuarioVO -> {
                 usuario = usuarioVO;
                 Toast.makeText(this, "Hola " + usuario.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
             });
         });
-        wsAPI.sendObject("/app/conectarse/" + claveIncio, "VACIO");
+        wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO");
 
         Button crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));

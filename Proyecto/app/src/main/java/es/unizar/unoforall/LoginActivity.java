@@ -124,4 +124,10 @@ public class LoginActivity extends AppCompatActivity{
                 new SimpleCursorAdapter(this, R.layout.usuarios_row, usuariosCursor, from, to);
         listaUsuarios.setAdapter(usuariosAdapter);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDbHelper.close();
+    }
 }

@@ -7,12 +7,10 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompMessage;
@@ -55,18 +53,11 @@ public class WebSocketAPI {
         client.connect();
     }
 
-    public void subscribe(String topic, Consumer<? super StompMessage> consumer){
-        Disposable suscripcion = client.topic(topic).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(consumer);
-        suscripciones.put(topic, suscripcion);
-        compositeDisposable.add(suscripcion);
-    }
     public <T> void subscribe(String topic, Class<T> expectedClass, Consumer<T> consumer){
-        Disposable suscripcion = client.topic(topic).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(topicMessage -> {
+        Disposable suscripcion = client.topic(topic).subscribe(topicMessage -> {
             T t = Serializar.deserializar(topicMessage.getPayload(), expectedClass);
-            consumer.accept(t);
-        }, t -> onError.accept(t, SUBSCRIPTION_ERROR));
+            activity.runOnUiThread(() -> consumer.accept(t));
+        }, t -> activity.runOnUiThread(() -> onError.accept(t, SUBSCRIPTION_ERROR)));
         suscripciones.put(topic, suscripcion);
         compositeDisposable.add(suscripcion);
     }
