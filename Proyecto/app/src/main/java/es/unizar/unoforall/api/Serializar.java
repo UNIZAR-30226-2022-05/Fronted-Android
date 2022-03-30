@@ -11,14 +11,21 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 public class Serializar {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public static <T> String serializar(T dato){
+        String mensaje;
         if(dato instanceof String){
-            return (String) dato;
+            mensaje = (String) dato;
         }else{
-            return new Gson().toJson(dato);
+            mensaje = new Gson().toJson(dato);
         }
+
+        if(DEBUG){
+            Log.d("Mensaje enviado", mensaje);
+        }
+
+        return mensaje;
     }
 
     public static <T> T deserializar(String mensaje, Class<T> expectedClass){

@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
+import es.unizar.unoforall.model.UsuarioVO;
 
 public class PantallaPrincipalActivity extends AppCompatActivity {
 
@@ -22,6 +24,14 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         return sesionID;
     }
 
+    private static UsuarioVO usuario;
+    public static UsuarioVO getUsuario(){
+        return usuario;
+    }
+    public static void setUsuario(UsuarioVO usuario){
+        PantallaPrincipalActivity.usuario = usuario;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,10 +41,16 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         wsAPI = new WebSocketAPI(this);
         wsAPI.openConnection();
         wsAPI.subscribe("/topic/conectarse/" + claveIncio, UUID.class, sesionID -> {
+            wsAPI.unsubscribe("/topic/conectarse");
             PantallaPrincipalActivity.sesionID = sesionID;
-            Toast.makeText(this, "sesionID: " + sesionID, Toast.LENGTH_SHORT).show();
+
+            BackendAPI api = new BackendAPI(this);
+            api.obtenerUsuarioVO(sesionID, usuarioVO -> {
+                usuario = usuarioVO;
+                Toast.makeText(this, "Hola " + usuario.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
+            });
         });
-        wsAPI.sendObject("/app/conectarse/" + claveIncio, new Object());
+        wsAPI.sendObject("/app/conectarse/" + claveIncio, "VACIO");
 
         Button crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));

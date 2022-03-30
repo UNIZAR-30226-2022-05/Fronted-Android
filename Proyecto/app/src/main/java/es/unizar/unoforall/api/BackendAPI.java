@@ -5,9 +5,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.widget.Toast;
 
+import java.util.UUID;
+import java.util.function.Consumer;
+
 import es.unizar.unoforall.PantallaPrincipalActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
+import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.ResetPasswordDialogBuilder;
@@ -142,6 +146,13 @@ public class BackendAPI{
                 mostrarMensaje(error);
             }
         });
+    }
+
+    public void obtenerUsuarioVO(UUID sesionID, Consumer<UsuarioVO> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
+        api.addParameter("sessionID", sesionID.toString());
+        api.openConnection();
+        api.setOnObjectReceived(UsuarioVO.class, consumer);
     }
 
     @Override
