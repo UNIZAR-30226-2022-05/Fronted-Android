@@ -122,7 +122,7 @@ public class RestAPI{
         });
     }
 
-    public void close(){
+    public synchronized void close(){
         AsyncTask.execute(() -> {
             if(closed){
                 return;

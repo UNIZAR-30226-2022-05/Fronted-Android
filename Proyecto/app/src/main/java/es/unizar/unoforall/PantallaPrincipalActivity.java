@@ -17,10 +17,9 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
 
     private static WebSocketAPI wsAPI;
 
-    private static UUID miSesionID;
-
-    public static UUID getMiSesionID(){
-        return miSesionID;
+    private static UUID sesionID;
+    public static UUID getSesionID(){
+        return sesionID;
     }
 
     @Override
@@ -28,9 +27,14 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pantalla_principal);
 
-        miSesionID = (UUID) this.getIntent().getSerializableExtra("sesionID");
-        Toast.makeText(this, "miSesionID: " + miSesionID, Toast.LENGTH_SHORT).show();
-
+        UUID claveIncio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
+        wsAPI = new WebSocketAPI(this);
+        wsAPI.openConnection();
+        wsAPI.subscribe("/topic/conectarse/" + claveIncio, UUID.class, sesionID -> {
+            PantallaPrincipalActivity.sesionID = sesionID;
+            Toast.makeText(this, "sesionID: " + sesionID, Toast.LENGTH_SHORT).show();
+        });
+        wsAPI.sendObject("/app/conectarse/" + claveIncio, new Object());
 
         Button crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));
@@ -42,7 +46,7 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         builder.setTitle("Cerrar sesión");
         builder.setMessage("¿Quieres cerrar sesión?");
         builder.setPositiveButton("Sí", (dialog, which) -> {
-            //wsAPI.close();
+            wsAPI.close();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
@@ -51,5 +55,11 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
             dialog.dismiss();
         });
         builder.create().show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        wsAPI.close();
     }
 }

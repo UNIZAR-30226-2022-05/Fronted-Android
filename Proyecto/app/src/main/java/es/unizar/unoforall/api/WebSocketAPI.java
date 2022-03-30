@@ -17,7 +17,7 @@ import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 public class WebSocketAPI {
-    private static final String SERVER_IP = "ws://192.168.1.100/gs-guide-websocket";
+    private static final String SERVER_IP = "ws://192.168.1.100/unoforall";
     private static final int CLIENT_HEARTBEAT_MS = 1000;
     private static final int SERVER_HEARTBEAT_MS = 1000;
 
@@ -82,7 +82,7 @@ public class WebSocketAPI {
                 .subscribe(() -> {}, t -> onError.accept(t, GLOBAL_ERROR));
     }
 
-    public void close(){
+    public synchronized void close(){
         if(closed){
            return;
         }

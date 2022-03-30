@@ -88,9 +88,7 @@ public class BackendAPI{
         RestAPI api = new RestAPI(activity, "/api/registerCancel");
         api.addParameter("correo", correo);
         api.openConnection();
-        api.setOnObjectReceived(Boolean.class, exito -> {
-            mostrarMensaje("Registro cancelado");
-        });
+        api.setOnObjectReceived(Boolean.class, exito -> mostrarMensaje("Registro cancelado"));
     }
 
     public void restablecerContrasenna(String correo){

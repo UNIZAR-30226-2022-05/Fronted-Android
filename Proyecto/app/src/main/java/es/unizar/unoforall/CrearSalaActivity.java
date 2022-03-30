@@ -84,7 +84,7 @@ public class CrearSalaActivity extends AppCompatActivity {
 
         Button confirmarSalaButton = findViewById(R.id.confirmarSalaButton);
         confirmarSalaButton.setOnClickListener(view -> {
-            UUID miSesionID = PantallaPrincipalActivity.getMiSesionID();
+            UUID miSesionID = null;//PantallaPrincipalActivity.getClaveIncio();
 
             RestAPI api = new RestAPI(this,"/api/crearSala");
             api.addParameter("sessionID", miSesionID);
