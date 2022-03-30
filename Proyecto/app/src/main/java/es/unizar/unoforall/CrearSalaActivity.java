@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import java.util.UUID;
 
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ReglasEspeciales;
@@ -110,15 +111,8 @@ public class CrearSalaActivity extends AppCompatActivity {
         Button confirmarSalaButton = findViewById(R.id.confirmarSalaButton);
         confirmarSalaButton.setOnClickListener(view -> {
             UUID sesionID = PantallaPrincipalActivity.getSesionID();
-
-            RestAPI api = new RestAPI(this,"/api/crearSala");
-            api.addParameter("sessionID", sesionID);
-            api.addParameter("configuracion", configSala);
-            api.openConnection();
-
-            api.setOnObjectReceived(UUID.class, idSala ->
-                Toast.makeText(this, "idSala: " + idSala, Toast.LENGTH_SHORT).show());
-            //Ir a la pantalla de vista de sala
+            BackendAPI api = new BackendAPI(this);
+            api.crearSala(sesionID, configSala);
         });
 
     }

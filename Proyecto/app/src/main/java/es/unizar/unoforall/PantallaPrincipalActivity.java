@@ -41,7 +41,7 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         wsAPI = new WebSocketAPI(this);
         wsAPI.openConnection();
         wsAPI.subscribe("/topic/conectarse/" + claveIncio, UUID.class, sesionID -> {
-            wsAPI.unsubscribe("/topic/conectarse");
+            wsAPI.unsubscribe("/topic/conectarse/");
             PantallaPrincipalActivity.sesionID = sesionID;
 
             BackendAPI api = new BackendAPI(this);

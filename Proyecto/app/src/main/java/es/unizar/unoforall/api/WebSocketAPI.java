@@ -1,5 +1,6 @@
 package es.unizar.unoforall.api;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.widget.Toast;
 
@@ -77,6 +78,7 @@ public class WebSocketAPI {
         }
     }
 
+    @SuppressLint("CheckResult")
     public <T> void sendObject(String seccion, T object){
         client.send(seccion, Serializar.serializar(object))
                 .subscribe(() -> {}, t -> onError.accept(t, GLOBAL_ERROR));

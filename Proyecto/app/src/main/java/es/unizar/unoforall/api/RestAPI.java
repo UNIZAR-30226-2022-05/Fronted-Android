@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -45,6 +46,9 @@ public class RestAPI{
 
     public void setOnError(Consumer<Exception> onError){
         this.onError = onError;
+    }
+    public Consumer<Exception> getOnError(){
+        return this.onError;
     }
 
     public <T> void addParameter(String key, T value){
@@ -83,7 +87,7 @@ public class RestAPI{
                 conexion.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
                 OutputStream output = conexion.getOutputStream();
-                OutputStreamWriter writer = new OutputStreamWriter(output, "UTF-8");
+                OutputStreamWriter writer = new OutputStreamWriter(output, StandardCharsets.UTF_8);
                 writer.write(data);
                 writer.flush();
 
@@ -108,6 +112,10 @@ public class RestAPI{
                 return;
             }
             try {
+                if(conexion == null){
+                    throw new IOException("No has abierto la conexión del API rest");
+                }
+
                 InputStream responseBody = conexion.getInputStream();
                 T dato = Serializar.deserializar(responseBody, requestedClass);
                 activity.runOnUiThread(() -> {
