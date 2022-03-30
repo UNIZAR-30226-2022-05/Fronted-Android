@@ -42,7 +42,7 @@ public class CodeConfirmDialogBuilder {
         this.positiveRunnable = () -> {
             String codigoString = codeEditText.getText().toString();
             if(codigoString.isEmpty()){
-                codeEditText.setError("Debes rellenar este campo");
+                codeEditText.setError(activity.getString(R.string.campoVacio));
                 show();
             }else{
                 Integer codigo = Integer.parseInt(codigoString);

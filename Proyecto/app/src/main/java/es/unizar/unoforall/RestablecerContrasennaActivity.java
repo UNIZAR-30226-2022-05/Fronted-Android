@@ -12,19 +12,24 @@ import es.unizar.unoforall.api.RestAPI;
 
 public class RestablecerContrasennaActivity extends AppCompatActivity {
 
-    private EditText emailConfirmarText;
+    private EditText correoEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restablecer_contrasenna);
-        setTitle(R.string.recuperarContraseña);
+        setTitle(R.string.restablecerContrasenna);
 
-        emailConfirmarText = findViewById(R.id.correoConfirmacion);
+        correoEditText = findViewById(R.id.correoConfirmacion);
 
         Button enviarCodigoBoton = findViewById(R.id.confirmEmail);
         enviarCodigoBoton.setOnClickListener(view -> {
-            String correo = emailConfirmarText.getText().toString();
+            String correo = correoEditText.getText().toString();
+
+            if(correo.isEmpty()){
+                correoEditText.setError(getString(R.string.campoVacio));
+                return;
+            }
 
             RestAPI api = new RestAPI(this,"/api/reestablecercontrasennaStepOne");
             api.addParameter("correo", correo);

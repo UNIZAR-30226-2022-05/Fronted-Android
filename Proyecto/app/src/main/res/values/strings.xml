@@ -7,6 +7,8 @@
     <string name="contrasennaOlvidada">He olvidado mi contraseña</string>
     <string name="listaUsuariosRegistrados">Lista de usuarios registrados</string>
 
+    <string name="campoVacio">"Debes rellenar este campo"</string>
+
     <string name="nombre">Nombre de usuario</string>
     <string name="con_bis">Repite la contraseña</string>
     <string name="register">Registrarse</string>
@@ -38,11 +40,10 @@
     <string name="activarRedirigir_2_4">Redirigir efecto de +2 y +4</string>
     <string name="activarJugar_varias_cartas">Permite escalera y jugar varias del mismo número</string>
     <string name="activarPenalizacion_4_color">Penaliza si última carta es +4 o cambio de color</string>
-    
-    <string name="recuperarContraseña">Recuperar Contraseña</string>
+
     <string name="mensajeInformacion">Por favor, introduzca el correo de la cuenta
                                         que quiere recuperar para que le mandemos
                                                 un código de verificación</string>
-    <string name="enviarCodigo">Enviar Código</string>
+    <string name="restablecerContrasenna">Restablecer contraseña</string>
 
 </resources>

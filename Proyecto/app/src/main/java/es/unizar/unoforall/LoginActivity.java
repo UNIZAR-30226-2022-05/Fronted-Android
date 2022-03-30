@@ -62,6 +62,15 @@ public class LoginActivity extends AppCompatActivity{
             String correo = correoEditText.getText().toString();
             String contrasenna = contrasennaEditText.getText().toString();
 
+            if(correo.isEmpty()){
+                correoEditText.setError(getString(R.string.campoVacio));
+                return;
+            }
+            if(contrasenna.isEmpty()){
+                contrasennaEditText.setError(getString(R.string.campoVacio));
+                return;
+            }
+
             //envio de los datos al servidor
             BackendAPI api = new BackendAPI(this);
             api.login(correo, HashUtils.cifrarContrasenna(contrasenna));

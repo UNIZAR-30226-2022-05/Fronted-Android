@@ -45,6 +45,23 @@ public class RegisterActivity extends AppCompatActivity{
             String contrasenna = contrasennaEditText.getText().toString();
             String contrasennaBis = contrasennaBisEditText.getText().toString();
 
+            if(nombreUsuario.isEmpty()){
+                nombreUsuarioEditText.setError(getString(R.string.campoVacio));
+                return;
+            }
+            if(correo.isEmpty()){
+                correoEditText.setError(getString(R.string.campoVacio));
+                return;
+            }
+            if(contrasenna.isEmpty()){
+                contrasennaEditText.setError(getString(R.string.campoVacio));
+                return;
+            }
+            if(contrasennaBis.isEmpty()){
+                contrasennaBisEditText.setError(getString(R.string.campoVacio));
+                return;
+            }
+
             if(!contrasenna.equals(contrasennaBis)){
                 Toast.makeText(RegisterActivity.this, getString(R.string.errorContrasegnas), Toast.LENGTH_SHORT).show();
                 return;
