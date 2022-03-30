@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
 
 public class RestablecerContrasennaActivity extends AppCompatActivity {
@@ -31,19 +32,8 @@ public class RestablecerContrasennaActivity extends AppCompatActivity {
                 return;
             }
 
-            RestAPI api = new RestAPI(this,"/api/reestablecercontrasennaStepOne");
-            api.addParameter("correo", correo);
-            api.openConnection();
-
-            api.setOnObjectReceived(String.class, resp -> {
-                if(resp == null){
-                    Intent i = new Intent(this, PantallaPrincipalActivity.class);
-                    startActivity(i);
-
-                } else {
-                    Toast.makeText(this, resp, Toast.LENGTH_SHORT).show();
-                }
-            });
+            BackendAPI api = new BackendAPI(this);
+            api.restablecerContrasenna(correo);
         });
     }
 }

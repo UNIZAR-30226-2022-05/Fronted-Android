@@ -29,6 +29,7 @@ public class CodeConfirmDialogBuilder {
         this.codeEditText = new EditText(activity);
         this.codeEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
         this.codeEditText.setFilters(new InputFilter[] { new InputFilter.LengthFilter(MAX_CODE_LENGTH) });
+        this.codeEditText.setHint("Código");
 
         this.positiveRunnable = () -> {};
         this.negativeRunnable = () -> {};
