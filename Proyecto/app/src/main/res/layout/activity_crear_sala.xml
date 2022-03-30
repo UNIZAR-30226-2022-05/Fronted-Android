@@ -52,10 +52,24 @@
                 android:layout_height="wrap_content"
                 android:text="@string/esPublica"/>
 
-            <CheckBox android:id="@+id/checkbox_publica"
-                android:layout_width="wrap_content"
+            <RadioGroup
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/publica" />
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_publica"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/publica"
+                    android:onClick="onRadioButtonClicked"/>
+                <RadioButton
+                    android:id="@+id/radio_privada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/privada"
+                    android:onClick="onRadioButtonClicked"/>
+            </RadioGroup>
 
             <TextView
                 android:layout_width="match_parent"
@@ -90,7 +104,9 @@
             <Spinner
                 android:id="@+id/modo_juego_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"/>
 
             <TextView
                 android:layout_width="match_parent"

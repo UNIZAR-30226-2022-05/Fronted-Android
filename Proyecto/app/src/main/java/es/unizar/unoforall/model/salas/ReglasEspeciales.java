@@ -13,7 +13,13 @@ public class ReglasEspeciales {
 	private boolean cartaX2;				//Hacer que el siguiente jugador robe el número de cartas que posee
 	
 	public ReglasEspeciales() {
-		
+		this.encadenarRoboCartas = false;
+		this.redirigirRoboCartas = false;
+		this.jugarVariasCartas = false;
+		this.evitarEspecialFinal = false;
+		this.cartaRayosX = false;
+		this.cartaIntercambio = false;
+		this.cartaX2 = false;
 	}
 	
 	public ReglasEspeciales(boolean encadenarRoboCartas, boolean redirigirRoboCartas, boolean jugarVariasCartas,
