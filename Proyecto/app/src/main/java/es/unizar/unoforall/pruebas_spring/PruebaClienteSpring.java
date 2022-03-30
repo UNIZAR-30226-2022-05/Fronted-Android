@@ -117,13 +117,13 @@ public class PruebaClienteSpring {
 
 
     private static void probarWebSockets2(){
-        WebSocketAPI api = new WebSocketAPI(null);
+        WebSocketAPI api = new WebSocketAPI();
         api.setOnError((t, errorType) -> {
             System.err.println("Se ha producido un error: " + errorType);
             t.printStackTrace();
         });
         api.openConnection();
-        api.subscribe("/topic/greetings", Empleado.class, e -> {
+        api.subscribe(null,"/topic/greetings", Empleado.class, e -> {
             System.out.println(e);
             api.close();
         });

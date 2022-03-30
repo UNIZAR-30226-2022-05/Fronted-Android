@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -23,7 +24,6 @@ public class WebSocketAPI {
     public static final int GLOBAL_ERROR = 0;
     public static final int SUBSCRIPTION_ERROR = 1;
 
-    private final Activity activity;
     private final Map<String, Disposable> suscripciones;
     private final CompositeDisposable compositeDisposable;
     private StompClient client;
@@ -33,9 +33,11 @@ public class WebSocketAPI {
     public void setOnError(BiConsumer<Throwable, Integer> onError){
         this.onError = onError;
     }
+    public BiConsumer<Throwable, Integer> getOnError(){
+        return this.onError;
+    }
 
-    public WebSocketAPI(Activity activity){
-        this.activity = activity;
+    public WebSocketAPI(){
         this.suscripciones = new HashMap<>();
         this.compositeDisposable = new CompositeDisposable();
         this.client = null;
@@ -43,7 +45,6 @@ public class WebSocketAPI {
         this.onError = (t, i) -> {
             t.printStackTrace();
             close();
-            Toast.makeText(activity, "RestAPI: Se ha producido un error de conexión", Toast.LENGTH_LONG).show();
         };
     }
 
@@ -53,11 +54,19 @@ public class WebSocketAPI {
         client.connect();
     }
 
-    public <T> void subscribe(String topic, Class<T> expectedClass, Consumer<T> consumer){
+    public <T> void subscribe(Activity activity, String topic, Class<T> expectedClass, Consumer<T> consumer){
+        if(client == null){
+            try{
+                throw new IOException("No has abierto la conexión del API websocket");
+            }catch(Exception ex){
+                onError.accept(ex, GLOBAL_ERROR);
+            }
+        }
+
         Disposable suscripcion = client.topic(topic).subscribe(topicMessage -> {
             T t = Serializar.deserializar(topicMessage.getPayload(), expectedClass);
             activity.runOnUiThread(() -> consumer.accept(t));
-        }, t -> activity.runOnUiThread(() -> onError.accept(t, SUBSCRIPTION_ERROR)));
+        }, t -> onError.accept(t, SUBSCRIPTION_ERROR));
         suscripciones.put(topic, suscripcion);
         compositeDisposable.add(suscripcion);
     }

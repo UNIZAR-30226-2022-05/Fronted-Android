@@ -24,6 +24,9 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
     public static UUID getSesionID(){
         return sesionID;
     }
+    public static void setSesionID(UUID sesionID){
+        PantallaPrincipalActivity.sesionID = sesionID;
+    }
 
     private static UsuarioVO usuario;
     public static UsuarioVO getUsuario(){
@@ -39,19 +42,8 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pantalla_principal);
 
         UUID claveInicio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
-        wsAPI = new WebSocketAPI(this);
-        wsAPI.openConnection();
-
-        wsAPI.subscribe("/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
-            wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
-            PantallaPrincipalActivity.sesionID = sesionID;
-            BackendAPI api = new BackendAPI(this);
-            api.obtenerUsuarioVO(sesionID, usuarioVO -> {
-                usuario = usuarioVO;
-                Toast.makeText(this, "Hola " + usuario.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
-            });
-        });
-        wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO");
+        BackendAPI api = new BackendAPI(this);
+        api.loginPaso2(claveInicio);
 
         Button crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));
@@ -77,6 +69,6 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        wsAPI.close();
+        BackendAPI.closeWebSocketAPI();
     }
 }

@@ -3,6 +3,7 @@ package es.unizar.unoforall.api;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.UUID;
@@ -23,11 +24,21 @@ import es.unizar.unoforall.utils.ResetPasswordDialogBuilder;
 public class BackendAPI{
     private static final String VACIO = "VACIO";
 
+    private static WebSocketAPI wsAPI = null;
+
     private final Activity activity;
     private final UsuarioDbAdapter usuarioDbAdapter;
-    private WebSocketAPI wsAPI;
 
     public BackendAPI(Activity activity){
+        if(wsAPI == null){
+            wsAPI = new WebSocketAPI();
+            wsAPI.setOnError((t, i) -> {
+                wsAPI.getOnError().accept(t, i);
+                wsAPI = null;
+            });
+            wsAPI.openConnection();
+        }
+
         this.activity = activity;
         this.usuarioDbAdapter = new UsuarioDbAdapter(this.activity).open();
     }
@@ -58,6 +69,17 @@ public class BackendAPI{
                 mostrarMensaje(respuestaLogin.getErrorInfo());
             }
         });
+    }
+    public void loginPaso2(UUID claveInicio){
+        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
+            wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
+            PantallaPrincipalActivity.setSesionID(sesionID);
+            obtenerUsuarioVO(sesionID, usuarioVO -> {
+                PantallaPrincipalActivity.setUsuario(usuarioVO);
+                Toast.makeText(activity, "Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
+            });
+        });
+        wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO");
     }
 
     public void register(String nombreUsuario, String correo, String contrasennaHash){
@@ -178,18 +200,18 @@ public class BackendAPI{
     }
 
     public void iniciarUnirseSala(UUID salaID){
-        Intent intent = new Intent(activity, PantallaPrincipalActivity.class);
+        Intent intent = new Intent(activity, SalaActivity.class);
         intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
         activity.startActivity(intent);
     }
 
     public void unirseSala(UUID salaID, Consumer<Sala> consumer){
-        wsAPI = new WebSocketAPI(activity);
-        wsAPI.openConnection();
-        wsAPI.subscribe("/topic/salas/" + salaID, Sala.class, sala -> {
+        Log.i("SalaID", "" + salaID);
+        wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
                 mostrarMensaje("Error al conectarse a la sala");
+                wsAPI.unsubscribe("/topic/salas/" + salaID);
             }else{
                 consumer.accept(sala);
             }
@@ -202,7 +224,12 @@ public class BackendAPI{
     public void salirSala(UUID salaID){
         wsAPI.unsubscribe("/topic/salas/" + salaID);
         wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
-        wsAPI.close();
+    }
+
+    public static void closeWebSocketAPI(){
+        if(wsAPI != null){
+            wsAPI.close();
+        }
     }
 
     @Override
