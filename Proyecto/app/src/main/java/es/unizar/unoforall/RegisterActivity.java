@@ -26,6 +26,8 @@ public class RegisterActivity extends AppCompatActivity{
     private EditText contrasennaEditText;
     private EditText contrasennaBisEditText;
 
+    private Button registerButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +39,9 @@ public class RegisterActivity extends AppCompatActivity{
         contrasennaEditText = (EditText) findViewById(R.id.contrasennaEditTextRegistro);
         contrasennaBisEditText = (EditText) findViewById(R.id.contrasennabisEditTextRegistro);
 
-        Button confirmRegister = (Button) findViewById(R.id.register);
+        registerButton = (Button) findViewById(R.id.register);
 
-        confirmRegister.setOnClickListener(view -> {
+        registerButton.setOnClickListener(view -> {
             String nombreUsuario = nombreUsuarioEditText.getText().toString();
             String correo = correoEditText.getText().toString();
             String contrasenna = contrasennaEditText.getText().toString();

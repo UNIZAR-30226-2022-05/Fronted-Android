@@ -10,7 +10,10 @@ public class ConfigSala {
 	private boolean esPublica;
 	
 	public ConfigSala() {
-		
+		modoJuego = ModoJuego.Original;
+		reglas = new ReglasEspeciales();
+		maxParticipantes = 4;
+		esPublica = true;
 	}
 	
 	public ConfigSala(ModoJuego modoJuego, ReglasEspeciales reglas, 
@@ -34,7 +37,7 @@ public class ConfigSala {
 		return maxParticipantes;
 	}
 
-	public boolean isEsPublica() {
+	public boolean esPublica() {
 		return esPublica;
 	}
 

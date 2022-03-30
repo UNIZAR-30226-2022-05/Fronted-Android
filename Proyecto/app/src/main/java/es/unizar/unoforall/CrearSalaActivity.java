@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import java.util.UUID;
 
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ReglasEspeciales;
@@ -28,16 +29,18 @@ public class CrearSalaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crear_sala);
+        setTitle(R.string.crearSala);
 
         configSala = new ConfigSala();
-        reglasEspeciales = new ReglasEspeciales();
-        configSala.setReglas(reglasEspeciales);
+        reglasEspeciales = configSala.getReglas();
 
         Spinner spinner = findViewById(R.id.modo_juego_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.modo_juego_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+        spinner.setSelection(0);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -48,52 +51,68 @@ public class CrearSalaActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
 
-        CheckBox checkBox = findViewById(R.id.checkbox_publica);
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
-                configSala.setEsPublica(isChecked));
+        RadioButton button;
+        if(configSala.esPublica()){
+            button = findViewById(R.id.radio_publica);
+        }else{
+            button = findViewById(R.id.radio_privada);
+        }
+        button.setChecked(true);
 
+        switch(configSala.getMaxParticipantes()){
+            case 2:
+                button = findViewById(R.id.radio_dos);
+                break;
+            case 3:
+                button = findViewById(R.id.radio_tres);
+                break;
+            default:
+                button = findViewById(R.id.radio_cuatro);
+                break;
+        }
+        button.setChecked(true);
 
-        checkBox = findViewById(R.id.checkbox_rayosX);
+        CheckBox checkBox = findViewById(R.id.checkbox_rayosX);
+        checkBox.setChecked(reglasEspeciales.isCartaRayosX());
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setCartaRayosX(isChecked));
 
         checkBox = findViewById(R.id.checkbox_intercambio);
+        checkBox.setChecked(reglasEspeciales.isCartaIntercambio());
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setCartaIntercambio(isChecked));
 
         checkBox = findViewById(R.id.checkbox_x2);
+        checkBox.setChecked(reglasEspeciales.isCartaX2());
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setCartaX2(isChecked));
 
 
         checkBox = findViewById(R.id.checkbox_encadenar_2_4);
+        checkBox.setChecked(reglasEspeciales.isEncadenarRoboCartas());
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setEncadenarRoboCartas(isChecked));
 
         checkBox = findViewById(R.id.checkbox_redirigir_2_4);
+        checkBox.setChecked(reglasEspeciales.isRedirigirRoboCartas());
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setRedirigirRoboCartas(isChecked));
 
         checkBox = findViewById(R.id.checkbox_jugar_varias_cartas);
+        checkBox.setChecked(reglasEspeciales.isJugarVariasCartas());
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setJugarVariasCartas(isChecked));
 
         checkBox = findViewById(R.id.checkbox_penalizacion_4_color);
+        checkBox.setChecked(reglasEspeciales.isEvitarEspecialFinal());
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setEvitarEspecialFinal(isChecked));
 
         Button confirmarSalaButton = findViewById(R.id.confirmarSalaButton);
         confirmarSalaButton.setOnClickListener(view -> {
-            UUID miSesionID = null;//PantallaPrincipalActivity.getClaveIncio();
-
-            RestAPI api = new RestAPI(this,"/api/crearSala");
-            api.addParameter("sessionID", miSesionID);
-            api.addParameter("configuracion", configSala);
-            api.openConnection();
-
-            api.setOnObjectReceived(UUID.class, idSala ->
-                Toast.makeText(this, "idSala: " + idSala, Toast.LENGTH_SHORT).show());
-            //Ir a la pantalla de vista de sala
+            UUID sesionID = PantallaPrincipalActivity.getSesionID();
+            BackendAPI api = new BackendAPI(this);
+            api.crearSala(sesionID, configSala);
         });
 
     }
@@ -103,6 +122,14 @@ public class CrearSalaActivity extends AppCompatActivity {
         boolean checked = ((RadioButton) view).isChecked();
 
         switch(view.getId()) {
+            case R.id.radio_publica:
+                if (checked)
+                    configSala.setEsPublica(true);
+                    break;
+            case R.id.radio_privada:
+                if (checked)
+                    configSala.setEsPublica(false);
+                    break;
             case R.id.radio_dos:
                 if (checked)
                     configSala.setMaxParticipantes(2);

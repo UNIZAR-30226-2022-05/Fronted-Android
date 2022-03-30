@@ -1,17 +1,17 @@
 package es.unizar.unoforall.api;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompMessage;
@@ -24,7 +24,6 @@ public class WebSocketAPI {
     public static final int GLOBAL_ERROR = 0;
     public static final int SUBSCRIPTION_ERROR = 1;
 
-    private final Activity activity;
     private final Map<String, Disposable> suscripciones;
     private final CompositeDisposable compositeDisposable;
     private StompClient client;
@@ -34,9 +33,11 @@ public class WebSocketAPI {
     public void setOnError(BiConsumer<Throwable, Integer> onError){
         this.onError = onError;
     }
+    public BiConsumer<Throwable, Integer> getOnError(){
+        return this.onError;
+    }
 
-    public WebSocketAPI(Activity activity){
-        this.activity = activity;
+    public WebSocketAPI(){
         this.suscripciones = new HashMap<>();
         this.compositeDisposable = new CompositeDisposable();
         this.client = null;
@@ -44,7 +45,6 @@ public class WebSocketAPI {
         this.onError = (t, i) -> {
             t.printStackTrace();
             close();
-            Toast.makeText(activity, "RestAPI: Se ha producido un error de conexión", Toast.LENGTH_LONG).show();
         };
     }
 
@@ -54,17 +54,18 @@ public class WebSocketAPI {
         client.connect();
     }
 
-    public void subscribe(String topic, Consumer<? super StompMessage> consumer){
-        Disposable suscripcion = client.topic(topic).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(consumer);
-        suscripciones.put(topic, suscripcion);
-        compositeDisposable.add(suscripcion);
-    }
-    public <T> void subscribe(String topic, Class<T> expectedClass, Consumer<T> consumer){
-        Disposable suscripcion = client.topic(topic).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(topicMessage -> {
+    public <T> void subscribe(Activity activity, String topic, Class<T> expectedClass, Consumer<T> consumer){
+        if(client == null){
+            try{
+                throw new IOException("No has abierto la conexión del API websocket");
+            }catch(Exception ex){
+                onError.accept(ex, GLOBAL_ERROR);
+            }
+        }
+
+        Disposable suscripcion = client.topic(topic).subscribe(topicMessage -> {
             T t = Serializar.deserializar(topicMessage.getPayload(), expectedClass);
-            consumer.accept(t);
+            activity.runOnUiThread(() -> consumer.accept(t));
         }, t -> onError.accept(t, SUBSCRIPTION_ERROR));
         suscripciones.put(topic, suscripcion);
         compositeDisposable.add(suscripcion);
@@ -77,6 +78,7 @@ public class WebSocketAPI {
         }
     }
 
+    @SuppressLint("CheckResult")
     public <T> void sendObject(String seccion, T object){
         client.send(seccion, Serializar.serializar(object))
                 .subscribe(() -> {}, t -> onError.accept(t, GLOBAL_ERROR));

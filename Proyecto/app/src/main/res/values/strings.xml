@@ -23,8 +23,9 @@
     <string name="dos">2</string>
     <string name="tres">3</string>
     <string name="cuatro">4</string>
-    <string name="publica">Publica</string>
-    <string name="esPublica">Pulsa para hacerla pública (si no será privada)</string>
+    <string name="publica">Sala pública</string>
+    <string name="privada">Sala privada</string>
+    <string name="esPublica">Sala pública o privada</string>
     <string name="eleccionCartasEspeciales">Pulsa para añadir cartas especiales</string>
     <string name="activarRayosX">RayosX</string>
     <string name="activarIntercambio">Intercambio</string>

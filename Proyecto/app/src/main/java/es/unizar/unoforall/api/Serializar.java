@@ -22,7 +22,7 @@ public class Serializar {
         }
 
         if(DEBUG){
-            Log.d("Mensaje enviado", mensaje);
+            Log.i("Mensaje enviado", mensaje);
         }
 
         return mensaje;
@@ -30,7 +30,7 @@ public class Serializar {
 
     public static <T> T deserializar(String mensaje, Class<T> expectedClass){
         if(DEBUG){
-            Log.d("Mensaje recibido", mensaje);
+            Log.i("Mensaje recibido", mensaje);
         }
 
         if(expectedClass.equals(String.class)){
@@ -56,7 +56,7 @@ public class Serializar {
 
             String mensaje = mensajeBuilder.toString();
             if(DEBUG){
-                Log.d("Mensaje recibido", mensaje);
+                Log.i("Mensaje recibido", mensaje);
             }
             if(expectedClass.equals(String.class)){
                 if(mensaje.equals("null")){

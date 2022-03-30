@@ -3,25 +3,43 @@ package es.unizar.unoforall.api;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import es.unizar.unoforall.PantallaPrincipalActivity;
+import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.RespuestaSala;
+import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.ResetPasswordDialogBuilder;
 
 public class BackendAPI{
+    private static final String VACIO = "VACIO";
+
+    private static WebSocketAPI wsAPI = null;
+
     private final Activity activity;
     private final UsuarioDbAdapter usuarioDbAdapter;
 
     public BackendAPI(Activity activity){
+        if(wsAPI == null){
+            wsAPI = new WebSocketAPI();
+            wsAPI.setOnError((t, i) -> {
+                wsAPI.getOnError().accept(t, i);
+                wsAPI = null;
+            });
+            wsAPI.openConnection();
+        }
+
         this.activity = activity;
         this.usuarioDbAdapter = new UsuarioDbAdapter(this.activity).open();
     }
@@ -45,13 +63,24 @@ public class BackendAPI{
                     usuarioDbAdapter.modificarUsuario(usuarioID, correo, contrasennaHash);
                 }
 
-                Intent i = new Intent(activity, PantallaPrincipalActivity.class);
-                i.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
-                activity.startActivity(i);
+                Intent intent = new Intent(activity, PantallaPrincipalActivity.class);
+                intent.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
+                activity.startActivity(intent);
             }else{
                 mostrarMensaje(respuestaLogin.getErrorInfo());
             }
         });
+    }
+    public void loginPaso2(UUID claveInicio){
+        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
+            wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
+            PantallaPrincipalActivity.setSesionID(sesionID);
+            obtenerUsuarioVO(sesionID, usuarioVO -> {
+                PantallaPrincipalActivity.setUsuario(usuarioVO);
+                Toast.makeText(activity, "Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
+            });
+        });
+        wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO");
     }
 
     public void register(String nombreUsuario, String correo, String contrasennaHash){
@@ -154,6 +183,54 @@ public class BackendAPI{
         api.addParameter("sessionID", sesionID.toString());
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, consumer);
+    }
+
+    public void crearSala(UUID sesionID, ConfigSala configSala){
+        RestAPI api = new RestAPI(activity, "/api/crearSala");
+        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("configuracion", configSala);
+        api.openConnection();
+        api.setOnObjectReceived(RespuestaSala.class, respuestaSala -> {
+            if(respuestaSala.isExito()){
+                // No ha habido errores
+                iniciarUnirseSala(respuestaSala.getSalaID());
+            }else{
+                mostrarMensaje(respuestaSala.getErrorInfo());
+            }
+        });
+    }
+
+    public void iniciarUnirseSala(UUID salaID){
+        Intent intent = new Intent(activity, SalaActivity.class);
+        intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
+        activity.startActivity(intent);
+    }
+
+    public void unirseSala(UUID salaID, Consumer<Sala> consumer){
+        Log.i("SalaID", "" + salaID);
+        wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
+            if(sala.isNoExiste()){
+                // Se ha producido un error
+                mostrarMensaje("Error al conectarse a la sala");
+                wsAPI.unsubscribe("/topic/salas/" + salaID);
+            }else{
+                consumer.accept(sala);
+            }
+        });
+        wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
+    }
+    public void listoSala(UUID salaID){
+        wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
+    }
+    public void salirSala(UUID salaID){
+        wsAPI.unsubscribe("/topic/salas/" + salaID);
+        wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
+    }
+
+    public static void closeWebSocketAPI(){
+        if(wsAPI != null){
+            wsAPI.close();
+        }
     }
 
     public void obtenerSalasInicio(UUID sesionID, Consumer<RespuestaSalas> consumer){
