@@ -23,9 +23,6 @@
             android:name=".PantallaPrincipalActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ConfirmEmailActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait" />
         <activity
