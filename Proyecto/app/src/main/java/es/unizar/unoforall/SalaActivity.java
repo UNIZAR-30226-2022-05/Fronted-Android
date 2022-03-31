@@ -67,6 +67,11 @@ public class SalaActivity extends AppCompatActivity {
             api.listoSala(salaID);
         });
 
+        Button invitarAmigos = findViewById(R.id.invitarAmigosButton);
+        invitarAmigos.setOnClickListener(view -> {
+            // Mostrar la lista de amigos en un dialog
+        });
+
         api = new BackendAPI(this);
         api.unirseSala(salaID, sala -> updateWidgets(sala));
     }

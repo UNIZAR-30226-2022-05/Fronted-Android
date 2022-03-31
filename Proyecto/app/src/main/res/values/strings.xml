@@ -26,7 +26,7 @@
     <string name="publica">Sala pública</string>
     <string name="privada">Sala privada</string>
     <string name="esPublica">Sala pública o privada</string>
-    <string name="eleccionCartasEspeciales">Pulsa para añadir cartas especiales</string>
+    <string name="eleccionCartasEspeciales">Elige las cartas especiales</string>
     <string name="activarRayosX">RayosX</string>
     <string name="activarIntercambio">Intercambio</string>
     <string name="activarx2">x2</string>
@@ -58,6 +58,7 @@
     <string name="usuariosSala">Usuarios en la sala</string>
     <string name="usuariosListos">Usuarios listos</string>
     <string name="sala">Sala</string>
+    <string name="invitarAmigos">Invitar amigos</string>
     <string name="abandonarSala">Abandonar sala</string>
     <string name="listo">Listo</string>
 </resources>

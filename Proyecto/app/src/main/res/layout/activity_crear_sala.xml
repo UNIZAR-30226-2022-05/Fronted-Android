@@ -71,6 +71,19 @@
                     android:onClick="onRadioButtonClicked"/>
             </RadioGroup>
 
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/elegirModoJuego"/>
+            <Spinner
+                android:id="@+id/modo_juego_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"/>
+
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -96,17 +109,6 @@
 
             </LinearLayout>
 
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/elegirModoJuego"/>
-            <Spinner
-                android:id="@+id/modo_juego_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"/>
 
             <TextView
                 android:layout_width="match_parent"
