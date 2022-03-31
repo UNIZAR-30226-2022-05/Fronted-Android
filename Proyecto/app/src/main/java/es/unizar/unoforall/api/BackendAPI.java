@@ -203,7 +203,7 @@ public class BackendAPI{
     public void iniciarUnirseSala(UUID salaID){
         Intent intent = new Intent(activity, SalaActivity.class);
         intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent,0);
     }
 
     public void unirseSala(UUID salaID, Consumer<Sala> consumer){
@@ -217,7 +217,7 @@ public class BackendAPI{
             }
         });
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
-        mostrarMensaje("Te has unido a la sala " + salaID);
+        mostrarMensaje("Te has unido a la sala");
     }
     public void listoSala(UUID salaID){
         wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
@@ -225,7 +225,7 @@ public class BackendAPI{
     public void salirSala(UUID salaID){
         wsAPI.unsubscribe("/topic/salas/" + salaID);
         wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
-        mostrarMensaje("Has salido de la sala " + salaID);
+        mostrarMensaje("Has salido de la sala");
     }
 
     public void obtenerSalasInicio(UUID sesionID, Consumer<RespuestaSalas> consumer){

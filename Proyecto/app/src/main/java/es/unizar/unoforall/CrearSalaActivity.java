@@ -1,8 +1,10 @@
 package es.unizar.unoforall;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -143,5 +145,13 @@ public class CrearSalaActivity extends AppCompatActivity {
                     configSala.setMaxParticipantes(4);
                     break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Volver a la pantalla principal cuando se salga de la sala creada
+        finish();
     }
 }

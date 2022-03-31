@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="112.04656mm"
+   height="112.04656mm"
+   viewBox="0 0 112.04656 112.04656"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="iconoPerfil.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.74118967"
+     inkscape:cx="138.29119"
+     inkscape:cy="281.30451"
+     inkscape:window-width="1600"
+     inkscape:window-height="837"
+     inkscape:window-x="-8"
+     inkscape:window-y="79"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-68.559621,-74.27123)">
+    <circle
+       style="fill:#8dcaec;fill-opacity:1;stroke:#000000;stroke-width:4.87557;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:9.31653;stroke-opacity:1;paint-order:markers fill stroke"
+       id="circle116930"
+       cx="124.5829"
+       cy="130.29451"
+       r="53.585495" />
+    <path
+       id="circle117034"
+       style="fill:#025786;fill-opacity:1;stroke:#000000;stroke-width:4.168;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:9.31653;stroke-opacity:1;paint-order:markers fill stroke"
+       d="m 124.9756,99.556 a 20.526655,20.526655 0 0 0 -20.5267,20.527 20.526655,20.526655 0 0 0 12.2013,18.747 37.807412,37.807412 0 0 0 -29.1455,27.9909 52.082822,52.082822 0 0 0 37.0781,15.5566 52.082822,52.082822 0 0 0 36.4407,-14.9191 37.807412,37.807412 0 0 0 -28.2127,-28.4144 20.526655,20.526655 0 0 0 12.6915,-18.961 20.526655,20.526655 0 0 0 -20.5267,-20.527 z" />
+  </g>
+</svg>
