@@ -1,8 +1,10 @@
 package es.unizar.unoforall;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,6 +34,7 @@ public class CrearSalaActivity extends AppCompatActivity {
         setTitle(R.string.crearSala);
 
         configSala = new ConfigSala();
+        configSala.setModoJuego(ConfigSala.ModoJuego.Original);
         reglasEspeciales = configSala.getReglas();
 
         Spinner spinner = findViewById(R.id.modo_juego_spinner);
@@ -52,7 +55,7 @@ public class CrearSalaActivity extends AppCompatActivity {
         });
 
         RadioButton button;
-        if(configSala.esPublica()){
+        if(configSala.isEsPublica()){
             button = findViewById(R.id.radio_publica);
         }else{
             button = findViewById(R.id.radio_privada);
@@ -143,5 +146,13 @@ public class CrearSalaActivity extends AppCompatActivity {
                     configSala.setMaxParticipantes(4);
                     break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Volver a la pantalla principal cuando se salga de la sala creada
+        finish();
     }
 }

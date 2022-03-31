@@ -16,8 +16,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
+import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
+import es.unizar.unoforall.utils.FilterSearchDialogBuilder;
 import es.unizar.unoforall.utils.MyAdapter;
 
 public class BuscarSalaActivity extends AppCompatActivity {
@@ -40,12 +42,12 @@ public class BuscarSalaActivity extends AppCompatActivity {
         BackendAPI api = new BackendAPI(this);
         api.obtenerSalasInicio(sesionID, misSalas -> {
             lasSalas = misSalas;
-        });
+            salasIniciales = lasSalas.getSalas();
 
-        //https://www.geeksforgeeks.org/how-to-convert-hashmap-to-arraylist-in-java/
-        salasIniciales = lasSalas.getSalas();
-        informacionBusqueda = findViewById(R.id.salasEncontradas);
-        fillData();
+            informacionBusqueda = findViewById(R.id.salasEncontradas);
+            MyAdapter adapter = new MyAdapter(salasIniciales, this);
+            informacionBusqueda.setAdapter(adapter);
+        });
 
         idSala = findViewById(R.id.busquedaIdSala);
 
@@ -63,26 +65,23 @@ public class BuscarSalaActivity extends AppCompatActivity {
                     UUID clave = UUID.fromString(salaIdText);
                     salasIniciales = new HashMap<UUID, Sala>();
                     salasIniciales.put(clave, laSala);
-                    fillData();
+                    MyAdapter adapter = new MyAdapter(salasIniciales, this);
+                    informacionBusqueda.setAdapter(adapter);
                 }
             });
         });
 
         Button busquedaAvanzadaButton = findViewById(R.id.busquedaConFiltros);
         busquedaAvanzadaButton.setOnClickListener(view -> {
-
+            BackendAPI api2 = new BackendAPI(this);
+            FilterSearchDialogBuilder filtrado = new FilterSearchDialogBuilder(this);
+            filtrado.setPositiveButton(configSala -> api2.obtenerSalasFiltro(sesionID, configSala, respuestaSalas -> {
+                salasIniciales = respuestaSalas.getSalas();
+                MyAdapter adapter = new MyAdapter(salasIniciales, this);
+                informacionBusqueda.setAdapter(adapter);
+            }));
+            filtrado.setNegativeButton(() -> {});
+            filtrado.show();
         });
-
-
-    }
-
-    private void fillData(){
-        Set<UUID> claves = salasIniciales.keySet();
-        ArrayList<UUID> listOfKeys = new ArrayList<UUID>(claves);
-        Collection<Sala> values = salasIniciales.values();
-        ArrayList<Sala> listOfValues = new ArrayList<>(values);
-
-        MyAdapter adapter = new MyAdapter(listOfKeys, listOfValues, this);
-        informacionBusqueda.setAdapter(adapter);
     }
 }

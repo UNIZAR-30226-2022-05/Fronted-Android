@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,9 +25,9 @@ public class MyAdapter extends BaseAdapter {
     private ArrayList<Sala> valores;
     private Activity activity;
 
-    public MyAdapter(ArrayList<UUID> lista1, ArrayList<Sala> lista2, Activity activity) {
-        claves = lista1;
-        valores = lista2;
+    public MyAdapter(Map<UUID, Sala> salas, Activity activity) {
+        claves = new ArrayList<>(salas.keySet());
+        valores = new ArrayList<>(salas.values());
         this.activity = activity;
     }
 
@@ -67,8 +68,8 @@ public class MyAdapter extends BaseAdapter {
 
         UUID dato1 = getItemLista1(position);
         Sala miSala = getItemLista2(position);
-        int dato2 = miSala.configuracion.getMaxParticipantes();
-        ConfigSala.ModoJuego dato3 = miSala.configuracion.getModoJuego();
+        int dato2 = miSala.getConfiguracion().getMaxParticipantes();
+        ConfigSala.ModoJuego dato3 = miSala.getConfiguracion().getModoJuego();
 
 
         // TODO replace findViewById by ViewHolder

@@ -21,10 +21,9 @@ public class ReglasEspeciales {
 		this.cartaIntercambio = false;
 		this.cartaX2 = false;
 	}
-	
+
 	public ReglasEspeciales(boolean encadenarRoboCartas, boolean redirigirRoboCartas, boolean jugarVariasCartas,
 			boolean evitarEspecialFinal, boolean cartaRayosX, boolean cartaIntercambio, boolean cartaX2) {
-		super();
 		this.encadenarRoboCartas = encadenarRoboCartas;
 		this.redirigirRoboCartas = redirigirRoboCartas;
 		this.jugarVariasCartas = jugarVariasCartas;
@@ -33,7 +32,7 @@ public class ReglasEspeciales {
 		this.cartaIntercambio = cartaIntercambio;
 		this.cartaX2 = cartaX2;
 	}
-
+	
 	public void setEncadenarRoboCartas(boolean encadenarRoboCartas) {
 		this.encadenarRoboCartas = encadenarRoboCartas;
 	}
