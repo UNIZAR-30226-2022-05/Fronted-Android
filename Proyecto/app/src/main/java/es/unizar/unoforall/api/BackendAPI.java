@@ -19,6 +19,7 @@ import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
+import es.unizar.unoforall.utils.ModifyAccountDialogBuilder;
 import es.unizar.unoforall.utils.ResetPasswordDialogBuilder;
 
 public class BackendAPI{
@@ -204,7 +205,6 @@ public class BackendAPI{
         intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
         activity.startActivityForResult(intent,0);
     }
-
     public void unirseSala(UUID salaID, Consumer<Sala> consumer){
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
@@ -233,6 +233,68 @@ public class BackendAPI{
         api.addParameter("configuracion", null);
         api.openConnection();
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
+    }
+
+    public void modificarCuenta(UUID sesionID){
+        RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
+        api.addParameter("sessionID", sesionID.toString());
+        api.openConnection();
+        api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
+            ModifyAccountDialogBuilder builder = new ModifyAccountDialogBuilder(activity);
+            builder.setNombreUsuario(usuarioVO.getNombre());
+            builder.setCorreo(usuarioVO.getCorreo());
+            builder.setPositiveButton((nombreUsuario, correo, contrasenna) -> {
+                if(contrasenna == null){
+                    // Si no se ha cambiado la contraseña,
+                    //   se envía la anterior
+                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, usuarioVO.getContrasenna());
+                }else{
+                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna));
+                }
+            });
+            builder.setNegativeButton(() -> {
+                mostrarMensaje("Operación cancelada");
+            });
+            builder.show();
+        });
+    }
+    private void modificarCuentaPaso2(UUID sesionID, String nombreUsuario, String correo, String contrasennaHash){
+        RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepOne");
+        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("correoNuevo", correo);
+        api.addParameter("nombre", nombreUsuario);
+        api.addParameter("contrasenna", contrasennaHash);
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error == null){
+                // Si no ha habido error
+                CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(activity);
+                builder.setPositiveButton(codigo -> modificarCuentaPaso3(sesionID, codigo, correo, contrasennaHash, builder));
+                builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+                builder.show();
+            }else{
+                mostrarMensaje(error);
+            }
+        });
+    }
+    private void modificarCuentaPaso3(UUID sesionID, int codigo,
+                                      String correo, String contrasennaHash,
+                                      CodeConfirmDialogBuilder builder){
+        RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepTwo");
+        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("codigo", codigo);
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error == null){
+                // Cerrar sesión y volverla a iniciar
+                activity.finish();
+                login(correo, contrasennaHash);
+            }else if(!error.equals("SESION_EXPIRADA")){
+                mostrarMensaje(error);
+                builder.setError("Código incorrecto");
+                builder.show();
+            }
+        });
     }
 
     public static synchronized void closeWebSocketAPI(){
