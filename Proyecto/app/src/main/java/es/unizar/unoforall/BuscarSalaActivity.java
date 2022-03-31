@@ -35,18 +35,14 @@ public class BuscarSalaActivity extends AppCompatActivity {
         BackendAPI api = new BackendAPI(this);
         api.obtenerSalasInicio(sesionID, misSalas -> {
             lasSalas = misSalas;
+            salasIniciales = lasSalas.getSalas();
+
+            informacionBusqueda = findViewById(R.id.salasEncontradas);
+            MyAdapter adapter = new MyAdapter(salasIniciales);
+            informacionBusqueda.setAdapter(adapter);
         });
 
-        //https://www.geeksforgeeks.org/how-to-convert-hashmap-to-arraylist-in-java/
-        salasIniciales = lasSalas.getSalas();
-        Set<UUID> claves = salasIniciales.keySet();
-        ArrayList<UUID> listOfKeys = new ArrayList<UUID>(claves);
-        Collection<Sala> values = salasIniciales.values();
-        ArrayList<Sala> listOfValues = new ArrayList<>(values);
 
-        informacionBusqueda = findViewById(R.id.salasEncontradas);
-        MyAdapter adapter = new MyAdapter(listOfKeys, listOfValues);
-        informacionBusqueda.setAdapter(adapter);
 
     }
 }

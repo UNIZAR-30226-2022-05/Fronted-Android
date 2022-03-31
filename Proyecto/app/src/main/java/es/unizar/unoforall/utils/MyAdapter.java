@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,12 +19,12 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 
 public class MyAdapter extends BaseAdapter {
-    private ArrayList<UUID> claves;
-    private ArrayList<Sala> valores;
+    private List<UUID> claves;
+    private List<Sala> valores;
 
-    public MyAdapter(ArrayList<UUID> lista1, ArrayList<Sala> lista2) {
-        claves = lista1;
-        valores = lista2;
+    public MyAdapter(Map<UUID, Sala> salas) {
+        claves = new ArrayList<>(salas.keySet());
+        valores = new ArrayList<>(salas.values());
     }
 
     @Override

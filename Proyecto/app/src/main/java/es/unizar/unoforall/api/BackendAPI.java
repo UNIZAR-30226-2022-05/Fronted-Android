@@ -232,6 +232,7 @@ public class BackendAPI{
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
         api.addParameter("sesionID", sesionID.toString());
         api.addParameter("configuracion", null);
+        api.openConnection();
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
