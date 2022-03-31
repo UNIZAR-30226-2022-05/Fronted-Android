@@ -8,25 +8,18 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 import java.util.HashMap;
 import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.api.RestAPI;
-import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.FilterSearchDialogBuilder;
-import es.unizar.unoforall.utils.MyAdapter;
+import es.unizar.unoforall.utils.SalaListAdapter;
 
 public class BuscarSalaActivity extends AppCompatActivity {
 
     private UUID sesionID;
     private HashMap<UUID, Sala> salasIniciales;
-    private RespuestaSalas lasSalas;
     private ListView informacionBusqueda;
     private EditText idSala;
 
@@ -40,12 +33,11 @@ public class BuscarSalaActivity extends AppCompatActivity {
         sesionID = PrincipalActivity.getSesionID();
 
         BackendAPI api = new BackendAPI(this);
-        api.obtenerSalasInicio(sesionID, misSalas -> {
-            lasSalas = misSalas;
-            salasIniciales = lasSalas.getSalas();
+        api.obtenerSalasInicio(sesionID, respuestaSalas -> {
+            salasIniciales = respuestaSalas.getSalas();
 
             informacionBusqueda = findViewById(R.id.salasEncontradas);
-            MyAdapter adapter = new MyAdapter(salasIniciales, this);
+            SalaListAdapter adapter = new SalaListAdapter(this, salasIniciales);
             informacionBusqueda.setAdapter(adapter);
         });
 
@@ -65,7 +57,7 @@ public class BuscarSalaActivity extends AppCompatActivity {
                     UUID clave = UUID.fromString(salaIdText);
                     salasIniciales = new HashMap<UUID, Sala>();
                     salasIniciales.put(clave, laSala);
-                    MyAdapter adapter = new MyAdapter(salasIniciales, this);
+                    SalaListAdapter adapter = new SalaListAdapter(this, salasIniciales);
                     informacionBusqueda.setAdapter(adapter);
                 }
             });
@@ -77,7 +69,7 @@ public class BuscarSalaActivity extends AppCompatActivity {
             FilterSearchDialogBuilder filtrado = new FilterSearchDialogBuilder(this);
             filtrado.setPositiveButton(configSala -> api2.obtenerSalasFiltro(sesionID, configSala, respuestaSalas -> {
                 salasIniciales = respuestaSalas.getSalas();
-                MyAdapter adapter = new MyAdapter(salasIniciales, this);
+                SalaListAdapter adapter = new SalaListAdapter(this, salasIniciales);
                 informacionBusqueda.setAdapter(adapter);
             }));
             filtrado.setNegativeButton(() -> {});

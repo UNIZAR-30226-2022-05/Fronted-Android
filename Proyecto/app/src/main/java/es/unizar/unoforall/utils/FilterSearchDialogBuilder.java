@@ -64,6 +64,9 @@ public class FilterSearchDialogBuilder{
     public FilterSearchDialogBuilder(Activity activity){
         this.activity = activity;
 
+        this.configSala = new ConfigSala();
+        this.reglasEspeciales = configSala.getReglas();
+
         this.participantes = new TextView(activity);
         this.participantes.setText("Participantes");
 
