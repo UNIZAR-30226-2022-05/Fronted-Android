@@ -266,9 +266,7 @@ public class BackendAPI{
                     modificarCuentaPaso2(sesionID, nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
                 }
             });
-            builder.setNegativeButton(() -> {
-                mostrarMensaje("Operación cancelada");
-            });
+            builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
             builder.show();
         });
     }
@@ -286,7 +284,7 @@ public class BackendAPI{
                 // Si no ha habido error
                 CodeConfirmDialogBuilder builder2 = new CodeConfirmDialogBuilder(activity);
                 builder2.setPositiveButton(codigo -> modificarCuentaPaso3(sesionID, codigo, correo, contrasennaHash, builder2));
-                builder2.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+                builder2.setNegativeButton(() -> cancelModificarCuenta(sesionID));
                 builder2.show();
             }else{
                 mostrarMensaje(error);
@@ -312,6 +310,12 @@ public class BackendAPI{
                 builder.show();
             }
         });
+    }
+    private void cancelModificarCuenta(UUID sesionID){
+        RestAPI api = new RestAPI(activity, "/api/sesionID");
+        api.addParameter("sessionID", sesionID.toString());
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> mostrarMensaje("Operación cancelada"));
     }
 
     public static synchronized void closeWebSocketAPI(){
