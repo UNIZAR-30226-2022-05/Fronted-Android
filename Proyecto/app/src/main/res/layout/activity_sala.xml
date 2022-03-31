@@ -38,18 +38,39 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="180sp"
                 android:layout_height="match_parent"
                 android:text="@string/usuariosSala"
                 android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/numUsuariosTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:text="numUsuarios"
+                android:textSize="20sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="180sp"
+                android:layout_height="match_parent"
+                android:text="@string/usuariosListos"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/numUsuariosListosTextView"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:text="numUsuariosListos"
                 android:textSize="20sp"/>
         </LinearLayout>
 

@@ -56,6 +56,7 @@
 
     <string name="salaID">ID de la sala:</string>
     <string name="usuariosSala">Usuarios en la sala</string>
+    <string name="usuariosListos">Usuarios listos</string>
     <string name="sala">Sala</string>
     <string name="abandonarSala">Abandonar sala</string>
     <string name="listo">Listo</string>

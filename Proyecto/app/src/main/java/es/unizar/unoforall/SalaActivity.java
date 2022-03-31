@@ -34,6 +34,7 @@ public class SalaActivity extends AppCompatActivity {
     private UUID salaID;
 
     private TextView numUsuariosTextView;
+    private TextView numUsuariosListosTextView;
     private LinearLayout[] layoutUsuarios;
 
     @Override
@@ -48,6 +49,7 @@ public class SalaActivity extends AppCompatActivity {
         salaIDTextView.setText(salaID.toString());
 
         numUsuariosTextView = findViewById(R.id.numUsuariosTextView);
+        numUsuariosListosTextView = findViewById(R.id.numUsuariosListosTextView);
         layoutUsuarios = new LinearLayout[] {
                 findViewById(R.id.layoutUsuario1),
                 findViewById(R.id.layoutUsuario2),
@@ -71,8 +73,6 @@ public class SalaActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void updateWidgets(Sala sala){
-        numUsuariosTextView.setText(sala.numParticipantes() + " / " + sala.configuracion.getMaxParticipantes());
-
         for(int i=0; i<MAX_PARTICIPANTES_SALA; i++){
             if(i < sala.configuracion.getMaxParticipantes()){
                 layoutUsuarios[i].setVisibility(View.VISIBLE);
@@ -83,16 +83,22 @@ public class SalaActivity extends AppCompatActivity {
 
         Map<UsuarioVO, Boolean> participantes = sala.getParticipantes();
         List<UsuarioVO> usuarios = new ArrayList<>(participantes.keySet());
-        usuarios.sort(Comparator.comparing(UsuarioVO::getId));
-        int i;
+        usuarios.sort(Comparator.comparing(UsuarioVO::getNombre));
+        int i, numParticipantesListos = 0;
         for(i=0; i<sala.configuracion.getMaxParticipantes(); i++){
             if(i < usuarios.size()){
                 UsuarioVO usuario = usuarios.get(i);
                 setUserData(i, usuario, participantes.get(usuario));
+                if(participantes.get(usuario)){
+                    numParticipantesListos++;
+                }
             }else{
                 setUserData(i, null, false);
             }
         }
+
+        numUsuariosTextView.setText(sala.numParticipantes() + " / " + sala.configuracion.getMaxParticipantes());
+        numUsuariosListosTextView.setText(numParticipantesListos + " / " + sala.numParticipantes());
     }
 
     @SuppressLint("SetTextI18n")
