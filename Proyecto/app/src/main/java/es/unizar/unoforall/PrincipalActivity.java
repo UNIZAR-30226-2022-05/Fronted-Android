@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
@@ -16,7 +17,12 @@ import es.unizar.unoforall.model.UsuarioVO;
 public class PrincipalActivity extends AppCompatActivity {
 
     public static final String KEY_CLAVE_INICIO = "claveInicio";
+
     private static final int MODIFICAR_CUENTA_ID = 0;
+    private static final int MODIFICAR_ASPECTO_ID = 1;
+    private static final int GESTIONAR_AMIGOS_ID = 2;
+    private static final int VER_ESTADISTICAS_ID = 3;
+    private static final int VER_HISTORIAL_ID = 4;
 
     private static UUID sesionID;
     public static UUID getSesionID(){
@@ -54,6 +60,10 @@ public class PrincipalActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu){
         boolean result = super.onCreateOptionsMenu(menu);
         menu.add(Menu.NONE, MODIFICAR_CUENTA_ID, Menu.NONE, R.string.modificarCuenta);
+        menu.add(Menu.NONE, MODIFICAR_ASPECTO_ID, Menu.NONE, R.string.modificarAspecto);
+        menu.add(Menu.NONE, GESTIONAR_AMIGOS_ID, Menu.NONE, R.string.gestionarAmigos);
+        menu.add(Menu.NONE, VER_ESTADISTICAS_ID, Menu.NONE, R.string.verEstadisticas);
+        menu.add(Menu.NONE, VER_HISTORIAL_ID, Menu.NONE, R.string.verHistorial);
         return result;
     }
 
@@ -63,6 +73,8 @@ public class PrincipalActivity extends AppCompatActivity {
             case MODIFICAR_CUENTA_ID:
                 new BackendAPI(this).modificarCuenta(sesionID);
                 break;
+            default:
+                Toast.makeText(this, "No implementado todavía", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
