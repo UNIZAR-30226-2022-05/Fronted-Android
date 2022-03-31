@@ -200,6 +200,14 @@ public class BackendAPI{
         });
     }
 
+    public void buscarSala(String sesionID, String salaID, Consumer<Sala> consumer){
+        RestAPI api = new RestAPI(activity, "/api/buscarSalaID");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("salaID", salaID);
+        api.openConnection();
+        api.setOnObjectReceived(Sala.class, consumer);
+    }
+
     public void iniciarUnirseSala(UUID salaID){
         Intent intent = new Intent(activity, SalaActivity.class);
         intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
@@ -232,6 +240,13 @@ public class BackendAPI{
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
         api.addParameter("sesionID", sesionID.toString());
         api.addParameter("configuracion", null);
+        api.setOnObjectReceived(RespuestaSalas.class, consumer);
+    }
+
+    public void obtenerSalasFiltro(UUID sesionID, ConfigSala filtro, Consumer<RespuestaSalas> consumer){
+        RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
+        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("configuracion", filtro.toString());
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 

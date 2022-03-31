@@ -2,6 +2,7 @@ package es.unizar.unoforall.utils;
 
 //https://stackoverflow.com/questions/19466757/hashmap-to-listview
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +15,19 @@ import java.util.Map;
 import java.util.UUID;
 
 import es.unizar.unoforall.R;
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 
 public class MyAdapter extends BaseAdapter {
     private ArrayList<UUID> claves;
     private ArrayList<Sala> valores;
+    private Activity activity;
 
-    public MyAdapter(ArrayList<UUID> lista1, ArrayList<Sala> lista2) {
+    public MyAdapter(ArrayList<UUID> lista1, ArrayList<Sala> lista2, Activity activity) {
         claves = lista1;
         valores = lista2;
+        this.activity = activity;
     }
 
     @Override
@@ -74,6 +78,14 @@ public class MyAdapter extends BaseAdapter {
         Button botonEntrar = result.findViewById(R.id.entrar);
         botonEntrar.setOnClickListener(view -> {
             //abrir web sockets, solicitar unirse e ir a la sala de espera de jugadores
+            BackendAPI api = new BackendAPI(activity);
+            api.unirseSala(dato1, sala -> {
+                if(sala.isNoExiste()){
+                    return;
+                }else {
+                    api.iniciarUnirseSala(dato1);
+                }
+            });
         });
 
         return result;
