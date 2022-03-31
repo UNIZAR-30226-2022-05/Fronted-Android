@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -43,6 +45,7 @@ public class LoginActivity extends AppCompatActivity{
         correoEditText = findViewById(R.id.correoEditTextLogin);
         contrasennaEditText = findViewById(R.id.contrasennaEditTextLogin);
 
+
         TextView linkText = findViewById(R.id.textoMarcableLogin);
         linkText.setOnClickListener(v -> startActivity(new Intent(this, RestablecerContrasennaActivity.class)));
         linkText.setOnTouchListener((view, event) -> {
@@ -74,6 +77,15 @@ public class LoginActivity extends AppCompatActivity{
             //envio de los datos al servidor
             BackendAPI api = new BackendAPI(this);
             api.login(correo, HashUtils.cifrarContrasenna(contrasenna));
+        });
+
+        contrasennaEditText.setOnKeyListener((view, keyCode, keyEvent) -> {
+            if((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+                confirmLogin.performClick();
+                return true;
+            }else{
+                return false;
+            }
         });
 
         if(mDbHelper.getNumUsuarios() <= 0){

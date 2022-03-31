@@ -3,6 +3,7 @@ package es.unizar.unoforall;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -72,6 +73,15 @@ public class RegisterActivity extends AppCompatActivity{
             //envio de los datos al servidor
             BackendAPI api = new BackendAPI(this);
             api.register(nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna));
+        });
+
+        contrasennaBisEditText.setOnKeyListener((view, keyCode, keyEvent) -> {
+            if((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+                registerButton.performClick();
+                return true;
+            }else{
+                return false;
+            }
         });
     }
 
