@@ -12,7 +12,8 @@ import java.util.Objects;
 
 import es.unizar.unoforall.R;
 
-public class ModifyAccountDialogBuilder {
+public class ModifyAccountDialogBuilder{
+    private static final int PADDING = 25;
     private final Activity activity;
 
     private final LinearLayout linearLayout;
@@ -44,6 +45,7 @@ public class ModifyAccountDialogBuilder {
 
         this.linearLayout = new LinearLayout(activity);
         this.linearLayout.setOrientation(LinearLayout.VERTICAL);
+        this.linearLayout.setPadding(PADDING, PADDING, PADDING, PADDING);
         this.linearLayout.addView(nombreUsuarioEditText);
         this.linearLayout.addView(correoEditText);
         this.linearLayout.addView(passwordEditText);

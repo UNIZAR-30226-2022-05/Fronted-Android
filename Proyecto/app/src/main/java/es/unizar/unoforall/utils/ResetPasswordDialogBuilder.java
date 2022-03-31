@@ -13,7 +13,8 @@ import java.util.function.Consumer;
 
 import es.unizar.unoforall.R;
 
-public class ResetPasswordDialogBuilder {
+public class ResetPasswordDialogBuilder{
+    private static final int PADDING = 25;
     private final Activity activity;
 
     private final LinearLayout linearLayout;
@@ -36,6 +37,7 @@ public class ResetPasswordDialogBuilder {
 
         this.linearLayout = new LinearLayout(activity);
         this.linearLayout.setOrientation(LinearLayout.VERTICAL);
+        this.linearLayout.setPadding(PADDING, PADDING, PADDING, PADDING);
         this.linearLayout.addView(passwordEditText);
         this.linearLayout.addView(passwordBisEditText);
 

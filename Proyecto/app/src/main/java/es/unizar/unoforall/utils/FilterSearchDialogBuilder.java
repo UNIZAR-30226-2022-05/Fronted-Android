@@ -22,8 +22,8 @@ import es.unizar.unoforall.R;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ReglasEspeciales;
 
-public class FilterSearchDialogBuilder {
-
+public class FilterSearchDialogBuilder{
+    private static final int PADDING = 25;
     private final Activity activity;
 
     private final TextView participantes;
@@ -96,6 +96,7 @@ public class FilterSearchDialogBuilder {
 
         this.linearLayout1 = new LinearLayout(activity);
         this.linearLayout1.setOrientation(LinearLayout.HORIZONTAL);
+        this.linearLayout1.setPadding(PADDING, PADDING, PADDING, PADDING);
         this.rayosX = new CheckBox(activity);
         this.rayosX.setText("RayosX");
         rayosX.setChecked(reglasEspeciales.isCartaRayosX());
