@@ -10,7 +10,7 @@ public class Sala {
 	//Para devolver una sala que no existe
 	private boolean noExiste;
 	
-	public ConfigSala configuracion;
+	private ConfigSala configuracion;
 	
 	private boolean enPartida;
 	
@@ -88,7 +88,7 @@ public class Sala {
 	}
 	
 	public boolean puedeUnirse() {
-		if (getConfiguracion().esPublica()
+		if (getConfiguracion().isEsPublica()
 				&& numParticipantes() < getConfiguracion().getMaxParticipantes() 
 				&& !isEnPartida()) {
 			return true;

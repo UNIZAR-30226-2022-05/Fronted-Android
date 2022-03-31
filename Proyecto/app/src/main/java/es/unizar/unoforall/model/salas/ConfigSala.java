@@ -10,22 +10,21 @@ public class ConfigSala {
 	private boolean esPublica;
 	
 	public ConfigSala() {
-		modoJuego = ModoJuego.Original;
-		reglas = new ReglasEspeciales();
-		maxParticipantes = 4;
-		esPublica = true;
+		this.modoJuego = ModoJuego.Undefined;
+		this.reglas = new ReglasEspeciales();
+		this.maxParticipantes = 4;
+		this.esPublica = true;
 	}
 	
 	public ConfigSala(ModoJuego modoJuego, ReglasEspeciales reglas, 
 			int maxParticipantes, boolean esPublica) {
-		super();
 		this.modoJuego = modoJuego;
 		this.reglas = reglas;
 		this.maxParticipantes = maxParticipantes;
 		this.esPublica = esPublica;
 	}
-
-	public void setModoJuego(ModoJuego modoJuego) {
+    
+    public void setModoJuego(ModoJuego modoJuego) {
 		this.modoJuego = modoJuego;
 	}
 
@@ -53,7 +52,7 @@ public class ConfigSala {
 		return maxParticipantes;
 	}
 
-	public boolean esPublica() {
+	public boolean isEsPublica() {
 		return esPublica;
 	}
 

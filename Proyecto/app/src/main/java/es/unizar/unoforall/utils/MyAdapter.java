@@ -64,8 +64,8 @@ public class MyAdapter extends BaseAdapter {
 
         UUID dato1 = getItemLista1(position);
         Sala miSala = getItemLista2(position);
-        int dato2 = miSala.configuracion.getMaxParticipantes();
-        ConfigSala.ModoJuego dato3 = miSala.configuracion.getModoJuego();
+        int dato2 = miSala.getConfiguracion().getMaxParticipantes();
+        ConfigSala.ModoJuego dato3 = miSala.getConfiguracion().getModoJuego();
 
 
         // TODO replace findViewById by ViewHolder

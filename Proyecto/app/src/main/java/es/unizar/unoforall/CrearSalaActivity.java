@@ -34,6 +34,7 @@ public class CrearSalaActivity extends AppCompatActivity {
         setTitle(R.string.crearSala);
 
         configSala = new ConfigSala();
+        configSala.setModoJuego(ConfigSala.ModoJuego.Original);
         reglasEspeciales = configSala.getReglas();
 
         Spinner spinner = findViewById(R.id.modo_juego_spinner);
@@ -54,7 +55,7 @@ public class CrearSalaActivity extends AppCompatActivity {
         });
 
         RadioButton button;
-        if(configSala.esPublica()){
+        if(configSala.isEsPublica()){
             button = findViewById(R.id.radio_publica);
         }else{
             button = findViewById(R.id.radio_privada);

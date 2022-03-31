@@ -74,7 +74,7 @@ public class SalaActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void updateWidgets(Sala sala){
         for(int i=0; i<MAX_PARTICIPANTES_SALA; i++){
-            if(i < sala.configuracion.getMaxParticipantes()){
+            if(i < sala.getConfiguracion().getMaxParticipantes()){
                 layoutUsuarios[i].setVisibility(View.VISIBLE);
             }else{
                 layoutUsuarios[i].setVisibility(View.GONE);
@@ -85,7 +85,7 @@ public class SalaActivity extends AppCompatActivity {
         List<UsuarioVO> usuarios = new ArrayList<>(participantes.keySet());
         usuarios.sort(Comparator.comparing(UsuarioVO::getNombre));
         int i, numParticipantesListos = 0;
-        for(i=0; i<sala.configuracion.getMaxParticipantes(); i++){
+        for(i=0; i<sala.getConfiguracion().getMaxParticipantes(); i++){
             if(i < usuarios.size()){
                 UsuarioVO usuario = usuarios.get(i);
                 setUserData(i, usuario, participantes.get(usuario));
@@ -97,7 +97,7 @@ public class SalaActivity extends AppCompatActivity {
             }
         }
 
-        numUsuariosTextView.setText(sala.numParticipantes() + " / " + sala.configuracion.getMaxParticipantes());
+        numUsuariosTextView.setText(sala.numParticipantes() + " / " + sala.getConfiguracion().getMaxParticipantes());
         numUsuariosListosTextView.setText(numParticipantesListos + " / " + sala.numParticipantes());
     }
 
