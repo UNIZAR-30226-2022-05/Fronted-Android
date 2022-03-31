@@ -3,13 +3,12 @@ package es.unizar.unoforall.api;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import es.unizar.unoforall.PantallaPrincipalActivity;
+import es.unizar.unoforall.PrincipalActivity;
 import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
@@ -63,8 +62,8 @@ public class BackendAPI{
                     usuarioDbAdapter.modificarUsuario(usuarioID, correo, contrasennaHash);
                 }
 
-                Intent intent = new Intent(activity, PantallaPrincipalActivity.class);
-                intent.putExtra(PantallaPrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
+                Intent intent = new Intent(activity, PrincipalActivity.class);
+                intent.putExtra(PrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
                 activity.startActivity(intent);
             }else{
                 mostrarMensaje(respuestaLogin.getErrorInfo());
@@ -74,9 +73,9 @@ public class BackendAPI{
     public void loginPaso2(UUID claveInicio){
         wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
-            PantallaPrincipalActivity.setSesionID(sesionID);
+            PrincipalActivity.setSesionID(sesionID);
             obtenerUsuarioVO(sesionID, usuarioVO -> {
-                PantallaPrincipalActivity.setUsuario(usuarioVO);
+                PrincipalActivity.setUsuario(usuarioVO);
                 Toast.makeText(activity, "Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
             });
         });

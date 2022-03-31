@@ -26,7 +26,7 @@
             android:name=".CrearSalaActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".PantallaPrincipalActivity"
+            android:name=".PrincipalActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
@@ -35,7 +35,7 @@
             android:name=".RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
+            android:name=".InicioActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

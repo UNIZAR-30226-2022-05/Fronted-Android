@@ -5,15 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
-import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.MyAdapter;
 
 public class BuscarSalaActivity extends AppCompatActivity {
@@ -30,7 +26,7 @@ public class BuscarSalaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_buscar_sala);
         setTitle(R.string.busquedaDeSalas);
 
-        sesionID = PantallaPrincipalActivity.getSesionID();
+        sesionID = PrincipalActivity.getSesionID();
 
         BackendAPI api = new BackendAPI(this);
         api.obtenerSalasInicio(sesionID, misSalas -> {

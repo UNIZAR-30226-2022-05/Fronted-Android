@@ -6,15 +6,12 @@ import java.util.UUID;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.api.WebSocketAPI;
 import es.unizar.unoforall.model.UsuarioVO;
 
-public class PantallaPrincipalActivity extends AppCompatActivity {
+public class PrincipalActivity extends AppCompatActivity {
 
     public static final String KEY_CLAVE_INICIO = "claveInicio";
 
@@ -23,7 +20,7 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         return sesionID;
     }
     public static void setSesionID(UUID sesionID){
-        PantallaPrincipalActivity.sesionID = sesionID;
+        PrincipalActivity.sesionID = sesionID;
     }
 
     private static UsuarioVO usuario;
@@ -31,13 +28,13 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         return usuario;
     }
     public static void setUsuario(UsuarioVO usuario){
-        PantallaPrincipalActivity.usuario = usuario;
+        PrincipalActivity.usuario = usuario;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pantalla_principal);
+        setContentView(R.layout.activity_principal);
 
         UUID claveInicio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
         BackendAPI api = new BackendAPI(this);
@@ -57,7 +54,7 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         builder.setMessage("¿Quieres cerrar sesión?");
         builder.setPositiveButton("Sí", (dialog, which) -> {
             BackendAPI.closeWebSocketAPI();
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, InicioActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });
