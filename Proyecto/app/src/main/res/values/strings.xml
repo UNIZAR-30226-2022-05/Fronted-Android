@@ -54,4 +54,5 @@
     <string name="busquedaDeSalas">Búsqueda de salas</string>
     <string name="entrar">Entrar</string>
 
+    <string name="salaID">ID de la sala:</string>
 </resources>

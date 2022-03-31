@@ -207,7 +207,6 @@ public class BackendAPI{
     }
 
     public void unirseSala(UUID salaID, Consumer<Sala> consumer){
-        Log.i("SalaID", "" + salaID);
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
@@ -218,6 +217,7 @@ public class BackendAPI{
             }
         });
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
+        mostrarMensaje("Te has unido a la sala " + salaID);
     }
     public void listoSala(UUID salaID){
         wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
@@ -225,12 +225,7 @@ public class BackendAPI{
     public void salirSala(UUID salaID){
         wsAPI.unsubscribe("/topic/salas/" + salaID);
         wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
-    }
-
-    public static void closeWebSocketAPI(){
-        if(wsAPI != null){
-            wsAPI.close();
-        }
+        mostrarMensaje("Has salido de la sala " + salaID);
     }
 
     public void obtenerSalasInicio(UUID sesionID, Consumer<RespuestaSalas> consumer){
@@ -240,6 +235,12 @@ public class BackendAPI{
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
+    public static synchronized void closeWebSocketAPI(){
+        if(wsAPI != null){
+            wsAPI.close();
+            wsAPI = null;
+        }
+    }
     @Override
     protected void finalize() throws Throwable{
         usuarioDbAdapter.close();

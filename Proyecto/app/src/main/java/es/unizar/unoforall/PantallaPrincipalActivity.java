@@ -18,8 +18,6 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
 
     public static final String KEY_CLAVE_INICIO = "claveInicio";
 
-    private static WebSocketAPI wsAPI;
-
     private static UUID sesionID;
     public static UUID getSesionID(){
         return sesionID;
@@ -58,7 +56,7 @@ public class PantallaPrincipalActivity extends AppCompatActivity {
         builder.setTitle("Cerrar sesión");
         builder.setMessage("¿Quieres cerrar sesión?");
         builder.setPositiveButton("Sí", (dialog, which) -> {
-            wsAPI.close();
+            BackendAPI.closeWebSocketAPI();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);

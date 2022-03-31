@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.UUID;
@@ -26,12 +27,15 @@ public class SalaActivity extends AppCompatActivity {
 
         salaID = (UUID) getIntent().getSerializableExtra(KEY_SALA_ID);
 
+        TextView salaIDTextView = findViewById(R.id.salaIDTextView);
+        salaIDTextView.setText(salaID.toString());
+
         api = new BackendAPI(this);
         api.unirseSala(salaID, sala -> updateWidgets(sala));
     }
 
     private void updateWidgets(Sala sala){
-        Toast.makeText(this, sala.getParticipantes().size() + "", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
