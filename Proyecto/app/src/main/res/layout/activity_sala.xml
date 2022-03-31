@@ -175,10 +175,29 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:layout_marginTop="30dp"
         android:padding="5dp"
-        android:gravity="center">
+        android:layout_marginTop="5dp">
+
+        <Button
+            android:id="@+id/invitarAmigosButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="120dp"
+            android:backgroundTint="#009688"
+            android:text="@string/invitarAmigos"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:gravity="center"
+        android:layout_marginTop="10dp">
 
         <Button
             android:id="@+id/abandonarSalaButton"

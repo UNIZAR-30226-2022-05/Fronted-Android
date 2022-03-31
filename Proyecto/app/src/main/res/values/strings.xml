@@ -17,6 +17,12 @@
     <string name="mensajeConfirmar">Por favor introduzca el código que le ha llegado a su correo</string>
     <string name="codigo">Código</string>
 
+    <string name="modificarCuenta">Modificar cuenta</string>
+    <string name="modificarAspecto">Modificar aspecto</string>
+    <string name="gestionarAmigos">Gestionar amigos</string>
+    <string name="verEstadisticas">Estadísticas</string>
+    <string name="verHistorial">Historial</string>
+
     <string name="crearSala">Crear Sala</string>
     <string name="confirmarSala">Confirmar Sala</string>
     <string name="participantes">Participantes</string>
@@ -26,7 +32,7 @@
     <string name="publica">Sala pública</string>
     <string name="privada">Sala privada</string>
     <string name="esPublica">Sala pública o privada</string>
-    <string name="eleccionCartasEspeciales">Pulsa para añadir cartas especiales</string>
+    <string name="eleccionCartasEspeciales">Elige las cartas especiales</string>
     <string name="activarRayosX">RayosX</string>
     <string name="activarIntercambio">Intercambio</string>
     <string name="activarx2">x2</string>
@@ -58,6 +64,7 @@
     <string name="usuariosSala">Usuarios en la sala</string>
     <string name="usuariosListos">Usuarios listos</string>
     <string name="sala">Sala</string>
+    <string name="invitarAmigos">Invitar amigos</string>
     <string name="abandonarSala">Abandonar sala</string>
     <string name="listo">Listo</string>
 </resources>

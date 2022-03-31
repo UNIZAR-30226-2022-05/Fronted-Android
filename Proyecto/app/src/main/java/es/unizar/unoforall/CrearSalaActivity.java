@@ -1,8 +1,5 @@
 package es.unizar.unoforall;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,12 +10,13 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ReglasEspeciales;
 
@@ -113,7 +111,7 @@ public class CrearSalaActivity extends AppCompatActivity {
 
         Button confirmarSalaButton = findViewById(R.id.confirmarSalaButton);
         confirmarSalaButton.setOnClickListener(view -> {
-            UUID sesionID = PantallaPrincipalActivity.getSesionID();
+            UUID sesionID = PrincipalActivity.getSesionID();
             BackendAPI api = new BackendAPI(this);
             api.crearSala(sesionID, configSala);
         });
