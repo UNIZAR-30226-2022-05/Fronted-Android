@@ -17,6 +17,8 @@
     <string name="mensajeConfirmar">Por favor introduzca el código que le ha llegado a su correo</string>
     <string name="codigo">Código</string>
 
+    <string name="modificarCuenta">Modificar cuenta</string>
+
     <string name="crearSala">Crear Sala</string>
     <string name="confirmarSala">Confirmar Sala</string>
     <string name="participantes">Participantes</string>

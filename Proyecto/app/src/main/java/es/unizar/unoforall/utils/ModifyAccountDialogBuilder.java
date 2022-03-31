@@ -28,9 +28,11 @@ public class ModifyAccountDialogBuilder {
         this.activity = activity;
 
         this.nombreUsuarioEditText = new EditText(activity);
+        this.nombreUsuarioEditText.setHint("Nuevo nombre de usuario");
 
         this.correoEditText = new EditText(activity);
         this.correoEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        this.correoEditText.setHint("Nuevo correo");
 
         this.passwordEditText = new EditText(activity);
         this.passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);

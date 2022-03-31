@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 
 import es.unizar.unoforall.api.BackendAPI;
@@ -14,6 +16,7 @@ import es.unizar.unoforall.model.UsuarioVO;
 public class PrincipalActivity extends AppCompatActivity {
 
     public static final String KEY_CLAVE_INICIO = "claveInicio";
+    private static final int MODIFICAR_CUENTA_ID = 0;
 
     private static UUID sesionID;
     public static UUID getSesionID(){
@@ -45,6 +48,23 @@ public class PrincipalActivity extends AppCompatActivity {
 
         Button buscarSalaButton = findViewById(R.id.buscarSalaPublicaButton);
         buscarSalaButton.setOnClickListener(v -> startActivity(new Intent(this, BuscarSalaActivity.class)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        boolean result = super.onCreateOptionsMenu(menu);
+        menu.add(Menu.NONE, MODIFICAR_CUENTA_ID, Menu.NONE, R.string.modificarCuenta);
+        return result;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case MODIFICAR_CUENTA_ID:
+                new BackendAPI(this).modificarCuenta(sesionID);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

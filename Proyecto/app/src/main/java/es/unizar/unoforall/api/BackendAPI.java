@@ -247,9 +247,9 @@ public class BackendAPI{
                 if(contrasenna == null){
                     // Si no se ha cambiado la contraseña,
                     //   se envía la anterior
-                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, usuarioVO.getContrasenna());
+                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, usuarioVO.getContrasenna(), builder);
                 }else{
-                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna));
+                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
                 }
             });
             builder.setNegativeButton(() -> {
@@ -258,7 +258,9 @@ public class BackendAPI{
             builder.show();
         });
     }
-    private void modificarCuentaPaso2(UUID sesionID, String nombreUsuario, String correo, String contrasennaHash){
+    private void modificarCuentaPaso2(UUID sesionID,
+                                      String nombreUsuario, String correo, String contrasennaHash,
+                                      ModifyAccountDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepOne");
         api.addParameter("sessionID", sesionID.toString());
         api.addParameter("correoNuevo", correo);
@@ -268,12 +270,13 @@ public class BackendAPI{
         api.setOnObjectReceived(String.class, error -> {
             if(error == null){
                 // Si no ha habido error
-                CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(activity);
-                builder.setPositiveButton(codigo -> modificarCuentaPaso3(sesionID, codigo, correo, contrasennaHash, builder));
-                builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
-                builder.show();
+                CodeConfirmDialogBuilder builder2 = new CodeConfirmDialogBuilder(activity);
+                builder2.setPositiveButton(codigo -> modificarCuentaPaso3(sesionID, codigo, correo, contrasennaHash, builder2));
+                builder2.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+                builder2.show();
             }else{
                 mostrarMensaje(error);
+                builder.show();
             }
         });
     }
