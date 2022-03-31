@@ -71,6 +71,7 @@ public class BackendAPI{
             }
         });
     }
+
     public void loginPaso2(UUID claveInicio){
         wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
@@ -101,6 +102,7 @@ public class BackendAPI{
             }
         });
     }
+
     private void registerPaso2(String correo, int codigo, String contrasennaHash, CodeConfirmDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/registerStepTwo");
         api.addParameter("correo", correo);
@@ -118,6 +120,7 @@ public class BackendAPI{
             }
         });
     }
+
     private void registerCancel(String correo){
         RestAPI api = new RestAPI(activity, "/api/registerCancel");
         api.addParameter("correo", correo);
@@ -142,6 +145,7 @@ public class BackendAPI{
             }
         });
     }
+
     private void restablecerContrasennaPaso2(String correo, int codigo, CodeConfirmDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/reestablecerContrasennaStepTwo");
         api.addParameter("correo", correo);
@@ -161,6 +165,7 @@ public class BackendAPI{
             }
         });
     }
+
     private void restablecerContrasennaPaso3(String correo, String contrasenna){
         String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
         RestAPI api = new RestAPI(activity, "/api/reestablecerContrasennaStepThree");
@@ -213,6 +218,7 @@ public class BackendAPI{
         intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
         activity.startActivityForResult(intent,0);
     }
+
     public void unirseSala(UUID salaID, Consumer<Sala> consumer){
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
@@ -226,9 +232,11 @@ public class BackendAPI{
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
         mostrarMensaje("Te has unido a la sala");
     }
+
     public void listoSala(UUID salaID){
         wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
     }
+
     public void salirSala(UUID salaID){
         wsAPI.unsubscribe("/topic/salas/" + salaID);
         wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
@@ -243,13 +251,13 @@ public class BackendAPI{
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
-<<<<<<< HEAD
-    public void obtenerSalasFiltro(UUID sesionID, ConfigSala filtro, Consumer<RespuestaSalas> consumer){
+    public void obtenerSalasFiltro(UUID sesionID, ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
         api.addParameter("sesionID", sesionID.toString());
         api.addParameter("configuracion", filtro.toString());
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
-=======
+    }
+
     public void modificarCuenta(UUID sesionID){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
         api.addParameter("sessionID", sesionID.toString());
@@ -273,6 +281,7 @@ public class BackendAPI{
             builder.show();
         });
     }
+
     private void modificarCuentaPaso2(UUID sesionID,
                                       String nombreUsuario, String correo, String contrasennaHash,
                                       ModifyAccountDialogBuilder builder){
@@ -295,6 +304,7 @@ public class BackendAPI{
             }
         });
     }
+
     private void modificarCuentaPaso3(UUID sesionID, int codigo,
                                       String correo, String contrasennaHash,
                                       CodeConfirmDialogBuilder builder){
@@ -313,7 +323,6 @@ public class BackendAPI{
                 builder.show();
             }
         });
->>>>>>> Desarrollo
     }
 
     public static synchronized void closeWebSocketAPI(){
