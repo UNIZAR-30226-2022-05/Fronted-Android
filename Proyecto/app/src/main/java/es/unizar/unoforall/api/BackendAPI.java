@@ -9,6 +9,7 @@ import android.widget.Toast;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import es.unizar.unoforall.InicioActivity;
 import es.unizar.unoforall.PrincipalActivity;
 import es.unizar.unoforall.R;
 import es.unizar.unoforall.SalaActivity;
@@ -323,7 +324,7 @@ public class BackendAPI{
         });
     }
     private void cancelModificarCuenta(UUID sesionID){
-        RestAPI api = new RestAPI(activity, "/api/sesionID");
+        RestAPI api = new RestAPI(activity, "/api/actualizarCancel");
         api.addParameter("sessionID", sesionID.toString());
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> mostrarMensaje("Operación cancelada"));
@@ -337,11 +338,14 @@ public class BackendAPI{
                 api.addParameter("sessionID", sesionID.toString());
                 api.openConnection();
                 api.setOnObjectReceived(String.class, error -> {
-                    if(error == null){
+                    if(error == null || error.equals("BORRADA")){
                         // No ha habido error
                         usuarioDbAdapter.deleteUsuario(usuarioVO.getCorreo());
                         mostrarMensaje("Cuenta borrada");
-                        activity.finish();
+                        BackendAPI.closeWebSocketAPI();
+                        Intent intent = new Intent(activity, InicioActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        activity.startActivity(intent);
                     }else{
                         mostrarMensaje(error);
                     }
