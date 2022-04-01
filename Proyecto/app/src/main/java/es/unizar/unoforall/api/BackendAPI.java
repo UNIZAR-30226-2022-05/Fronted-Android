@@ -17,10 +17,11 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
-import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
-import es.unizar.unoforall.utils.ModifyAccountDialogBuilder;
-import es.unizar.unoforall.utils.ResetPasswordDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.ModifyAccountDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
 
 public class BackendAPI{
     private static final String VACIO = "VACIO";
@@ -200,12 +201,11 @@ public class BackendAPI{
         });
     }
 
-    public void buscarSala(String sesionID, String salaID, Consumer<Sala> consumer){
-        RestAPI api = new RestAPI(activity, "/api/buscarSalaID");
-        api.addParameter("sesionID", sesionID);
-        api.addParameter("salaID", salaID);
-        api.openConnection();
-        api.setOnObjectReceived(Sala.class, consumer);
+    public void unirseSalaPorID(){
+        SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
+        builder.setPositiveButton(salaID -> iniciarUnirseSala(salaID));
+        builder.setNegativeButton(() -> mostrarMensaje("Búsqueda por ID cancelada"));
+        builder.show();
     }
 
     public void iniciarUnirseSala(UUID salaID){
@@ -219,6 +219,7 @@ public class BackendAPI{
                 // Se ha producido un error
                 mostrarMensaje("Error al conectarse a la sala");
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
+                activity.finish();
             }else{
                 consumer.accept(sala);
             }
