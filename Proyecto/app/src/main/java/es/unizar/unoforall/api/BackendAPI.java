@@ -1,6 +1,7 @@
 package es.unizar.unoforall.api;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import es.unizar.unoforall.PrincipalActivity;
+import es.unizar.unoforall.R;
 import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
@@ -19,6 +21,7 @@ import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
+import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ModifyAccountDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
@@ -183,7 +186,13 @@ public class BackendAPI{
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
         api.addParameter("sessionID", sesionID.toString());
         api.openConnection();
-        api.setOnObjectReceived(UsuarioVO.class, consumer);
+        api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
+            if(usuarioVO.isExito()){
+                consumer.accept(usuarioVO);
+            }else{
+                mostrarMensaje("Se ha producido un error al obtener el usuario");
+            }
+        });
     }
 
     public void crearSala(UUID sesionID, ConfigSala configSala){
@@ -204,7 +213,7 @@ public class BackendAPI{
     public void unirseSalaPorID(){
         SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
         builder.setPositiveButton(salaID -> iniciarUnirseSala(salaID));
-        builder.setNegativeButton(() -> mostrarMensaje("Búsqueda por ID cancelada"));
+        builder.setNegativeButton(() -> mostrarMensaje("Búsqueda de sala por ID cancelada"));
         builder.show();
     }
 
@@ -317,6 +326,29 @@ public class BackendAPI{
         api.addParameter("sessionID", sesionID.toString());
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> mostrarMensaje("Operación cancelada"));
+    }
+
+    public void borrarCuenta(UUID sesionID){
+        obtenerUsuarioVO(sesionID, usuarioVO -> {
+            DeleteAccountDialogBuilder builder = new DeleteAccountDialogBuilder(activity);
+            builder.setPositiveRunnable(() -> {
+                RestAPI api = new RestAPI(activity, "/api/borrarCuenta");
+                api.addParameter("sessionID", sesionID.toString());
+                api.openConnection();
+                api.setOnObjectReceived(String.class, error -> {
+                    if(error == null){
+                        // No ha habido error
+                        usuarioDbAdapter.deleteUsuario(usuarioVO.getCorreo());
+                        mostrarMensaje("Cuenta borrada");
+                        activity.finish();
+                    }else{
+                        mostrarMensaje(error);
+                    }
+                });
+            });
+            builder.setNegativeButton(() -> mostrarMensaje("Borrado cancelado"));
+            builder.show();
+        });
     }
 
     public static synchronized void closeWebSocketAPI(){

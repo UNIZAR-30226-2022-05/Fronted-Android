@@ -23,6 +23,7 @@ public class PrincipalActivity extends AppCompatActivity {
     private static final int GESTIONAR_AMIGOS_ID = 2;
     private static final int VER_ESTADISTICAS_ID = 3;
     private static final int VER_HISTORIAL_ID = 4;
+    private static final int BORRAR_CUENTA_ID = 5;
 
     private static UUID sesionID;
     public static UUID getSesionID(){
@@ -64,6 +65,7 @@ public class PrincipalActivity extends AppCompatActivity {
         menu.add(Menu.NONE, GESTIONAR_AMIGOS_ID, Menu.NONE, R.string.gestionarAmigos);
         menu.add(Menu.NONE, VER_ESTADISTICAS_ID, Menu.NONE, R.string.verEstadisticas);
         menu.add(Menu.NONE, VER_HISTORIAL_ID, Menu.NONE, R.string.verHistorial);
+        menu.add(Menu.NONE, BORRAR_CUENTA_ID, Menu.NONE, R.string.borrarCuenta);
         return result;
     }
 
@@ -72,6 +74,9 @@ public class PrincipalActivity extends AppCompatActivity {
         switch(item.getItemId()){
             case MODIFICAR_CUENTA_ID:
                 new BackendAPI(this).modificarCuenta(sesionID);
+                break;
+            case BORRAR_CUENTA_ID:
+                new BackendAPI(this).borrarCuenta(sesionID);
                 break;
             default:
                 Toast.makeText(this, "No implementado todavía", Toast.LENGTH_SHORT).show();
