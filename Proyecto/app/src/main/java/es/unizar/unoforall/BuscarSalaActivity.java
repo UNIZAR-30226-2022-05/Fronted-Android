@@ -40,8 +40,6 @@ public class BuscarSalaActivity extends AppCompatActivity {
             informacionBusqueda.setAdapter(adapter);
         });
 
-        idSala = findViewById(R.id.busquedaIdSala);
-
         Button buscarButton = findViewById(R.id.buscarPorIdButton);
         buscarButton.setOnClickListener(view -> api.unirseSalaPorID());
 

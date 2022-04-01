@@ -246,7 +246,8 @@ public class BackendAPI{
     public void obtenerSalasFiltro(UUID sesionID, ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
         api.addParameter("sesionID", sesionID.toString());
-        api.addParameter("configuracion", filtro.toString());
+        api.addParameter("configuracion", filtro);
+        api.openConnection();
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
