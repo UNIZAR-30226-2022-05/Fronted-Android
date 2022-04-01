@@ -22,6 +22,7 @@
     <string name="gestionarAmigos">Gestionar amigos</string>
     <string name="verEstadisticas">Estadísticas</string>
     <string name="verHistorial">Historial</string>
+    <string name="borrarCuenta">Borrar cuenta</string>
 
     <string name="crearSala">Crear Sala</string>
     <string name="confirmarSala">Confirmar Sala</string>

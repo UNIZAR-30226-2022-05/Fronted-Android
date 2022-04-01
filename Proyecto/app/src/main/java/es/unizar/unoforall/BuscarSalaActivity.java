@@ -1,6 +1,7 @@
 package es.unizar.unoforall;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -20,7 +21,6 @@ public class BuscarSalaActivity extends AppCompatActivity {
     private UUID sesionID;
     private HashMap<UUID, Sala> salasIniciales;
     private ListView informacionBusqueda;
-    private EditText idSala;
 
 
     @Override
@@ -54,6 +54,18 @@ public class BuscarSalaActivity extends AppCompatActivity {
             }));
             filtrado.setNegativeButton(() -> {});
             filtrado.show();
+        });
+
+        SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(() -> {
+            api.obtenerSalasInicio(sesionID, respuestaSalas -> {
+                salasIniciales = respuestaSalas.getSalas();
+
+                informacionBusqueda = findViewById(R.id.salasEncontradas);
+                SalaListAdapter adapter = new SalaListAdapter(this, salasIniciales);
+                informacionBusqueda.setAdapter(adapter);
+                pullToRefresh.setRefreshing(false);
+            });
         });
     }
 }
