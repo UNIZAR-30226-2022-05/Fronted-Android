@@ -20,6 +20,7 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
+import es.unizar.unoforall.utils.DelayedTask;
 import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
@@ -81,7 +82,7 @@ public class BackendAPI{
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
             consumer.accept(sesionID);
         });
-        wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO");
+        DelayedTask.runDelayedTask(() -> wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO"), 500);
     }
 
     public void register(String nombreUsuario, String correo, String contrasennaHash){
