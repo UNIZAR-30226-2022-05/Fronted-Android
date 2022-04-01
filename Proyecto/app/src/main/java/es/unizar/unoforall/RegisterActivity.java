@@ -8,15 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.api.RestAPI;
-import es.unizar.unoforall.api.Serializar;
-import es.unizar.unoforall.utils.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 
 

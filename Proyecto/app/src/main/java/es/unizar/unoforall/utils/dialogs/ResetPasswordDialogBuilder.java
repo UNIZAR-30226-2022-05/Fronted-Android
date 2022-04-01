@@ -1,53 +1,43 @@
-package es.unizar.unoforall.utils;
+package es.unizar.unoforall.utils.dialogs;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.text.InputType;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import java.util.Objects;
+import androidx.appcompat.app.AlertDialog;
+
+import java.util.function.Consumer;
 
 import es.unizar.unoforall.R;
 
-public class ModifyAccountDialogBuilder{
+public class ResetPasswordDialogBuilder{
     private static final int PADDING = 25;
     private final Activity activity;
 
     private final LinearLayout linearLayout;
-    private final EditText nombreUsuarioEditText;
-    private final EditText correoEditText;
     private final EditText passwordEditText;
     private final EditText passwordBisEditText;
 
     private Runnable positiveRunnable;
     private Runnable negativeRunnable;
 
-    public ModifyAccountDialogBuilder(Activity activity){
+    public ResetPasswordDialogBuilder(Activity activity){
         this.activity = activity;
-
-        this.nombreUsuarioEditText = new EditText(activity);
-        this.nombreUsuarioEditText.setHint("Nuevo nombre de usuario");
-
-        this.correoEditText = new EditText(activity);
-        this.correoEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        this.correoEditText.setHint("Nuevo correo");
 
         this.passwordEditText = new EditText(activity);
         this.passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        this.passwordEditText.setHint("(Contraseña sin modificar)");
+        this.passwordEditText.setHint("Contraseña");
 
         this.passwordBisEditText = new EditText(activity);
         this.passwordBisEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        this.passwordBisEditText.setHint("(Contraseña sin modificar)");
+        this.passwordBisEditText.setHint("Repetir la contraseña");
 
         this.linearLayout = new LinearLayout(activity);
         this.linearLayout.setOrientation(LinearLayout.VERTICAL);
         this.linearLayout.setPadding(PADDING, PADDING, PADDING, PADDING);
-        this.linearLayout.addView(nombreUsuarioEditText);
-        this.linearLayout.addView(correoEditText);
         this.linearLayout.addView(passwordEditText);
         this.linearLayout.addView(passwordBisEditText);
 
@@ -55,41 +45,34 @@ public class ModifyAccountDialogBuilder{
         this.negativeRunnable = () -> {};
     }
 
-    public void setNombreUsuario(String nombreUsuario){
-        this.nombreUsuarioEditText.setText(nombreUsuario);
+    public void setErrorPassword(String error){
+        this.passwordEditText.setError(error);
     }
-    public void setCorreo(String correo) {
-        this.correoEditText.setText(correo);
+    public void setErrorPasswordBis(String error){
+        this.passwordBisEditText.setError(error);
     }
 
-    public void setPositiveButton(TriConsumer<String, String, String> consumer){
+    public void setPositiveButton(Consumer<String> consumer){
         this.positiveRunnable = () -> {
-            String nombreUsuario = nombreUsuarioEditText.getText().toString();
-            if(nombreUsuario.isEmpty()){
-                nombreUsuarioEditText.setError(activity.getString(R.string.campoVacio));
-                show();
-                return;
-            }
-
-            String correo = correoEditText.getText().toString();
-            if(correo.isEmpty()){
-                correoEditText.setError(activity.getString(R.string.campoVacio));
-                show();
-                return;
-            }
-
             String password = passwordEditText.getText().toString();
             String passwordBis = passwordBisEditText.getText().toString();
-            if(!passwordBis.equals(password)){
-                passwordBisEditText.setError(activity.getString(R.string.errorContrasegnas));
+            if(password.isEmpty()){
+                setErrorPassword(activity.getString(R.string.campoVacio));
                 show();
                 return;
             }
-            if(password.isEmpty()){
-                password = null;
+            if(passwordBis.isEmpty()){
+                setErrorPasswordBis(activity.getString(R.string.campoVacio));
+                show();
+                return;
+            }
+            if(!passwordBis.equals(password)){
+                setErrorPasswordBis(activity.getString(R.string.errorContrasegnas));
+                show();
+                return;
             }
 
-            consumer.accept(nombreUsuario, correo, password);
+            consumer.accept(password);
         };
     }
 
@@ -104,8 +87,8 @@ public class ModifyAccountDialogBuilder{
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Configuración de cuenta");
-        builder.setMessage("Modifique los datos deseados y pulse en confirmar");
+        builder.setTitle("Nueva contraseña");
+        builder.setMessage("Introduzca la nueva contraseña");
         builder.setView(linearLayout);
         builder.setPositiveButton("Confirmar", (dialog, which) -> positiveRunnable.run());
         builder.setNegativeButton("Cancelar", (dialog, which) -> negativeRunnable.run());

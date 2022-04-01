@@ -54,11 +54,12 @@
     <string name="restablecerContrasenna">Restablecer contraseña</string>
 
     <string name="buscarSala">Buscar Sala</string>
-    <string name="buscar">Buscar</string>
+    <string name="unirseSalaPorID">Unirse a una sala por su ID</string>
     <string name="busquedaAvanzada">Búsqueda Avanzada</string>
     <string name="resultadosBusqueda">Resultados</string>
     <string name="busquedaDeSalas">Búsqueda de salas</string>
     <string name="entrar">Entrar</string>
+    <string name="salaIDinvalido">ID de sala no válido</string>
 
     <string name="salaID">ID de la sala:</string>
     <string name="usuariosSala">Usuarios en la sala</string>
