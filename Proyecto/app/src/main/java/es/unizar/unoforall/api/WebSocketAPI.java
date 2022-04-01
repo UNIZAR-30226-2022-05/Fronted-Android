@@ -17,7 +17,7 @@ import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 public class WebSocketAPI {
-    private static final String SERVER_IP = "ws://192.168.1.133/unoforall";
+    private static String SERVER_URL = "ws://192.168.1.100/unoforall";
     private static final int CLIENT_HEARTBEAT_MS = 1000;
     private static final int SERVER_HEARTBEAT_MS = 1000;
 
@@ -37,6 +37,10 @@ public class WebSocketAPI {
         return this.onError;
     }
 
+    public static void setServerIP(String serverIP){
+        WebSocketAPI.SERVER_URL = "ws://" + serverIP + "/unoforall";
+    }
+
     public WebSocketAPI(){
         this.suscripciones = new HashMap<>();
         this.compositeDisposable = new CompositeDisposable();
@@ -49,7 +53,7 @@ public class WebSocketAPI {
     }
 
     public void openConnection(){
-        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SERVER_IP);
+        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SERVER_URL);
         client.withClientHeartbeat(CLIENT_HEARTBEAT_MS).withClientHeartbeat(SERVER_HEARTBEAT_MS);
         client.connect();
     }

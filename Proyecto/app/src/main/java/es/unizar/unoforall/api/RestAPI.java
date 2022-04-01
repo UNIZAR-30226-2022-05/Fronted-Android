@@ -18,21 +18,25 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class RestAPI{
-    private static final String SERVER_IP = "http://192.168.1.133";
+    private static String SERVER_URL = "http://192.168.1.100";
     private static final int HTTP_OK = 200;
     private static final int CONNECTION_TIMEOUT_MS = 3000;
 
     private final Activity activity;
     private final Map<String, String> parameters;
-    private String fullIP;
+    private final String fullIP;
     private HttpURLConnection conexion;
     private boolean closed;
     private Consumer<Exception> onError;
 
+    public static void setServerIP(String serverIP){
+        RestAPI.SERVER_URL = "http://" + serverIP;
+    }
+
     public RestAPI(Activity activity, String seccion){
         this.activity = activity;
         this.parameters = new HashMap<>();
-        this.fullIP = SERVER_IP + seccion;
+        this.fullIP = SERVER_URL + seccion;
         this.conexion = null;
         this.closed = false;
 
@@ -80,7 +84,7 @@ public class RestAPI{
 
                 URL url = new URL(fullIP);
                 conexion = (HttpURLConnection) url.openConnection();
-                conexion.setRequestMethod( "POST" );
+                conexion.setRequestMethod("POST");
                 conexion.setConnectTimeout(CONNECTION_TIMEOUT_MS);
                 conexion.setDoOutput(true);
 

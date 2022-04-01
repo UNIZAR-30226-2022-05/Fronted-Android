@@ -1,4 +1,4 @@
-package es.unizar.unoforall.utils;
+package es.unizar.unoforall.utils.dialogs;
 
 import android.app.Activity;
 import android.view.View;

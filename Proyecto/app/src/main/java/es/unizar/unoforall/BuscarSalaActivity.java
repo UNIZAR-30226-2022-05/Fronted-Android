@@ -5,7 +5,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.HashMap;
@@ -13,7 +12,7 @@ import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.Sala;
-import es.unizar.unoforall.utils.FilterSearchDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.FilterSearchDialogBuilder;
 import es.unizar.unoforall.utils.SalaListAdapter;
 
 public class BuscarSalaActivity extends AppCompatActivity {
