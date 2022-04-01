@@ -82,7 +82,7 @@ public class BackendAPI{
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
             consumer.accept(sesionID);
         });
-        DelayedTask.runDelayedTask(() -> wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO"), 500);
+        DelayedTask.runDelayedTask(() -> wsAPI.sendObject("/app/conectarse/" + claveInicio, VACIO), 500);
     }
 
     public void register(String nombreUsuario, String correo, String contrasennaHash){

@@ -1,0 +1,8 @@
+Para exportar los iconos:
+
+1- Seleccionar el icono deseado del archivo "Set graficos.svg"
+2- Copiarlo y pegarlo en una nueva ventana de InkScape
+3- Pulsar CTRL + SHIFT + R
+4- Guardar
+5- Si el archivo da problemas, usar la página https://www.svgminify.com/
+        para reducirlo

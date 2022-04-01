@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.UUID;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,11 +42,38 @@ public class PrincipalActivity extends AppCompatActivity {
         PrincipalActivity.usuario = usuario;
     }
 
+    private static boolean sesionIniciada = false;
+
+    private Button crearSalaButton;
+    private Button buscarSalaButton;
+
+    private void inicializarButtons(){
+        crearSalaButton = findViewById(R.id.crearSalaButton);
+        crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));
+
+        buscarSalaButton = findViewById(R.id.buscarSalaPublicaButton);
+        buscarSalaButton.setOnClickListener(v -> startActivity(new Intent(this, BuscarSalaActivity.class)));
+    }
+    private void setButtonsEnabled(boolean enabled){
+        crearSalaButton.setEnabled(enabled);
+        buscarSalaButton.setEnabled(enabled);
+        if(enabled){
+            crearSalaButton.setBackgroundColor(Color.parseColor("#2EC322"));
+            buscarSalaButton.setBackgroundColor(Color.parseColor("#2EC322"));
+        }else{
+            crearSalaButton.setBackgroundColor(Color.LTGRAY);
+            buscarSalaButton.setBackgroundColor(Color.LTGRAY);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
         setTitle(R.string.pantallaPrincipal);
+
+        inicializarButtons();
+        setButtonsEnabled(false);
 
         UUID claveInicio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
         BackendAPI api = new BackendAPI(this);
@@ -54,14 +82,10 @@ public class PrincipalActivity extends AppCompatActivity {
             api.obtenerUsuarioVO(sesionID, usuarioVO -> {
                 PrincipalActivity.usuario = usuarioVO;
                 Toast.makeText(this, "Hola " + usuario.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
+                sesionIniciada = true;
+                setButtonsEnabled(true);
             });
         });
-
-        Button crearSalaButton = findViewById(R.id.crearSalaButton);
-        crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));
-
-        Button buscarSalaButton = findViewById(R.id.buscarSalaPublicaButton);
-        buscarSalaButton.setOnClickListener(v -> startActivity(new Intent(this, BuscarSalaActivity.class)));
     }
 
     @Override
@@ -78,6 +102,10 @@ public class PrincipalActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
+        if(!sesionIniciada){
+            return false;
+        }
+
         switch(item.getItemId()){
             case MODIFICAR_CUENTA_ID:
                 new BackendAPI(this).modificarCuenta(sesionID);
@@ -93,6 +121,10 @@ public class PrincipalActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
+        if(!sesionIniciada){
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Cerrar sesión");
         builder.setMessage("¿Quieres cerrar sesión?");
