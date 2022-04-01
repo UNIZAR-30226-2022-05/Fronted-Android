@@ -17,7 +17,7 @@ import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 public class WebSocketAPI {
-    private static final String SERVER_IP = "ws://192.168.1.100/unoforall";
+    private static final String SERVER_IP = "ws://192.168.1.133/unoforall";
     private static final int CLIENT_HEARTBEAT_MS = 1000;
     private static final int SERVER_HEARTBEAT_MS = 1000;
 

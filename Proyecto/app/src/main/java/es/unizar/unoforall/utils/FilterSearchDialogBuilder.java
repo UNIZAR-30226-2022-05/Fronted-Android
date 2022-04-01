@@ -162,10 +162,10 @@ public class FilterSearchDialogBuilder{
         penalizar.setChecked(reglasEspeciales.isEvitarEspecialFinal());
         penalizar.setOnCheckedChangeListener((buttonView, isChecked) ->
                 reglasEspeciales.setEvitarEspecialFinal(isChecked));
-        this.linearLayout1.addView(acumular);
-        this.linearLayout1.addView(redirigir);
-        this.linearLayout1.addView(apilarVarias);
-        this.linearLayout1.addView(penalizar);
+        this.linearLayout2.addView(acumular);
+        this.linearLayout2.addView(redirigir);
+        this.linearLayout2.addView(apilarVarias);
+        this.linearLayout2.addView(penalizar);
 
         this.layoutGlobal = new LinearLayout(activity);
         this.layoutGlobal.setOrientation(LinearLayout.VERTICAL);
@@ -179,8 +179,6 @@ public class FilterSearchDialogBuilder{
         this.layoutGlobal.addView(seleccion);
         this.layoutGlobal.addView(reglasAdicionales);
         this.layoutGlobal.addView(linearLayout2);
-
-
 
         this.positiveRunnable = () -> {};
         this.negativeRunnable = () -> {};
