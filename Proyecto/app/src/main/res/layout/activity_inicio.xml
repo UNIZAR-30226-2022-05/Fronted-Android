@@ -7,24 +7,41 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-
-
-    <Button
-        android:id="@+id/botonRegistro"
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#2EC322"
-        android:text="@string/register"
-        android:textColor="@color/white"
-        app:rippleColor="#1A2351" />
+        app:srcCompat="@drawable/ic_logouno"
+        android:layout_marginTop="50dp"/>
 
-    <Button
-        android:id="@+id/botonLogin"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#2EC322"
-        android:text="@string/login"
-        android:textColor="@color/white"
-        app:rippleColor="#1A2351" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="45dp">
+
+        <Button
+            android:id="@+id/botonRegistro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#2EC322"
+            android:text="@string/register"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351"
+            android:layout_marginEnd="40dp"/>
+
+        <Button
+            android:id="@+id/botonLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#2EC322"
+            android:text="@string/login"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351" />
+    </LinearLayout>
+
+
+
 
 </LinearLayout>

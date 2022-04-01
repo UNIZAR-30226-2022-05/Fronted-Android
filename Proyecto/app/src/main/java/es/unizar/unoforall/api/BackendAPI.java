@@ -76,14 +76,10 @@ public class BackendAPI{
             }
         });
     }
-    public void loginPaso2(UUID claveInicio){
+    public void loginPaso2(UUID claveInicio, Consumer<UUID> consumer){
         wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
-            PrincipalActivity.setSesionID(sesionID);
-            obtenerUsuarioVO(sesionID, usuarioVO -> {
-                PrincipalActivity.setUsuario(usuarioVO);
-                Toast.makeText(activity, "Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
-            });
+            consumer.accept(sesionID);
         });
         wsAPI.sendObject("/app/conectarse/" + claveInicio, "VACIO");
     }

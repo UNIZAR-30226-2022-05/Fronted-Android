@@ -45,10 +45,17 @@ public class PrincipalActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
+        setTitle(R.string.pantallaPrincipal);
 
         UUID claveInicio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
         BackendAPI api = new BackendAPI(this);
-        api.loginPaso2(claveInicio);
+        api.loginPaso2(claveInicio, sesionID -> {
+            PrincipalActivity.sesionID = sesionID;
+            api.obtenerUsuarioVO(sesionID, usuarioVO -> {
+                PrincipalActivity.usuario = usuarioVO;
+                Toast.makeText(this, "Hola " + usuario.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
+            });
+        });
 
         Button crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));

@@ -17,6 +17,7 @@
     <string name="mensajeConfirmar">Por favor introduzca el código que le ha llegado a su correo</string>
     <string name="codigo">Código</string>
 
+    <string name="pantallaPrincipal">Pantalla principal</string>
     <string name="modificarCuenta">Modificar cuenta</string>
     <string name="modificarAspecto">Modificar aspecto</string>
     <string name="gestionarAmigos">Gestionar amigos</string>
