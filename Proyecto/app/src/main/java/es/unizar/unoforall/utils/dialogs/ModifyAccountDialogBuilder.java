@@ -105,7 +105,7 @@ public class ModifyAccountDialogBuilder{
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Configuración de cuenta");
+        builder.setTitle("Modificar cuenta");
         builder.setMessage("Modifique los datos deseados y pulse en confirmar");
         builder.setView(linearLayout);
         builder.setPositiveButton("Confirmar", (dialog, which) -> positiveRunnable.run());

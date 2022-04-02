@@ -224,7 +224,7 @@ public class BackendAPI{
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
-                mostrarMensaje("Error al conectarse a la sala");
+                mostrarMensaje(sala.getError());
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
                 activity.finish();
             }else{
@@ -313,10 +313,12 @@ public class BackendAPI{
                 // Cerrar sesión y volverla a iniciar
                 activity.finish();
                 login(correo, contrasennaHash);
-            }else if(!error.equals("SESION_EXPIRADA")){
+            }else{
                 mostrarMensaje(error);
-                builder.setError("Código incorrecto");
-                builder.show();
+                if(!error.equals("SESION_EXPIRADA")){
+                    builder.setError("Código incorrecto");
+                    builder.show();
+                }
             }
         });
     }
