@@ -40,6 +40,8 @@ public class SalaListAdapter extends ArrayAdapter<Map.Entry<UUID, Sala>> {
 
         Map.Entry<UUID, Sala> entry = getItem(position);
         if(entry != null){
+            String[] nombreModosJuego = activity.getResources().getStringArray(R.array.modo_juego_filtro_array);
+
             UUID uuid = entry.getKey();
             Sala sala = entry.getValue();
             int numParticipantes = sala.numParticipantes();
@@ -53,7 +55,7 @@ public class SalaListAdapter extends ArrayAdapter<Map.Entry<UUID, Sala>> {
 
             textView1.setText("salaID: " + uuid);
             textView2.setText("Número de jugadores: " + numParticipantes + " / " + maxParticipantes);
-            textView3.setText("Modo de juego: " + modoJuego.name());
+            textView3.setText("Modo de juego: " + nombreModosJuego[modoJuego.ordinal()]);
             button.setOnClickListener(v -> {
                 BackendAPI api = new BackendAPI(activity);
                 api.iniciarUnirseSala(uuid);

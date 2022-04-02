@@ -1,18 +1,18 @@
 package es.unizar.unoforall.utils.dialogs;
 
 import android.app.Activity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -26,159 +26,93 @@ public class FilterSearchDialogBuilder{
     private static final int PADDING = 25;
     private final Activity activity;
 
-    private final TextView participantes;
-    private final RadioGroup grupo1;
-    private final RadioButton dos;
-    private final RadioButton tres;
-    private final RadioButton cuatro;
+    private final View mainView;
+    private final LinearLayout filtrosAdicionalesLinearLayout;
 
-    private final TextView privadaPublica;
-    private final RadioGroup grupo2;
-    private final RadioButton publica;
-    private final RadioButton privada;
+    private final RadioButton radio2;
+    private final RadioButton radio3;
+    private final RadioButton radio4;
+    private final RadioButton radioCualquiera;
 
-    private final TextView cartasEspeciales;
-    private final LinearLayout linearLayout1;
-    private final CheckBox rayosX;
-    private final CheckBox intercambio;
-    private final CheckBox x2;
+    private final Spinner modoJuegoSpinner;
 
-    private final TextView modoJuego;
-    private final Spinner seleccion;
+    private final CheckBox rayosXCheckBox;
+    private final CheckBox intercambioCheckBox;
+    private final CheckBox x2CheckBox;
 
-    private final TextView reglasAdicionales;
-    private final LinearLayout linearLayout2;
-    private final CheckBox acumular;
-    private final CheckBox redirigir;
-    private final CheckBox apilarVarias;
-    private final CheckBox penalizar;
-
-    private final LinearLayout layoutGlobal;
-
-    private ConfigSala configSala;
-    private ReglasEspeciales reglasEspeciales;
+    private final CheckBox encadenar_2_4Checkbox;
+    private final CheckBox redirigir_2_4CheckBox;
+    private final CheckBox jugarVariasCartasCheckbox;
+    private final CheckBox penalizacion_4_colorCheckbox;
 
     private Runnable positiveRunnable;
     private Runnable negativeRunnable;
 
-    public FilterSearchDialogBuilder(Activity activity){
+    public FilterSearchDialogBuilder(Activity activity, ConfigSala configSala){
         this.activity = activity;
 
-        this.configSala = new ConfigSala();
-        this.reglasEspeciales = configSala.getReglas();
+        this.mainView = LayoutInflater.from(activity).inflate(R.layout.dialog_busqueda_salas, null);
+        this.filtrosAdicionalesLinearLayout = this.mainView.findViewById(R.id.filtrosAdicionalesLinearLayout);
 
-        this.participantes = new TextView(activity);
-        this.participantes.setText("Participantes");
+        this.radio2 = this.mainView.findViewById(R.id.buscarSala_radio_dos);
+        this.radio3 = this.mainView.findViewById(R.id.buscarSala_radio_tres);
+        this.radio4 = this.mainView.findViewById(R.id.buscarSala_radio_cuatro);
+        this.radioCualquiera = this.mainView.findViewById(R.id.buscarSala_radio_cualquiera);
 
-        this.grupo1 = new RadioGroup(activity);
-        this.dos = new RadioButton(activity);
-        this.dos.setText("2");
-        this.tres = new RadioButton(activity);
-        this.tres.setText("3");
-        this.cuatro = new RadioButton(activity);
-        this.cuatro.setText("4");
-        this.grupo1.setOrientation(LinearLayout.HORIZONTAL);
-        this.grupo1.addView(this.dos);
-        this.grupo1.addView(this.tres);
-        this.grupo1.addView(this.cuatro);
+        this.modoJuegoSpinner = this.mainView.findViewById(R.id.modo_juego_spinner);
 
-        this.privadaPublica = new TextView(activity);
-        this.privadaPublica.setText("Sala pública o privada");
+        this.rayosXCheckBox = this.mainView.findViewById(R.id.buscarSala_checkbox_rayosX);
+        this.intercambioCheckBox = this.mainView.findViewById(R.id.buscarSala_checkbox_intercambio);
+        this.x2CheckBox = this.mainView.findViewById(R.id.buscarSala_checkbox_x2);
 
-        this.grupo2 = new RadioGroup(activity);
-        this.publica = new RadioButton(activity);
-        this.publica.setText("pública");
-        this.privada = new RadioButton(activity);
-        this.privada.setText("privada");
-        this.grupo2.setOrientation(LinearLayout.HORIZONTAL);
-        this.grupo2.addView(this.publica);
-        this.grupo2.addView(this.privada);
+        this.encadenar_2_4Checkbox = this.mainView.findViewById(R.id.buscarSala_checkbox_encadenar_2_4);
+        this.redirigir_2_4CheckBox = this.mainView.findViewById(R.id.buscarSala_checkbox_redirigir_2_4);
+        this.jugarVariasCartasCheckbox = this.mainView.findViewById(R.id.buscarSala_checkbox_jugar_varias_cartas);
+        this.penalizacion_4_colorCheckbox = this.mainView.findViewById(R.id.buscarSala_checkbox_penalizacion_4_color);
 
-        this.cartasEspeciales = new TextView(activity);
-        this.cartasEspeciales.setText("Pulsa para añadir cartas especiales");
-
-        this.linearLayout1 = new LinearLayout(activity);
-        this.linearLayout1.setOrientation(LinearLayout.HORIZONTAL);
-        this.linearLayout1.setPadding(PADDING, PADDING, PADDING, PADDING);
-        this.rayosX = new CheckBox(activity);
-        this.rayosX.setText("RayosX");
-        rayosX.setChecked(reglasEspeciales.isCartaRayosX());
-        rayosX.setOnCheckedChangeListener((buttonView, isChecked) ->
-                reglasEspeciales.setCartaRayosX(isChecked));
-        this.intercambio = new CheckBox(activity);
-        this.intercambio.setText("Intercambio");
-        intercambio.setChecked(reglasEspeciales.isCartaIntercambio());
-        intercambio.setOnCheckedChangeListener((buttonView, isChecked) ->
-                reglasEspeciales.setCartaIntercambio(isChecked));
-        this.x2 = new CheckBox(activity);
-        this.x2.setText("x2");
-        x2.setChecked(reglasEspeciales.isCartaX2());
-        x2.setOnCheckedChangeListener((buttonView, isChecked) ->
-                reglasEspeciales.setCartaX2(isChecked));
-        this.linearLayout1.addView(rayosX);
-        this.linearLayout1.addView(intercambio);
-        this.linearLayout1.addView(x2);
-
-        this.modoJuego = new TextView(activity);
-        this.modoJuego.setText("Elige un modo de juego");
-
-        this.seleccion = new Spinner(activity);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
-                R.array.modo_juego_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.seleccion.setAdapter(adapter);
-        this.seleccion.setSelection(0);
-        seleccion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                configSala.setModoJuego(ConfigSala.ModoJuego.values()[i]);
+        ToggleButton toggleButton = this.mainView.findViewById(R.id.filtrosAdicionalesToggleButton);
+        toggleButton.setOnCheckedChangeListener((compoundButton, checked) -> {
+            if(checked){
+                this.filtrosAdicionalesLinearLayout.setVisibility(View.VISIBLE);
+            }else{
+                this.filtrosAdicionalesLinearLayout.setVisibility(View.GONE);
             }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {}
         });
 
-        this.reglasAdicionales = new TextView(activity);
-        this.reglasAdicionales.setText("Elige reglas adicionales");
+        switch(configSala.getMaxParticipantes()){
+            case 2:
+                radio2.setChecked(true);
+                break;
+            case 3:
+                radio3.setChecked(true);
+                break;
+            case 4:
+                radio4.setChecked(true);
+                break;
+            default:
+                radioCualquiera.setChecked(true);
+                break;
+        }
 
-        this.linearLayout2 = new LinearLayout(activity);
-        this.linearLayout2.setOrientation(LinearLayout.VERTICAL);
-        this.acumular = new CheckBox(activity);
-        this.acumular.setText("Acumular efecto de +2 y +4");
-        acumular.setChecked(reglasEspeciales.isEncadenarRoboCartas());
-        acumular.setOnCheckedChangeListener((buttonView, isChecked) ->
-                reglasEspeciales.setEncadenarRoboCartas(isChecked));
-        this.redirigir = new CheckBox(activity);
-        this.redirigir.setText("Redirigir efecto de +2 y +4");
-        redirigir.setChecked(reglasEspeciales.isRedirigirRoboCartas());
-        redirigir.setOnCheckedChangeListener((buttonView, isChecked) ->
-                reglasEspeciales.setRedirigirRoboCartas(isChecked));
-        this.apilarVarias = new CheckBox(activity);
-        this.apilarVarias.setText("Permite escalera y jugar varias del mismo numero");
-        apilarVarias.setChecked(reglasEspeciales.isJugarVariasCartas());
-        apilarVarias.setOnCheckedChangeListener((buttonView, isChecked) ->
-                reglasEspeciales.setJugarVariasCartas(isChecked));
-        this.penalizar = new CheckBox(activity);
-        this.penalizar.setText("Penaliza si ultima carta es +4 o cambio de color");
-        penalizar.setChecked(reglasEspeciales.isEvitarEspecialFinal());
-        penalizar.setOnCheckedChangeListener((buttonView, isChecked) ->
-                reglasEspeciales.setEvitarEspecialFinal(isChecked));
-        this.linearLayout2.addView(acumular);
-        this.linearLayout2.addView(redirigir);
-        this.linearLayout2.addView(apilarVarias);
-        this.linearLayout2.addView(penalizar);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
+                R.array.modo_juego_filtro_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.modoJuegoSpinner.setAdapter(adapter);
+        this.modoJuegoSpinner.setSelection(configSala.getModoJuego().ordinal());
 
-        this.layoutGlobal = new LinearLayout(activity);
-        this.layoutGlobal.setOrientation(LinearLayout.VERTICAL);
-        this.layoutGlobal.addView(participantes);
-        this.layoutGlobal.addView(grupo1);
-        this.layoutGlobal.addView(privadaPublica);
-        this.layoutGlobal.addView(grupo2);
-        this.layoutGlobal.addView(cartasEspeciales);
-        this.layoutGlobal.addView(linearLayout1);
-        this.layoutGlobal.addView(modoJuego);
-        this.layoutGlobal.addView(seleccion);
-        this.layoutGlobal.addView(reglasAdicionales);
-        this.layoutGlobal.addView(linearLayout2);
+        ReglasEspeciales reglasEspeciales = configSala.getReglas();
+        this.rayosXCheckBox.setChecked(reglasEspeciales.isCartaRayosX());
+        this.intercambioCheckBox.setChecked(reglasEspeciales.isCartaIntercambio());
+        this.x2CheckBox.setChecked(reglasEspeciales.isCartaX2());
+
+        this.encadenar_2_4Checkbox.setChecked(reglasEspeciales.isEncadenarRoboCartas());
+        this.redirigir_2_4CheckBox.setChecked(reglasEspeciales.isRedirigirRoboCartas());
+        this.jugarVariasCartasCheckbox.setChecked(reglasEspeciales.isJugarVariasCartas());
+        this.penalizacion_4_colorCheckbox.setChecked(reglasEspeciales.isEvitarEspecialFinal());
+
+        if(reglasEspeciales.isReglasValidas()){
+            toggleButton.performClick();
+        }
 
         this.positiveRunnable = () -> {};
         this.negativeRunnable = () -> {};
@@ -186,23 +120,36 @@ public class FilterSearchDialogBuilder{
 
     public void setPositiveButton(Consumer<ConfigSala> consumer){
         this.positiveRunnable = () -> {
+            ConfigSala configSala = new ConfigSala();
 
-            if(publica.isChecked()){
-                configSala.setEsPublica(true);
-            }
-            if(privada.isChecked()){
-                configSala.setEsPublica(false);
-            }
-
-            if(dos.isChecked()){
+            // Establecer el número máximo de participantes
+            if(this.radio2.isChecked()){
                 configSala.setMaxParticipantes(2);
-            }
-            if(tres.isChecked()){
+            }else if(this.radio3.isChecked()){
                 configSala.setMaxParticipantes(3);
-            }
-            if(cuatro.isChecked()){
+            }else if(this.radio4.isChecked()){
                 configSala.setMaxParticipantes(4);
+            }else{
+                configSala.setMaxParticipantes(-1);
             }
+
+            // Establecer el modo de juego
+            int idModoJuego = this.modoJuegoSpinner.getSelectedItemPosition();
+            configSala.setModoJuego(ConfigSala.ModoJuego.values()[idModoJuego]);
+
+            // Establecer los filtros adicionales
+            ReglasEspeciales reglasEspeciales = new ReglasEspeciales();
+
+            reglasEspeciales.setCartaRayosX(this.rayosXCheckBox.isChecked());
+            reglasEspeciales.setCartaIntercambio(this.intercambioCheckBox.isChecked());
+            reglasEspeciales.setCartaX2(this.x2CheckBox.isChecked());
+
+            reglasEspeciales.setEncadenarRoboCartas(this.encadenar_2_4Checkbox.isChecked());
+            reglasEspeciales.setRedirigirRoboCartas(this.redirigir_2_4CheckBox.isChecked());
+            reglasEspeciales.setJugarVariasCartas(this.jugarVariasCartasCheckbox.isChecked());
+            reglasEspeciales.setEvitarEspecialFinal(this.penalizacion_4_colorCheckbox.isChecked());
+
+            reglasEspeciales.setReglasValidas(this.filtrosAdicionalesLinearLayout.getVisibility() == View.VISIBLE);
 
             configSala.setReglas(reglasEspeciales);
 
@@ -215,15 +162,15 @@ public class FilterSearchDialogBuilder{
     }
 
     public void show(){
-        ViewParent parent = layoutGlobal.getParent();
+        ViewParent parent = mainView.getParent();
         if(parent != null){
-            ((ViewGroup) parent).removeView(layoutGlobal);
+            ((ViewGroup) parent).removeView(mainView);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Busqueda Avanzada");
+        builder.setTitle("Búsqueda Avanzada");
         builder.setMessage("Seleccione los filtros de búsqueda");
-        builder.setView(layoutGlobal);
+        builder.setView(mainView);
         builder.setPositiveButton("Confirmar", (dialog, which) -> positiveRunnable.run());
         builder.setNegativeButton("Cancelar", (dialog, which) -> negativeRunnable.run());
         builder.setOnCancelListener(dialog -> negativeRunnable.run());

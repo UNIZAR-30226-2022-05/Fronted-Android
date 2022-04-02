@@ -37,6 +37,8 @@ public class SalaActivity extends AppCompatActivity {
     private TextView numUsuariosListosTextView;
     private LinearLayout[] layoutUsuarios;
 
+    private TextView salaTipoTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +49,8 @@ public class SalaActivity extends AppCompatActivity {
 
         TextView salaIDTextView = findViewById(R.id.salaIDTextView);
         salaIDTextView.setText(salaID.toString());
+
+        salaTipoTextView = findViewById(R.id.salaTipoTextView);
 
         numUsuariosTextView = findViewById(R.id.numUsuariosTextView);
         numUsuariosListosTextView = findViewById(R.id.numUsuariosListosTextView);
@@ -104,6 +108,12 @@ public class SalaActivity extends AppCompatActivity {
 
         numUsuariosTextView.setText(sala.numParticipantes() + " / " + sala.getConfiguracion().getMaxParticipantes());
         numUsuariosListosTextView.setText(numParticipantesListos + " / " + sala.numParticipantes());
+
+        if(sala.getConfiguracion().isEsPublica()){
+            salaTipoTextView.setText("pública");
+        }else{
+            salaTipoTextView.setText("privada");
+        }
     }
 
     @SuppressLint("SetTextI18n")

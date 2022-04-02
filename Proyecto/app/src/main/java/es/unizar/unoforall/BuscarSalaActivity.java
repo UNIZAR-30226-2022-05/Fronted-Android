@@ -1,16 +1,20 @@
 package es.unizar.unoforall;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
+import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.dialogs.FilterSearchDialogBuilder;
 import es.unizar.unoforall.utils.SalaListAdapter;
@@ -19,8 +23,11 @@ public class BuscarSalaActivity extends AppCompatActivity {
 
     private UUID sesionID;
     private HashMap<UUID, Sala> salasIniciales;
-    private ListView informacionBusqueda;
+    private ListView listViewSalas;
+    private SwipeRefreshLayout pullToRefresh;
 
+    private BackendAPI api;
+    private ConfigSala configSala;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,42 +36,49 @@ public class BuscarSalaActivity extends AppCompatActivity {
         setTitle(R.string.busquedaDeSalas);
 
         sesionID = PrincipalActivity.getSesionID();
+        listViewSalas = findViewById(R.id.listViewSalas);
 
+        api = new BackendAPI(this);
+        configSala = new ConfigSala();
+        configSala.setModoJuego(ConfigSala.ModoJuego.Undefined);
+        configSala.setMaxParticipantes(-1);
         BackendAPI api = new BackendAPI(this);
-        api.obtenerSalasInicio(sesionID, respuestaSalas -> {
-            salasIniciales = respuestaSalas.getSalas();
-
-            informacionBusqueda = findViewById(R.id.salasEncontradas);
-            SalaListAdapter adapter = new SalaListAdapter(this, salasIniciales);
-            informacionBusqueda.setAdapter(adapter);
-        });
 
         Button buscarButton = findViewById(R.id.buscarPorIdButton);
         buscarButton.setOnClickListener(view -> api.unirseSalaPorID());
 
         Button busquedaAvanzadaButton = findViewById(R.id.busquedaConFiltros);
         busquedaAvanzadaButton.setOnClickListener(view -> {
-            BackendAPI api2 = new BackendAPI(this);
-            FilterSearchDialogBuilder filtrado = new FilterSearchDialogBuilder(this);
-            filtrado.setPositiveButton(configSala -> api2.obtenerSalasFiltro(sesionID, configSala, respuestaSalas -> {
-                salasIniciales = respuestaSalas.getSalas();
-                SalaListAdapter adapter = new SalaListAdapter(this, salasIniciales);
-                informacionBusqueda.setAdapter(adapter);
-            }));
-            filtrado.setNegativeButton(() -> {});
-            filtrado.show();
-        });
-
-        SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
-        pullToRefresh.setOnRefreshListener(() -> {
-            api.obtenerSalasInicio(sesionID, respuestaSalas -> {
-                salasIniciales = respuestaSalas.getSalas();
-
-                informacionBusqueda = findViewById(R.id.salasEncontradas);
-                SalaListAdapter adapter = new SalaListAdapter(this, salasIniciales);
-                informacionBusqueda.setAdapter(adapter);
-                pullToRefresh.setRefreshing(false);
+            FilterSearchDialogBuilder builder = new FilterSearchDialogBuilder(this, this.configSala);
+            builder.setPositiveButton(configSala -> {
+                this.configSala = configSala;
+                actualizarSalas();
             });
+            builder.show();
         });
+
+        pullToRefresh = findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(() -> actualizarSalas());
+
+        actualizarSalas();
+    }
+
+    private void actualizarSalas(){
+        pullToRefresh.setRefreshing(true);
+        api.obtenerSalasFiltro(sesionID, configSala, respuestaSalas -> {
+            if(!respuestaSalas.isExito()){
+                Toast.makeText(this, "Se ha producido un error al obtener las salas", Toast.LENGTH_SHORT).show();
+            }else{
+                SalaListAdapter adapter = new SalaListAdapter(this, respuestaSalas.getSalas());
+                listViewSalas.setAdapter(adapter);
+            }
+            pullToRefresh.setRefreshing(false);
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        actualizarSalas();
     }
 }

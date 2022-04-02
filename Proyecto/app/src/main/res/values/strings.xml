@@ -28,9 +28,11 @@
     <string name="crearSala">Crear Sala</string>
     <string name="confirmarSala">Confirmar Sala</string>
     <string name="participantes">Participantes</string>
+    <string name="participantesFiltro">Filtrar por número de participantes</string>
     <string name="dos">2</string>
     <string name="tres">3</string>
     <string name="cuatro">4</string>
+    <string name="cualquiera">Cualquiera</string>
     <string name="publica">Sala pública</string>
     <string name="privada">Sala privada</string>
     <string name="esPublica">Sala pública o privada</string>
@@ -39,10 +41,17 @@
     <string name="activarIntercambio">Intercambio</string>
     <string name="activarx2">x2</string>
     <string name="elegirModoJuego">Elige un modo de juego</string>
+    <string name="modoJuegoFiltro">Filtrar por modo de juego</string>
     <string-array name="modo_juego_array">
         <item>Clásico</item>
         <item>Attack</item>
         <item>Por Parejas</item>
+    </string-array>
+    <string-array name="modo_juego_filtro_array">
+        <item>Clásico</item>
+        <item>Attack</item>
+        <item>Por parejas</item>
+        <item>Cualquiera</item>
     </string-array>
     <string name="activarReglasEspeciales">Elige reglas adicionales</string>
     <string name="activarEncadenar_2_4">Acumular efecto de +2 y +4</string>
@@ -64,6 +73,7 @@
     <string name="salaIDinvalido">ID de sala no válido</string>
 
     <string name="salaID">ID de la sala:</string>
+    <string name="tipoSala">Tipo de sala:</string>
     <string name="usuariosSala">Usuarios en la sala</string>
     <string name="usuariosListos">Usuarios listos</string>
     <string name="sala">Sala</string>

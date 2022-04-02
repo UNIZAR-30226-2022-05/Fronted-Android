@@ -243,13 +243,6 @@ public class BackendAPI{
         mostrarMensaje("Has salido de la sala");
     }
 
-    public void obtenerSalasInicio(UUID sesionID, Consumer<RespuestaSalas> consumer){
-        RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
-        api.addParameter("sesionID", sesionID.toString());
-        api.addParameter("configuracion", null);
-        api.openConnection();
-        api.setOnObjectReceived(RespuestaSalas.class, consumer);
-    }
     public void obtenerSalasFiltro(UUID sesionID, ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
         api.addParameter("sesionID", sesionID.toString());
