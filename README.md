@@ -1,2 +1,2 @@
 # Fronted-Android
-Repositorio para el fronted de Android
+Repositorio para el frontend de Android

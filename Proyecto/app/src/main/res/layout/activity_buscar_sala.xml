@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:id="@+id/pullToRefresh"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/buscarPorIdButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#2EC322"
+            android:text="@string/unirseSalaPorID"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351" />
+
+        <Button
+            android:id="@+id/busquedaConFiltros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FF6200EE"
+            android:text="@string/busquedaAvanzada"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351" />
+
+        <TextView
+            android:id="@+id/textViewResultadosBusqueda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="@string/resultadosBusqueda"
+            android:textSize="16sp" />
+
+        <ListView
+            android:id="@+id/listViewSalas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" />
+
+    </LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

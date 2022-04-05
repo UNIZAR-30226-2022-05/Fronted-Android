@@ -1,0 +1,83 @@
+<resources>
+    <string name="app_name">UnoForAll</string>
+
+    <string name="correo">Correo</string>
+    <string name="contrasegna">Contraseña</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="contrasennaOlvidada">He olvidado mi contraseña</string>
+    <string name="listaUsuariosRegistrados">Lista de usuarios registrados</string>
+
+    <string name="campoVacio">"Debes rellenar este campo"</string>
+
+    <string name="nombre">Nombre de usuario</string>
+    <string name="con_bis">Repite la contraseña</string>
+    <string name="register">Registrarse</string>
+    <string name="errorContrasegnas">Las contraseñas no coinciden</string>
+    <string name="confirmarEmail">Confirmar Correo</string>
+    <string name="mensajeConfirmar">Por favor introduzca el código que le ha llegado a su correo</string>
+    <string name="codigo">Código</string>
+
+    <string name="pantallaPrincipal">Pantalla principal</string>
+    <string name="modificarCuenta">Modificar cuenta</string>
+    <string name="modificarAspecto">Modificar aspecto</string>
+    <string name="gestionarAmigos">Gestionar amigos</string>
+    <string name="verEstadisticas">Estadísticas</string>
+    <string name="verHistorial">Historial</string>
+    <string name="borrarCuenta">Borrar cuenta</string>
+
+    <string name="crearSala">Crear Sala</string>
+    <string name="confirmarSala">Confirmar Sala</string>
+    <string name="participantes">Participantes</string>
+    <string name="participantesFiltro">Filtrar por número de participantes</string>
+    <string name="dos">2</string>
+    <string name="tres">3</string>
+    <string name="cuatro">4</string>
+    <string name="cualquiera">Cualquiera</string>
+    <string name="publica">Sala pública</string>
+    <string name="privada">Sala privada</string>
+    <string name="esPublica">Sala pública o privada</string>
+    <string name="eleccionCartasEspeciales">Elige las cartas especiales</string>
+    <string name="activarRayosX">RayosX</string>
+    <string name="activarIntercambio">Intercambio</string>
+    <string name="activarx2">x2</string>
+    <string name="elegirModoJuego">Elige un modo de juego</string>
+    <string name="modoJuegoFiltro">Filtrar por modo de juego</string>
+    <string-array name="modo_juego_array">
+        <item>Clásico</item>
+        <item>Attack</item>
+        <item>Por Parejas</item>
+    </string-array>
+    <string-array name="modo_juego_filtro_array">
+        <item>Clásico</item>
+        <item>Attack</item>
+        <item>Por parejas</item>
+        <item>Cualquiera</item>
+    </string-array>
+    <string name="activarReglasEspeciales">Elige reglas adicionales</string>
+    <string name="activarEncadenar_2_4">Acumular efecto de +2 y +4</string>
+    <string name="activarRedirigir_2_4">Redirigir efecto de +2 y +4</string>
+    <string name="activarJugar_varias_cartas">Permite escalera y jugar varias del mismo número</string>
+    <string name="activarPenalizacion_4_color">Penaliza si última carta es +4 o cambio de color</string>
+
+    <string name="mensajeInformacion">Por favor, introduzca el correo de la cuenta
+                                        que quiere recuperar para que le mandemos
+                                                un código de verificación</string>
+    <string name="restablecerContrasenna">Restablecer contraseña</string>
+
+    <string name="buscarSala">Buscar Sala</string>
+    <string name="unirseSalaPorID">Unirse a una sala por su ID</string>
+    <string name="busquedaAvanzada">Búsqueda Avanzada</string>
+    <string name="resultadosBusqueda">Resultados</string>
+    <string name="busquedaDeSalas">Búsqueda de salas</string>
+    <string name="entrar">Entrar</string>
+    <string name="salaIDinvalido">ID de sala no válido</string>
+
+    <string name="salaID">ID de la sala:</string>
+    <string name="tipoSala">Tipo de sala:</string>
+    <string name="usuariosSala">Usuarios en la sala</string>
+    <string name="usuariosListos">Usuarios listos</string>
+    <string name="sala">Sala</string>
+    <string name="invitarAmigos">Invitar amigos</string>
+    <string name="abandonarSala">Abandonar sala</string>
+    <string name="listo">Listo</string>
+</resources>
