@@ -2,7 +2,9 @@ package es.unizar.unoforall.api;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.widget.Toast;
+
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -53,8 +55,7 @@ public class WebSocketAPI {
     }
 
     public void openConnection(){
-        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SERVER_URL);
-        client.withClientHeartbeat(CLIENT_HEARTBEAT_MS).withClientHeartbeat(SERVER_HEARTBEAT_MS);
+        client = Stomp.over(Stomp.ConnectionProvider.JWS, SERVER_URL);
         client.connect();
     }
 
