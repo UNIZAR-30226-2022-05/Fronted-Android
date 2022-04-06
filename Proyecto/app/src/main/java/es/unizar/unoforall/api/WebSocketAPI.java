@@ -2,26 +2,27 @@ package es.unizar.unoforall.api;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.os.AsyncTask;
-import android.widget.Toast;
-
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import es.unizar.unoforall.utils.tasks.CancellableRunnable;
+import es.unizar.unoforall.utils.tasks.Task;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
-import ua.naiksoftware.stomp.dto.StompMessage;
 
 public class WebSocketAPI {
     private static String SERVER_URL = "ws://192.168.1.100/unoforall";
     private static final int CLIENT_HEARTBEAT_MS = 1000;
     private static final int SERVER_HEARTBEAT_MS = 1000;
+    private static final int CONNECTION_TIMEOUT = 3000;
+    private static final int CONNECTION_CHECK_TIME = 100;
 
     public static final int GLOBAL_ERROR = 0;
     public static final int SUBSCRIPTION_ERROR = 1;
@@ -34,9 +35,6 @@ public class WebSocketAPI {
     private BiConsumer<Throwable, Integer> onError;
     public void setOnError(BiConsumer<Throwable, Integer> onError){
         this.onError = onError;
-    }
-    public BiConsumer<Throwable, Integer> getOnError(){
-        return this.onError;
     }
 
     public static void setServerIP(String serverIP){
@@ -54,17 +52,48 @@ public class WebSocketAPI {
         };
     }
 
-    public void openConnection(){
+    public void openConnection(Activity activity, Runnable onConnectionRunnable){
         client = Stomp.over(Stomp.ConnectionProvider.JWS, SERVER_URL);
         client.connect();
+
+        // Comprobar si ya se ha conectado
+        CancellableRunnable cancellableRunnable = new CancellableRunnable() {
+            @Override
+            public void run() {
+                if(client.isConnected()){
+                    cancel();
+                    activity.runOnUiThread(onConnectionRunnable);
+                }
+            }
+        };
+        Task.runPeriodicTask(cancellableRunnable, 0, CONNECTION_CHECK_TIME);
+
+        // Comprobar si se ha agotado el timeout
+        Task.runDelayedTask(() -> {
+            if(!client.isConnected()){
+                cancellableRunnable.cancel();
+                Throwable t = new TimeoutException("Tiempo de espera para conexión de WebSocket agotado");
+                onError.accept(t, GLOBAL_ERROR);
+            }
+        }, CONNECTION_TIMEOUT);
     }
 
     public <T> void subscribe(Activity activity, String topic, Class<T> expectedClass, Consumer<T> consumer){
         if(client == null){
             try{
-                throw new IOException("No has abierto la conexión del API websocket");
+                throw new IOException("No has abierto la conexión del API WebSocket");
             }catch(Exception ex){
                 onError.accept(ex, GLOBAL_ERROR);
+                return;
+            }
+        }
+
+        if(!client.isConnected()){
+            try{
+                throw new IOException("No se ha podido conectar con el servidor de WebSocket");
+            }catch(Exception ex){
+                onError.accept(ex, GLOBAL_ERROR);
+                return;
             }
         }
 
@@ -85,6 +114,15 @@ public class WebSocketAPI {
 
     @SuppressLint("CheckResult")
     public <T> void sendObject(String seccion, T object){
+        if(!client.isConnected()){
+            try{
+                throw new IOException("No se ha podido conectar con el servidor de WebSocket");
+            }catch(Exception ex){
+                onError.accept(ex, GLOBAL_ERROR);
+                return;
+            }
+        }
+
         client.send(seccion, Serializar.serializar(object))
                 .subscribe(() -> {}, t -> onError.accept(t, GLOBAL_ERROR));
     }
