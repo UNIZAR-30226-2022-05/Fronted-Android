@@ -122,7 +122,7 @@ public class PruebaClienteSpring {
             System.err.println("Se ha producido un error: " + errorType);
             t.printStackTrace();
         });
-        api.openConnection();
+        api.openConnection(null, null);
         api.subscribe(null,"/topic/greetings", Empleado.class, e -> {
             System.out.println(e);
             api.close();

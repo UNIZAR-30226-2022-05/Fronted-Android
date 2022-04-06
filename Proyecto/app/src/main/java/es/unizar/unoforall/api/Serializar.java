@@ -34,7 +34,7 @@ public class Serializar {
         }
 
         if(expectedClass.equals(String.class)){
-            if(mensaje.equals("null")){
+            if(mensaje.equals("null") || mensaje.equals("nulo")){
                 return expectedClass.cast(null);
             }else{
                 return expectedClass.cast(mensaje);
@@ -59,7 +59,7 @@ public class Serializar {
                 Log.i("Mensaje recibido", mensaje);
             }
             if(expectedClass.equals(String.class)){
-                if(mensaje.equals("null")){
+                if(mensaje.equals("null") || mensaje.equals("nulo")){
                     return expectedClass.cast(null);
                 }else{
                     return expectedClass.cast(mensaje);

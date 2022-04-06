@@ -1,7 +1,6 @@
 package es.unizar.unoforall.api;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.widget.Toast;
@@ -11,7 +10,6 @@ import java.util.function.Consumer;
 
 import es.unizar.unoforall.InicioActivity;
 import es.unizar.unoforall.PrincipalActivity;
-import es.unizar.unoforall.R;
 import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.RespuestaLogin;
@@ -20,7 +18,6 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
-import es.unizar.unoforall.utils.DelayedTask;
 import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
@@ -37,15 +34,6 @@ public class BackendAPI{
     private final UsuarioDbAdapter usuarioDbAdapter;
 
     public BackendAPI(Activity activity){
-        if(wsAPI == null){
-            wsAPI = new WebSocketAPI();
-            wsAPI.setOnError((t, i) -> {
-                wsAPI.getOnError().accept(t, i);
-                wsAPI = null;
-            });
-            wsAPI.openConnection();
-        }
-
         this.activity = activity;
         this.usuarioDbAdapter = new UsuarioDbAdapter(this.activity).open();
     }
@@ -69,9 +57,16 @@ public class BackendAPI{
                     usuarioDbAdapter.modificarUsuario(usuarioID, correo, contrasennaHash);
                 }
 
-                Intent intent = new Intent(activity, PrincipalActivity.class);
-                intent.putExtra(PrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
-                activity.startActivity(intent);
+                wsAPI = new WebSocketAPI();
+                wsAPI.setOnError((t, i) -> {
+                    t.printStackTrace();
+                    closeWebSocketAPI();
+                });
+                wsAPI.openConnection(activity, () -> {
+                    Intent intent = new Intent(activity, PrincipalActivity.class);
+                    intent.putExtra(PrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
+                    activity.startActivity(intent);
+                });
             }else{
                 mostrarMensaje(respuestaLogin.getErrorInfo());
             }
@@ -82,7 +77,7 @@ public class BackendAPI{
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
             consumer.accept(sesionID);
         });
-        DelayedTask.runDelayedTask(() -> wsAPI.sendObject("/app/conectarse/" + claveInicio, VACIO), 500);
+        wsAPI.sendObject("/app/conectarse/" + claveInicio, VACIO);
     }
 
     public void register(String nombreUsuario, String correo, String contrasennaHash){
