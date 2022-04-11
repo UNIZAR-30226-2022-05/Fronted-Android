@@ -33,45 +33,26 @@ public class Serializar {
             Log.i("Mensaje recibido", mensaje);
         }
 
+        if(mensaje.equals("null") || mensaje.equals("nulo")){
+            return expectedClass.cast(null);
+        }
+
         if(expectedClass.equals(String.class)){
-            if(mensaje.equals("null") || mensaje.equals("nulo")){
-                return expectedClass.cast(null);
-            }else{
-                return expectedClass.cast(mensaje);
-            }
+            return expectedClass.cast(mensaje);
         }else{
             return new Gson().fromJson(mensaje, expectedClass);
         }
     }
 
     public static <T> T deserializar(InputStream inputStream, Class<T> expectedClass) throws IOException {
-        InputStreamReader responseReader;
-        if(DEBUG || expectedClass.equals(String.class)){
-            StringBuilder mensajeBuilder = new StringBuilder();
-            byte[] buffer = new byte[1024];
-            int bytesReaded;
-            while((bytesReaded = inputStream.read(buffer)) > 0){
-                mensajeBuilder.append(new String(buffer, 0, bytesReaded));
-            }
-
-            String mensaje = mensajeBuilder.toString();
-            if(DEBUG){
-                Log.i("Mensaje recibido", mensaje);
-            }
-            if(expectedClass.equals(String.class)){
-                if(mensaje.equals("null") || mensaje.equals("nulo")){
-                    return expectedClass.cast(null);
-                }else{
-                    return expectedClass.cast(mensaje);
-                }
-            }
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(mensaje.getBytes(StandardCharsets.UTF_8));
-            responseReader = new InputStreamReader(bais);
-        }else{
-            responseReader = new InputStreamReader(inputStream);
+        StringBuilder mensajeBuilder = new StringBuilder();
+        byte[] buffer = new byte[1024];
+        int bytesReaded;
+        while((bytesReaded = inputStream.read(buffer)) > 0){
+            mensajeBuilder.append(new String(buffer, 0, bytesReaded));
         }
 
-        return new Gson().fromJson(responseReader, expectedClass);
+        String mensaje = mensajeBuilder.toString();
+        return deserializar(mensaje, expectedClass);
     }
 }
