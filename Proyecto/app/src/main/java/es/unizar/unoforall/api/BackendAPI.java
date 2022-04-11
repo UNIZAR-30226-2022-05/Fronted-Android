@@ -30,7 +30,7 @@ import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
 public class BackendAPI{
     private static final String VACIO = "VACIO";
 
-    private static String sessionID = null;
+    private static String sesionID = null;
     private static WebSocketAPI wsAPI = null;
 
     private final Activity activity;
@@ -72,9 +72,9 @@ public class BackendAPI{
         });
     }
     private void loginPaso2(UUID claveInicio){
-        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, String.class, sessionID -> {
+        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, String.class, sesionID -> {
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
-            BackendAPI.sessionID = sessionID;
+            BackendAPI.sesionID = sesionID;
 
             obtenerUsuarioVO(usuarioVO -> {
                 mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
@@ -184,7 +184,7 @@ public class BackendAPI{
 
     public void obtenerUsuarioVO(Consumer<UsuarioVO> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
-        api.addParameter("sessionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             if(usuarioVO.isExito()){
@@ -197,7 +197,7 @@ public class BackendAPI{
 
     public void crearSala(ConfigSala configSala){
         RestAPI api = new RestAPI(activity, "/api/crearSala");
-        api.addParameter("sesionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.addParameter("configuracion", configSala);
         api.openConnection();
         api.setOnObjectReceived(RespuestaSala.class, respuestaSala -> {
@@ -247,7 +247,7 @@ public class BackendAPI{
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
-        api.addParameter("sesionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.addParameter("configuracion", filtro);
         api.openConnection();
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
@@ -255,7 +255,7 @@ public class BackendAPI{
 
     public void modificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
-        api.addParameter("sessionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             ModifyAccountDialogBuilder builder = new ModifyAccountDialogBuilder(activity);
@@ -277,7 +277,7 @@ public class BackendAPI{
     private void modificarCuentaPaso2(String nombreUsuario, String correo, String contrasennaHash,
                                       ModifyAccountDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepOne");
-        api.addParameter("sessionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.addParameter("correoNuevo", correo);
         api.addParameter("nombre", nombreUsuario);
         api.addParameter("contrasenna", contrasennaHash);
@@ -299,7 +299,7 @@ public class BackendAPI{
                                       String correo, String contrasennaHash,
                                       CodeConfirmDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepTwo");
-        api.addParameter("sessionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.addParameter("codigo", codigo);
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> {
@@ -318,7 +318,7 @@ public class BackendAPI{
     }
     private void cancelModificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/actualizarCancel");
-        api.addParameter("sessionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> mostrarMensaje("Operación cancelada"));
     }
@@ -328,7 +328,7 @@ public class BackendAPI{
             DeleteAccountDialogBuilder builder = new DeleteAccountDialogBuilder(activity);
             builder.setPositiveRunnable(() -> {
                 RestAPI api = new RestAPI(activity, "/api/borrarCuenta");
-                api.addParameter("sessionID", sessionID);
+                api.addParameter("sesionID", sesionID);
                 api.openConnection();
                 api.setOnObjectReceived(String.class, error -> {
                     if(error == null || error.equals("BORRADA")){
@@ -349,10 +349,9 @@ public class BackendAPI{
         });
     }
 
-    
     public void obtenerAmigos(Consumer<ListaUsuarios> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarAmigos");
-        api.addParameter("sessionID", sessionID);
+        api.addParameter("sesionID", sesionID);
         api.openConnection();
         api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado()){
