@@ -26,14 +26,6 @@ public class PrincipalActivity extends AppCompatActivity {
     private static final int VER_HISTORIAL_ID = 4;
     private static final int BORRAR_CUENTA_ID = 5;
 
-    private static UUID sesionID;
-    public static UUID getSesionID(){
-        return sesionID;
-    }
-    public static void setSesionID(UUID sesionID){
-        PrincipalActivity.sesionID = sesionID;
-    }
-
     private static UsuarioVO usuario;
     public static UsuarioVO getUsuario(){
         return usuario;
@@ -73,19 +65,8 @@ public class PrincipalActivity extends AppCompatActivity {
         setTitle(R.string.pantallaPrincipal);
 
         inicializarButtons();
-        setButtonsEnabled(false);
-
-        UUID claveInicio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
-        BackendAPI api = new BackendAPI(this);
-        api.loginPaso2(claveInicio, sesionID -> {
-            PrincipalActivity.sesionID = sesionID;
-            api.obtenerUsuarioVO(sesionID, usuarioVO -> {
-                PrincipalActivity.usuario = usuarioVO;
-                Toast.makeText(this, "Hola " + usuario.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
-                sesionIniciada = true;
-                setButtonsEnabled(true);
-            });
-        });
+        setButtonsEnabled(true);
+        sesionIniciada = true;
     }
 
     @Override
@@ -108,10 +89,10 @@ public class PrincipalActivity extends AppCompatActivity {
 
         switch(item.getItemId()){
             case MODIFICAR_CUENTA_ID:
-                new BackendAPI(this).modificarCuenta(sesionID);
+                new BackendAPI(this).modificarCuenta();
                 break;
             case BORRAR_CUENTA_ID:
-                new BackendAPI(this).borrarCuenta(sesionID);
+                new BackendAPI(this).borrarCuenta();
                 break;
             default:
                 Toast.makeText(this, "No implementado todavía", Toast.LENGTH_SHORT).show();

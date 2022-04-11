@@ -21,8 +21,6 @@ import es.unizar.unoforall.utils.SalaListAdapter;
 
 public class BuscarSalaActivity extends AppCompatActivity {
 
-    private UUID sesionID;
-    private HashMap<UUID, Sala> salasIniciales;
     private ListView listViewSalas;
     private SwipeRefreshLayout pullToRefresh;
 
@@ -35,7 +33,6 @@ public class BuscarSalaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_buscar_sala);
         setTitle(R.string.busquedaDeSalas);
 
-        sesionID = PrincipalActivity.getSesionID();
         listViewSalas = findViewById(R.id.listViewSalas);
 
         api = new BackendAPI(this);
@@ -65,7 +62,7 @@ public class BuscarSalaActivity extends AppCompatActivity {
 
     private void actualizarSalas(){
         pullToRefresh.setRefreshing(true);
-        api.obtenerSalasFiltro(sesionID, configSala, respuestaSalas -> {
+        api.obtenerSalasFiltro(configSala, respuestaSalas -> {
             if(!respuestaSalas.isExito()){
                 Toast.makeText(this, "Se ha producido un error al obtener las salas", Toast.LENGTH_SHORT).show();
             }else{

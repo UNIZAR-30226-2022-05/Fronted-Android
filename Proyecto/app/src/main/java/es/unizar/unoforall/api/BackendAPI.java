@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.widget.Toast;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -12,6 +13,7 @@ import es.unizar.unoforall.InicioActivity;
 import es.unizar.unoforall.PrincipalActivity;
 import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
+import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
@@ -28,6 +30,7 @@ import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
 public class BackendAPI{
     private static final String VACIO = "VACIO";
 
+    private static String sessionID = null;
     private static WebSocketAPI wsAPI = null;
 
     private final Activity activity;
@@ -62,20 +65,24 @@ public class BackendAPI{
                     t.printStackTrace();
                     closeWebSocketAPI();
                 });
-                wsAPI.openConnection(activity, () -> {
-                    Intent intent = new Intent(activity, PrincipalActivity.class);
-                    intent.putExtra(PrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
-                    activity.startActivity(intent);
-                });
+                wsAPI.openConnection(activity, () -> loginPaso2(respuestaLogin.getClaveInicio()));
             }else{
                 mostrarMensaje(respuestaLogin.getErrorInfo());
             }
         });
     }
-    public void loginPaso2(UUID claveInicio, Consumer<UUID> consumer){
-        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
+    private void loginPaso2(UUID claveInicio){
+        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, String.class, sessionID -> {
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
-            consumer.accept(sesionID);
+            BackendAPI.sessionID = sessionID;
+
+            obtenerUsuarioVO(usuarioVO -> {
+                mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
+
+                // Iniciar la actividad principal
+                Intent intent = new Intent(activity, PrincipalActivity.class);
+                activity.startActivity(intent);
+            });
         });
         wsAPI.sendObject("/app/conectarse/" + claveInicio, VACIO);
     }
@@ -175,9 +182,9 @@ public class BackendAPI{
         });
     }
 
-    public void obtenerUsuarioVO(UUID sesionID, Consumer<UsuarioVO> consumer){
+    public void obtenerUsuarioVO(Consumer<UsuarioVO> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sessionID", sessionID);
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             if(usuarioVO.isExito()){
@@ -188,9 +195,9 @@ public class BackendAPI{
         });
     }
 
-    public void crearSala(UUID sesionID, ConfigSala configSala){
+    public void crearSala(ConfigSala configSala){
         RestAPI api = new RestAPI(activity, "/api/crearSala");
-        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("sesionID", sessionID);
         api.addParameter("configuracion", configSala);
         api.openConnection();
         api.setOnObjectReceived(RespuestaSala.class, respuestaSala -> {
@@ -238,17 +245,17 @@ public class BackendAPI{
         mostrarMensaje("Has salido de la sala");
     }
 
-    public void obtenerSalasFiltro(UUID sesionID, ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
+    public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
-        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("sesionID", sessionID);
         api.addParameter("configuracion", filtro);
         api.openConnection();
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
-    public void modificarCuenta(UUID sesionID){
+    public void modificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sessionID", sessionID);
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             ModifyAccountDialogBuilder builder = new ModifyAccountDialogBuilder(activity);
@@ -258,20 +265,19 @@ public class BackendAPI{
                 if(contrasenna == null){
                     // Si no se ha cambiado la contraseña,
                     //   se envía la anterior
-                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, usuarioVO.getContrasenna(), builder);
+                    modificarCuentaPaso2(nombreUsuario, correo, usuarioVO.getContrasenna(), builder);
                 }else{
-                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
+                    modificarCuentaPaso2(nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
                 }
             });
             builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
             builder.show();
         });
     }
-    private void modificarCuentaPaso2(UUID sesionID,
-                                      String nombreUsuario, String correo, String contrasennaHash,
+    private void modificarCuentaPaso2(String nombreUsuario, String correo, String contrasennaHash,
                                       ModifyAccountDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepOne");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sessionID", sessionID);
         api.addParameter("correoNuevo", correo);
         api.addParameter("nombre", nombreUsuario);
         api.addParameter("contrasenna", contrasennaHash);
@@ -280,8 +286,8 @@ public class BackendAPI{
             if(error == null){
                 // Si no ha habido error
                 CodeConfirmDialogBuilder builder2 = new CodeConfirmDialogBuilder(activity);
-                builder2.setPositiveButton(codigo -> modificarCuentaPaso3(sesionID, codigo, correo, contrasennaHash, builder2));
-                builder2.setNegativeButton(() -> cancelModificarCuenta(sesionID));
+                builder2.setPositiveButton(codigo -> modificarCuentaPaso3(codigo, correo, contrasennaHash, builder2));
+                builder2.setNegativeButton(() -> cancelModificarCuenta());
                 builder2.show();
             }else{
                 mostrarMensaje(error);
@@ -289,11 +295,11 @@ public class BackendAPI{
             }
         });
     }
-    private void modificarCuentaPaso3(UUID sesionID, int codigo,
+    private void modificarCuentaPaso3(int codigo,
                                       String correo, String contrasennaHash,
                                       CodeConfirmDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepTwo");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sessionID", sessionID);
         api.addParameter("codigo", codigo);
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> {
@@ -310,19 +316,19 @@ public class BackendAPI{
             }
         });
     }
-    private void cancelModificarCuenta(UUID sesionID){
+    private void cancelModificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/actualizarCancel");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sessionID", sessionID);
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> mostrarMensaje("Operación cancelada"));
     }
 
-    public void borrarCuenta(UUID sesionID){
-        obtenerUsuarioVO(sesionID, usuarioVO -> {
+    public void borrarCuenta(){
+        obtenerUsuarioVO(usuarioVO -> {
             DeleteAccountDialogBuilder builder = new DeleteAccountDialogBuilder(activity);
             builder.setPositiveRunnable(() -> {
                 RestAPI api = new RestAPI(activity, "/api/borrarCuenta");
-                api.addParameter("sessionID", sesionID.toString());
+                api.addParameter("sessionID", sessionID);
                 api.openConnection();
                 api.setOnObjectReceived(String.class, error -> {
                     if(error == null || error.equals("BORRADA")){
@@ -340,6 +346,20 @@ public class BackendAPI{
             });
             builder.setNegativeButton(() -> mostrarMensaje("Borrado cancelado"));
             builder.show();
+        });
+    }
+
+    
+    public void obtenerAmigos(Consumer<ListaUsuarios> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarAmigos");
+        api.addParameter("sessionID", sessionID);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado()){
+                mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios);
+            }
         });
     }
 

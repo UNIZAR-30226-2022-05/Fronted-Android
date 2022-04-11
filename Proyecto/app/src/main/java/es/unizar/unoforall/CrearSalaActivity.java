@@ -111,9 +111,8 @@ public class CrearSalaActivity extends AppCompatActivity {
 
         Button confirmarSalaButton = findViewById(R.id.confirmarSalaButton);
         confirmarSalaButton.setOnClickListener(view -> {
-            UUID sesionID = PrincipalActivity.getSesionID();
             BackendAPI api = new BackendAPI(this);
-            api.crearSala(sesionID, configSala);
+            api.crearSala(configSala);
         });
 
     }
