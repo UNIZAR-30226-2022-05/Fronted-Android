@@ -20,7 +20,7 @@ import es.unizar.unoforall.utils.dialogs.SetIPDialogBuilder;
 public class InicioActivity extends AppCompatActivity {
 
     private static final int CAMBIAR_IP_ID = 0;
-    private static final String CHANNEL_ID = NotificationChannel.DEFAULT_CHANNEL_ID;
+    private static final String CHANNEL_ID = "unoforall";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -6,10 +6,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.widget.ListView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.utils.list_adapters.AmigosAdapter;
 import es.unizar.unoforall.utils.list_adapters.PeticionesEnviadasAdapter;
 import es.unizar.unoforall.utils.list_adapters.PeticionesRecibidasAdapter;
+import es.unizar.unoforall.utils.tasks.Task;
 
 public class AmigosActivity extends AppCompatActivity {
 
@@ -31,6 +34,9 @@ public class AmigosActivity extends AppCompatActivity {
 
         pullToRefresh = findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> refreshData());
+
+        FloatingActionButton fab = findViewById(R.id.agregarAmigoButton);
+        fab.setOnClickListener(view -> new BackendAPI(this).enviarPeticion(() -> refreshData()));
 
         refreshData();
     }

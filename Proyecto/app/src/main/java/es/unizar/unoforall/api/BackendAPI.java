@@ -24,8 +24,10 @@ import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ModifyAccountDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.PeticionDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
+import es.unizar.unoforall.utils.tasks.Task;
 
 public class BackendAPI{
     private static final String VACIO = "VACIO";
@@ -194,6 +196,19 @@ public class BackendAPI{
             }
         });
     }
+    public void buscarUsuarioVO(String correo, Consumer<UsuarioVO> consumer){
+        RestAPI api = new RestAPI(activity, "/api/buscarAmigo");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("amigo", correo);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado() || (listaUsuarios.getError() != null && !listaUsuarios.getError().equals("null"))){
+                mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios.getUsuarios().get(0));
+            }
+        });
+    }
 
     public void crearSala(ConfigSala configSala){
         RestAPI api = new RestAPI(activity, "/api/crearSala");
@@ -305,7 +320,7 @@ public class BackendAPI{
         api.setOnObjectReceived(String.class, error -> {
             if(error == null){
                 // Cerrar sesión y volverla a iniciar
-                activity.finish();
+                closeWebSocketAPI();
                 login(correo, contrasennaHash);
             }else{
                 mostrarMensaje(error);
@@ -386,8 +401,26 @@ public class BackendAPI{
         });
     }
 
-    public void enviarPeticion(UsuarioVO usuario){
-
+    public void enviarPeticion(Runnable runnable){
+        PeticionDialogBuilder builder = new PeticionDialogBuilder(activity);
+        builder.setPositiveButton(correo -> {
+            obtenerUsuarioVO(usuarioPrincipal -> {
+                if(correo.equals(usuarioPrincipal.getCorreo())){
+                    builder.setError("No puedes enviarte una solicitud a ti mismo");
+                    builder.show();
+                }else{
+                    enviarPeticion2(correo, runnable);
+                }
+            });
+        });
+        builder.setNegativeButton(() -> mostrarMensaje("Envío cancelado"));
+        builder.show();
+    }
+    private void enviarPeticion2(String correo, Runnable runnable){
+        buscarUsuarioVO(correo, usuarioVO -> {
+            wsAPI.sendObject("/app/notifAmistad/" + usuarioVO.getId(), VACIO);
+            Task.runDelayedTask(() -> runnable.run(), 300);
+        });
     }
 
     public void aceptarPeticion(UsuarioVO usuario){

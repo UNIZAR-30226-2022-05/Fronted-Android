@@ -52,30 +52,40 @@ public class WebSocketAPI {
         };
     }
 
+    private CancellableRunnable runnable1, runnable2;
     public void openConnection(Activity activity, Runnable onConnectionRunnable){
         client = Stomp.over(Stomp.ConnectionProvider.JWS, SERVER_URL);
         client.connect();
 
-        // Comprobar si ya se ha conectado
-        CancellableRunnable cancellableRunnable = new CancellableRunnable() {
+        // Comprobar si se ha conectado
+        runnable1 = new CancellableRunnable() {
             @Override
             public void run() {
                 if(client.isConnected()){
                     cancel();
+                    runnable2.cancel();
+
                     activity.runOnUiThread(onConnectionRunnable);
                 }
             }
         };
-        Task.runPeriodicTask(cancellableRunnable, 0, CONNECTION_CHECK_TIME);
 
         // Comprobar si se ha agotado el timeout
-        Task.runDelayedTask(() -> {
-            if(!client.isConnected()){
-                cancellableRunnable.cancel();
-                Throwable t = new TimeoutException("Tiempo de espera para conexión de WebSocket agotado");
-                onError.accept(t, GLOBAL_ERROR);
+        runnable2 = new CancellableRunnable() {
+            @Override
+            public void run() {
+                if(!client.isConnected()){
+                    cancel();
+                    runnable1.cancel();
+
+                    Throwable t = new TimeoutException("Tiempo de espera para conexión de WebSocket agotado");
+                    onError.accept(t, GLOBAL_ERROR);
+                }
             }
-        }, CONNECTION_TIMEOUT);
+        };
+
+        Task.runPeriodicTask(runnable1, 0, CONNECTION_CHECK_TIME);
+        Task.runDelayedTask(runnable2, CONNECTION_TIMEOUT);
     }
 
     public <T> void subscribe(Activity activity, String topic, Class<T> expectedClass, Consumer<T> consumer){

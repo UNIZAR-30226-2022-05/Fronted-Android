@@ -8,6 +8,14 @@ public class Task {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(runnable, milliseconds);
     }
+    public static void runDelayedTask(CancellableRunnable runnable, long milliseconds){
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(() -> {
+            if(!runnable.isCancelled()){
+                runnable.run();
+            }
+        }, milliseconds);
+    }
 
     public static void runPeriodicTask(CancellableRunnable runnable, long prePeriod_ms, long period_ms){
         Handler handler = new Handler(Looper.getMainLooper());
