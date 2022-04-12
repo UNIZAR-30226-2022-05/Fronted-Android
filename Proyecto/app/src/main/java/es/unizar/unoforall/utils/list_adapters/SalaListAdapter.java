@@ -1,4 +1,4 @@
-package es.unizar.unoforall.utils;
+package es.unizar.unoforall.utils.list_adapters;
 
 import android.app.Activity;
 import android.content.ClipData;

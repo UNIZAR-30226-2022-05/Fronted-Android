@@ -10,14 +10,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
-import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.dialogs.FilterSearchDialogBuilder;
-import es.unizar.unoforall.utils.SalaListAdapter;
+import es.unizar.unoforall.utils.list_adapters.SalaListAdapter;
 
 public class BuscarSalaActivity extends AppCompatActivity {
 

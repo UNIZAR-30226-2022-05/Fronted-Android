@@ -94,6 +94,10 @@ public class PrincipalActivity extends AppCompatActivity {
             case BORRAR_CUENTA_ID:
                 new BackendAPI(this).borrarCuenta();
                 break;
+            case GESTIONAR_AMIGOS_ID:
+                Intent intent = new Intent(this, AmigosActivity.class);
+                startActivity(intent);
+                break;
             default:
                 Toast.makeText(this, "No implementado todavía", Toast.LENGTH_SHORT).show();
         }

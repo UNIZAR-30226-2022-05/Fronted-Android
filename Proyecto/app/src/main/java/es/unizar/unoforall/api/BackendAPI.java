@@ -361,6 +361,61 @@ public class BackendAPI{
             }
         });
     }
+    public void obtenerPeticionesRecibidas(Consumer<ListaUsuarios> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarPeticionesRecibidas");
+        api.addParameter("sesionID", sesionID);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado()){
+                mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios);
+            }
+        });
+    }
+    public void obtenerPeticionesEnviadas(Consumer<ListaUsuarios> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarPeticionesEnviadas");
+        api.addParameter("sesionID", sesionID);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado()){
+                mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios);
+            }
+        });
+    }
+
+    public void enviarPeticion(UsuarioVO usuario){
+
+    }
+
+    public void aceptarPeticion(UsuarioVO usuario){
+        RestAPI api = new RestAPI(activity, "/api/aceptarPeticionAmistad");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("amigo", usuario.getId());
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error != null){
+                mostrarMensaje(error);
+            }else{
+                mostrarMensaje("Petición aceptada");
+            }
+        });
+    }
+    public void rechazarPeticion(UsuarioVO usuario){
+        RestAPI api = new RestAPI(activity, "/api/cancelarPeticionAmistad");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("amigo", usuario.getId());
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error != null){
+                mostrarMensaje(error);
+            }else{
+                mostrarMensaje("Petición cancelada");
+            }
+        });
+    }
 
     public static synchronized void closeWebSocketAPI(){
         if(wsAPI != null){
