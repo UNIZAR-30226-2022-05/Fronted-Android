@@ -1,5 +1,7 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import es.unizar.unoforall.db.PartidasDAO;
+import es.unizar.unoforall.model.PartidasAcabadasVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
@@ -16,22 +20,27 @@ public class Partida {
 	private List<Jugador> jugadores;
 	private int turno;
 	private boolean sentidoHorario;
+	private int numIAs;
 	
 	private ConfigSala configuracion;
 	private boolean terminada;	
+	private Date fechaInicio; //Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
 	
 	private static final int MAX_ROBO_ATTACK = 10;
 	
 		
-	public Partida(List<UUID> jugadoresID, int numIAs, ConfigSala configuracion) {
+	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
+		//Marcamos fecha de inicio
+		fechaInicio = new Date(System.currentTimeMillis()); //Fecha actual.
+		
 		//Mazo
 		this.mazo = new LinkedList<>();
 		for(Carta.Color color : Carta.Color.values()) {
 			if (color != Carta.Color.comodin) {
 				for(Carta.Tipo tipo : Carta.Tipo.values()) {
-					if (tipo == Carta.Tipo.n0) {
+					if (tipo.equals(Carta.Tipo.n0)) {
 						this.mazo.add(new Carta(tipo,color));
-					} else {	//dos veces
+					} else if (tipo != Carta.Tipo.cambioColor &&  tipo != Carta.Tipo.mas4) {	//dos veces
 						this.mazo.add(new Carta(tipo,color));
 						this.mazo.add(new Carta(tipo,color));
 					}
@@ -42,12 +51,14 @@ public class Partida {
 					this.mazo.add(new Carta(Carta.Tipo.mas4,Carta.Color.comodin));
 				}
 			}
+			//TODO meter solo las cartas especiales que estén en configuración
 		}
 		Collections.shuffle(this.mazo);
 		
 		
 		// Cartas jugadas
 		this.cartasJugadas = new ArrayList<>();
+		// TODO poner primera carta
 		
 		
 		// Jugadores
@@ -56,6 +67,7 @@ public class Partida {
 			this.jugadores.add(new Jugador(jID));
 		}
 			// Se crean las IA
+		numIAs = configuracion.getMaxParticipantes() - this.jugadores.size();
 		for(int i = 0; i < numIAs; i++) {
 			this.jugadores.add(new Jugador());
 		}
@@ -110,10 +122,44 @@ public class Partida {
 	}
 	
 	private Carta robarCarta() {
-		
+		//TODO cuando no haya para robar, coger todas las jugadas menos la última, shuffle, y meterlas en el mazo
 		Carta c = this.mazo.get(0);
 		this.mazo.remove(0);
 		return c;
+	}
+	
+	private String insertarPartidaEnBd() {
+		String error = null;
+		PartidasAcabadasVO pa = new PartidasAcabadasVO(null,fechaInicio,new Date(System.currentTimeMillis()),numIAs,configuracion.getModoJuego().ordinal());
+		ArrayList<HaJugadoVO> participantes = new ArrayList<HaJugadoVO>(); 
+		
+		ArrayList<Integer> puntos = new ArrayList<Integer>();
+		for (Jugador j : this.jugadores) {
+			puntos.add(j.sacarPuntos()); //puntos.size()==configuracion.getMaxParticipantes()
+		}
+		int i = 0; //indice del jugador que estamos comprobando
+		for (Jugador j : this.jugadores) {
+			if (!j.isEsIA()) {
+				int usuariosDebajo = 0;
+				boolean haGanado = false;
+				if (puntos.get(i)==0) {
+					haGanado = true;
+					usuariosDebajo = configuracion.getMaxParticipantes()-1;
+				} else {
+					for(Integer p : puntos) {
+						if(p>puntos.get(i)) { //En caso de usuarios empatados ninguno está por debajo de otro.
+							usuariosDebajo++; //No es necesario preocuparse por compararse consigo mismo porque
+						}					  //cuenta como empate.
+					}
+				}
+				participantes.add(new HaJugadoVO(j.getJugadorID(),pa.getId(),usuariosDebajo,haGanado));				
+			}
+			i++;
+		}
+		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
+		PartidaJugada pj = new PartidaJugada(pa,participantes);
+		error = PartidasDAO.insertarPartidaAcabada(pj);
+		return error;
 	}
 	
 
@@ -126,7 +172,7 @@ public class Partida {
 				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
 			
 			if(jugada.robar) {
-				if (configuracion.getModoJuego() == ConfigSala.ModoJuego.Attack) {
+				if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
 					int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
 					for (int i = 0; i < random_robo; i++) {
 						this.jugadores.get(turno).getMano().add(robarCarta());
@@ -165,7 +211,6 @@ public class Partida {
 							break;
 							
 						case rayosX:
-							//llamada a websockets
 							//TODO
 							break;
 							
@@ -181,6 +226,7 @@ public class Partida {
 							break;
 					}
 					this.cartasJugadas.add(0, c);
+					//TODO eliminar la carta de la mano del jugador; hacer antes de las acciones
 				}
 			}
 			
@@ -190,23 +236,34 @@ public class Partida {
 			for (Jugador j : this.jugadores) {
 				if (j.getMano().size() == 0) {
 					this.terminada = true;
+					//TODO meter partida en la BD
 				}
 			}
+			if (this.terminada) {
+				String error = insertarPartidaEnBd();
+				if (!error.equals("nulo")) {
+					//TODO Tratamiento de error al insertar en base de datos
+				}
+			}
+			
 		}
 		
-		//TODO
-		//eventos asíncronos: la carta rayosX, emojis, botón de UNO, tiempo, votación pausa
+		
+		//eventos asíncronos: emojis, botón de UNO, tiempo, votación pausa
 	}
 	
 	public void ejecutarJugadaIA() {
-		
+		//TODO
 	}
 	
 	public void expulsarJugador(UUID jugador) {
 		//se sustituye por IA
+		//TODO
 	}
 	
-	
+	public void pulsarBotonUNO(UUID jugador) {
+		//TODO
+	}
 	
 	/**************************************************************************/
 	// Para los FRONTENDs
@@ -238,6 +295,7 @@ public class Partida {
 				anterior = c;
 			}
 			return valida;
+			//TODO verificar si se hace bien la escalera... (igual mejor en los frontend)
 		}
 	}
 	
@@ -268,6 +326,7 @@ public class Partida {
 				});
 				return resultado;
 			}
+			//TODO asignar los puntos a cada jugador
 		} else {
 			return null;
 		}
