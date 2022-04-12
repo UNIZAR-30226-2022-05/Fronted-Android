@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.widget.Toast;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import es.unizar.unoforall.InicioActivity;
 import es.unizar.unoforall.PrincipalActivity;
+import es.unizar.unoforall.R;
 import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.ListaUsuarios;
@@ -24,9 +24,10 @@ import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ModifyAccountDialogBuilder;
-import es.unizar.unoforall.utils.dialogs.PeticionDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.PeticionAmistadDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.SeleccionAmigoDialogBuilder;
 import es.unizar.unoforall.utils.tasks.Task;
 
 public class BackendAPI{
@@ -402,7 +403,7 @@ public class BackendAPI{
     }
 
     public void enviarPeticion(Runnable runnable){
-        PeticionDialogBuilder builder = new PeticionDialogBuilder(activity);
+        PeticionAmistadDialogBuilder builder = new PeticionAmistadDialogBuilder(activity);
         builder.setPositiveButton(correo -> {
             obtenerUsuarioVO(usuarioPrincipal -> {
                 if(correo.equals(usuarioPrincipal.getCorreo())){
@@ -448,6 +449,17 @@ public class BackendAPI{
                 mostrarMensaje("Petición cancelada");
             }
         });
+    }
+
+    public void invitarAmigoSala(UUID salaID){
+        SeleccionAmigoDialogBuilder builder = new SeleccionAmigoDialogBuilder(activity);
+        builder.setPositiveButton(correo -> {
+            buscarUsuarioVO(correo, usuarioVO -> {
+                wsAPI.sendObject("/app/notifSala/" + usuarioVO.getId(), salaID);
+                mostrarMensaje("Invitación enviada");
+            });
+        });
+        builder.show();
     }
 
     public static synchronized void closeWebSocketAPI(){

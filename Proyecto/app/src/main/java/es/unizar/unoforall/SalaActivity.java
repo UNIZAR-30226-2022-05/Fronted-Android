@@ -75,7 +75,7 @@ public class SalaActivity extends AppCompatActivity {
 
         Button invitarAmigos = findViewById(R.id.invitarAmigosButton);
         invitarAmigos.setOnClickListener(view -> {
-            // Mostrar la lista de amigos en un dialog
+            new BackendAPI(this).invitarAmigoSala(salaID);
         });
 
         api = new BackendAPI(this);

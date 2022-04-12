@@ -41,7 +41,7 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
 
         TextView nombreTextView = view.findViewById(R.id.nombre);
         TextView correoTextView = view.findViewById(R.id.correo);
-        ImageView imageView = view.findViewById(R.id.image);
+        ImageView imageView = view.findViewById(R.id.imagen);
 
         nombreTextView.setText(nombre);
         correoTextView.setText(correo);

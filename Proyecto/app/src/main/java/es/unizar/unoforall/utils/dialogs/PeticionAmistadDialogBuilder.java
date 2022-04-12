@@ -13,14 +13,14 @@ import java.util.function.Consumer;
 
 import es.unizar.unoforall.R;
 
-public class PeticionDialogBuilder {
+public class PeticionAmistadDialogBuilder {
     private final Activity activity;
     private final EditText codeEditText;
 
     private Runnable positiveRunnable;
     private Runnable negativeRunnable;
 
-    public PeticionDialogBuilder(Activity activity){
+    public PeticionAmistadDialogBuilder(Activity activity){
         this.activity = activity;
 
         this.codeEditText = new EditText(activity);
