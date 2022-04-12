@@ -9,10 +9,13 @@ import es.unizar.unoforall.R;
 
 public class ImageManager{
 
-    // Pre: -1 <= imageID <= 6
+    public static int IA_IMAGE_ID = -1;
+    public static int DEFAULT_IMAGE_ID = -2;
+
+    // Pre: -2 <= imageID <= 6
     @SuppressLint("UseCompatLoadingForDrawables")
     public static void setImage(ImageView imageView, int imageID){
-        if(imageID < -1 || imageID > 6){
+        if(imageID < -2 || imageID > 6){
             throw new IllegalArgumentException("ID de imagen inválido: " + imageID + ". Debe estar entre -1 y 6");
         }
 
@@ -20,6 +23,9 @@ public class ImageManager{
         switch(imageID){
             case -1:
                 resourceID = R.drawable.ic_perfil_ia;
+                break;
+            case -2:
+                resourceID = R.drawable.ic_iconoperfil;
                 break;
             case 0:
                 resourceID = R.drawable.ic_perfil_0;
@@ -44,6 +50,6 @@ public class ImageManager{
                 break;
         }
 
-        imageView.setBackground(imageView.getContext().getDrawable(resourceID));
+        imageView.setImageResource(resourceID);
     }
 }

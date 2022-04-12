@@ -1,6 +1,7 @@
 package es.unizar.unoforall.utils.list_adapters;
 
 import android.app.Activity;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import es.unizar.unoforall.R;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.utils.ImageManager;
 
 public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
 
@@ -35,7 +37,7 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
 
         String nombre = usuarioVO.getNombre();
         String correo = usuarioVO.getCorreo();
-        //int imageID = ???;
+        int imageID = usuarioVO.getAvatar();
 
         TextView nombreTextView = view.findViewById(R.id.nombre);
         TextView correoTextView = view.findViewById(R.id.correo);
@@ -43,7 +45,7 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
 
         nombreTextView.setText(nombre);
         correoTextView.setText(correo);
-        //imageView.setBackground(???);
+        ImageManager.setImage(imageView, imageID);
 
         return view;
     }

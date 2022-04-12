@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.Sala;
+import es.unizar.unoforall.utils.ImageManager;
 
 public class SalaActivity extends AppCompatActivity {
 
@@ -55,10 +57,10 @@ public class SalaActivity extends AppCompatActivity {
         numUsuariosTextView = findViewById(R.id.numUsuariosTextView);
         numUsuariosListosTextView = findViewById(R.id.numUsuariosListosTextView);
         layoutUsuarios = new LinearLayout[] {
-                findViewById(R.id.layoutUsuario1),
-                findViewById(R.id.layoutUsuario2),
-                findViewById(R.id.layoutUsuario3),
-                findViewById(R.id.layoutUsuario4)
+            findViewById(R.id.layoutUsuario1),
+            findViewById(R.id.layoutUsuario2),
+            findViewById(R.id.layoutUsuario3),
+            findViewById(R.id.layoutUsuario4)
         };
 
         Button abandonarSalaButton = findViewById(R.id.abandonarSalaButton);
@@ -128,6 +130,12 @@ public class SalaActivity extends AppCompatActivity {
                     ((TextView) view).setText("Esperando al jugador " + (layoutID+1) + "...");
                 }else{
                     ((TextView) view).setText(usuario.getNombre());
+                }
+            }else if(view instanceof ImageView){
+                if(usuario == null){
+                    ImageManager.setImage((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
+                }else{
+                    ImageManager.setImage((ImageView) view, usuario.getAvatar());
                 }
             }
         }
