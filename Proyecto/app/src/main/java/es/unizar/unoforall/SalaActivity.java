@@ -6,7 +6,10 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.annotation.SuppressLint;
+<<<<<<< HEAD
 import android.app.PendingIntent;
+=======
+>>>>>>> Desarrollo
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -29,9 +32,11 @@ import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.Sala;
+import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
 
-public class SalaActivity extends AppCompatActivity {
+public class SalaActivity extends CustomActivity {
 
     public static final String KEY_SALA_ID = "id_sala";
     private static final int MAX_PARTICIPANTES_SALA = 4;
@@ -46,6 +51,11 @@ public class SalaActivity extends AppCompatActivity {
     private TextView salaTipoTextView;
 
     private static final int notificacionSala = 1;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.SALA;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +164,9 @@ public class SalaActivity extends AppCompatActivity {
         builder.setMessage("¿Quieres salir de la sala?");
         builder.setPositiveButton("Sí", (dialog, which) -> {
             api.salirSala(salaID);
-            super.onBackPressed();
+            Intent intent = new Intent(this, PrincipalActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivityForResult(intent, 0);
         });
         builder.setNegativeButton("No", (dialog, which) -> {
             dialog.dismiss();

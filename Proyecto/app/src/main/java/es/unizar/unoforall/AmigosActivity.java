@@ -9,18 +9,25 @@ import android.widget.ListView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import es.unizar.unoforall.api.BackendAPI;
+import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.list_adapters.AmigosAdapter;
 import es.unizar.unoforall.utils.list_adapters.PeticionesEnviadasAdapter;
 import es.unizar.unoforall.utils.list_adapters.PeticionesRecibidasAdapter;
 import es.unizar.unoforall.utils.tasks.Task;
 
-public class AmigosActivity extends AppCompatActivity {
+public class AmigosActivity extends CustomActivity {
 
     private ListView amigosListView;
     private ListView peticionesRecibidasListView;
     private ListView peticionesEnviadasListView;
 
     private SwipeRefreshLayout pullToRefresh;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.AMIGOS;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

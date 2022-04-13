@@ -3,6 +3,7 @@ package es.unizar.unoforall.api;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.UUID;
@@ -20,6 +21,7 @@ import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
@@ -35,6 +37,11 @@ public class BackendAPI{
 
     private static String sesionID = null;
     private static WebSocketAPI wsAPI = null;
+
+    private static CustomActivity currentActivity = null;
+    public static void setCurrentActivity(CustomActivity currentActivity){
+        BackendAPI.currentActivity = currentActivity;
+    }
 
     private final Activity activity;
     private final UsuarioDbAdapter usuarioDbAdapter;
@@ -84,7 +91,7 @@ public class BackendAPI{
 
                 // Iniciar la actividad principal
                 Intent intent = new Intent(activity, PrincipalActivity.class);
-                activity.startActivity(intent);
+                activity.startActivityForResult(intent, 0);
             });
         });
         wsAPI.sendObject("/app/conectarse/" + claveInicio, VACIO);
@@ -354,7 +361,7 @@ public class BackendAPI{
                         BackendAPI.closeWebSocketAPI();
                         Intent intent = new Intent(activity, InicioActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        activity.startActivity(intent);
+                        activity.startActivityForResult(intent, 0);
                     }else{
                         mostrarMensaje(error);
                     }

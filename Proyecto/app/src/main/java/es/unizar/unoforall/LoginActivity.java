@@ -1,8 +1,8 @@
 package es.unizar.unoforall;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -19,13 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
-import es.unizar.unoforall.model.RespuestaLogin;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.Vibration;
+import es.unizar.unoforall.utils.ActivityType;
 
-public class LoginActivity extends AppCompatActivity{
+public class LoginActivity extends CustomActivity {
 
     private ListView listaUsuarios;
     private EditText correoEditText;
@@ -33,6 +32,12 @@ public class LoginActivity extends AppCompatActivity{
     private UsuarioDbAdapter mDbHelper;
     private Long mRowId;
 
+    @Override
+    public ActivityType getType(){
+        return ActivityType.LOGIN;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +52,7 @@ public class LoginActivity extends AppCompatActivity{
 
 
         TextView linkText = findViewById(R.id.textoMarcableLogin);
-        linkText.setOnClickListener(v -> startActivity(new Intent(this, RestablecerContrasennaActivity.class)));
+        linkText.setOnClickListener(v -> startActivityForResult(new Intent(this, RestablecerContrasennaActivity.class), 0));
         linkText.setOnTouchListener((view, event) -> {
             switch(event.getAction()){
                 case MotionEvent.ACTION_DOWN:
