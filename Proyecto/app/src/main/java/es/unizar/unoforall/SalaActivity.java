@@ -6,10 +6,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.annotation.SuppressLint;
-<<<<<<< HEAD
 import android.app.PendingIntent;
-=======
->>>>>>> Desarrollo
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
