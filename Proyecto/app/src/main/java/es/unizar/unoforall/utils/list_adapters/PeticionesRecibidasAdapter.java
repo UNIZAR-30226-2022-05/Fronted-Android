@@ -12,14 +12,15 @@ import es.unizar.unoforall.R;
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.utils.CustomActivity;
 
 public class PeticionesRecibidasAdapter extends ArrayAdapter<UsuarioVO> {
 
     private final int resourceLayout;
-    private final Activity activity;
+    private final CustomActivity activity;
     private final Runnable onUpdate;
 
-    public PeticionesRecibidasAdapter(Activity activity, ListaUsuarios listaUsuarios, Runnable onUpdate){
+    public PeticionesRecibidasAdapter(CustomActivity activity, ListaUsuarios listaUsuarios, Runnable onUpdate){
         super(activity, R.layout.salas_row, listaUsuarios.getUsuarios());
         this.resourceLayout = R.layout.peticiones_rec_row;
         this.activity = activity;

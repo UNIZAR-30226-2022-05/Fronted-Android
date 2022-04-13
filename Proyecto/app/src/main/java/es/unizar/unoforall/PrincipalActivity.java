@@ -118,10 +118,4 @@ public class PrincipalActivity extends CustomActivity {
         });
         builder.create().show();
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        BackendAPI.closeWebSocketAPI();
-    }
 }

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
 import es.unizar.unoforall.utils.CustomActivity;
@@ -78,6 +79,7 @@ public class InicioActivity extends CustomActivity {
     @Override
     protected void onDestroy() {
         NotificationManager.close(this);
+        BackendAPI.closeWebSocketAPI();
         super.onDestroy();
     }
 }

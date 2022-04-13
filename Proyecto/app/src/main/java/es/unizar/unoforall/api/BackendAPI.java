@@ -89,12 +89,12 @@ public class BackendAPI{
                 // Suscribirse a las notificaciones de sala
                 wsAPI.subscribe(activity, "/topic/notifSala/" + usuarioVO.getId(),
                         NotificacionSala.class, notificacionSala ->
-                            Notificaciones.mostrarNotificacionSala(activity, notificacionSala));
+                            Notificaciones.mostrarNotificacionSala(notificacionSala));
 
                 // Suscribirse a las notificaciones de amigos
                 wsAPI.subscribe(activity, "/topic/notifAmistad/" + usuarioVO.getId(),
                         UsuarioVO.class, usuarioVO2 ->
-                            Notificaciones.mostrarNotificacionAmigo(activity, usuarioVO2));
+                            Notificaciones.mostrarNotificacionAmigo(usuarioVO2));
 
                 activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
 
@@ -462,7 +462,7 @@ public class BackendAPI{
             if(error != null){
                 activity.mostrarMensaje(error);
             }else{
-                activity.mostrarMensaje("Petición cancelada");
+                activity.mostrarMensaje("Petición rechazada");
             }
         });
     }

@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import es.unizar.unoforall.R;
 import es.unizar.unoforall.api.BackendAPI;
@@ -20,13 +21,12 @@ import es.unizar.unoforall.utils.CustomActivity;
 
 public class NotificationManager {
     private static final String CHANNEL_ID = "unoforall";
-    private static final String ACTION_KEY_ID = "ACTION";
     private static final String ACTION_1_KEY_ID = "ACTION_1";
     private static final String ACTION_2_KEY_ID = "ACTION_2";
     private static final String ACTION_3_KEY_ID = "ACTION_3";
     private static final int NOTIFICATION_ID = 1;
 
-    private static HashMap<UUID, Consumer<CustomActivity>> actionsMap;
+    private static HashMap<UUID, Function<CustomActivity, Boolean>> actionsMap;
 
     public static void initialize(Context context){
         createNotificationChannel(context);
@@ -63,28 +63,34 @@ public class NotificationManager {
 
         @Override
         protected void onHandleIntent(Intent intent) {
-            NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
-
             CustomActivity customActivity = BackendAPI.getCurrentActivity();
 
             UUID keyAction1 = (UUID) intent.getSerializableExtra(ACTION_1_KEY_ID);
             UUID keyAction2 = (UUID) intent.getSerializableExtra(ACTION_2_KEY_ID);
             UUID keyAction3 = (UUID) intent.getSerializableExtra(ACTION_3_KEY_ID);
 
-            Consumer<CustomActivity> consumer1 = actionsMap.remove(keyAction1);
-            Consumer<CustomActivity> consumer2 = actionsMap.remove(keyAction2);
-            Consumer<CustomActivity> consumer3 = actionsMap.remove(keyAction3);
+            Function<CustomActivity, Boolean> function1 = actionsMap.remove(keyAction1);
+            Function<CustomActivity, Boolean> function2 = actionsMap.remove(keyAction2);
+            Function<CustomActivity, Boolean> function3 = actionsMap.remove(keyAction3);
 
-            if(consumer1 != null){
-                customActivity.runOnUiThread(() -> consumer1.accept(customActivity));
-            }
-
-            if(consumer2 != null){
-                customActivity.runOnUiThread(() -> consumer2.accept(customActivity));
-            }
-
-            if(consumer3 != null){
-                customActivity.runOnUiThread(() -> consumer3.accept(customActivity));
+            if(function1 != null){
+                customActivity.runOnUiThread(() -> {
+                    if(function1.apply(customActivity)){
+                        NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
+                    }
+                });
+            }else if(function2 != null){
+                customActivity.runOnUiThread(() -> {
+                    if(function2.apply(customActivity)){
+                        NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
+                    }
+                });
+            }else if(function3 != null){
+                customActivity.runOnUiThread(() -> {
+                    if(function3.apply(customActivity)){
+                        NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
+                    }
+                });
             }
         }
     }
@@ -99,9 +105,9 @@ public class NotificationManager {
         private String action2title;
         private String action3title;
 
-        private Consumer<CustomActivity> action1;
-        private Consumer<CustomActivity> action2;
-        private Consumer<CustomActivity> action3;
+        private Function<CustomActivity, Boolean> action1;
+        private Function<CustomActivity, Boolean> action2;
+        private Function<CustomActivity, Boolean> action3;
 
         public Builder(Context context){
             this.context = context;
@@ -128,21 +134,21 @@ public class NotificationManager {
             return this;
         }
 
-        public Builder withAction1(String actionTitle, Consumer<CustomActivity> consumer){
+        public Builder withAction1(String actionTitle, Function<CustomActivity, Boolean> action){
             this.action1title = actionTitle;
-            this.action1 = consumer;
+            this.action1 = action;
             return this;
         }
 
-        public Builder withAction2(String actionTitle, Consumer<CustomActivity> consumer){
+        public Builder withAction2(String actionTitle, Function<CustomActivity, Boolean> action){
             this.action2title = actionTitle;
-            this.action2 = consumer;
+            this.action2 = action;
             return this;
         }
 
-        public Builder withAction3(String actionTitle, Consumer<CustomActivity> consumer){
+        public Builder withAction3(String actionTitle, Function<CustomActivity, Boolean> action){
             this.action3title = actionTitle;
-            this.action3 = consumer;
+            this.action3 = action;
             return this;
         }
 
@@ -157,6 +163,7 @@ public class NotificationManager {
                     .setSmallIcon(R.drawable.ic_iconobarranotificaciones)
                     .setContentTitle(title)
                     .setContentText(message)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
             UUID actionID1 = UUID.randomUUID();
