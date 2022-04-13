@@ -30,7 +30,7 @@ public class Notificaciones {
         builder
                 .withTitle("Nueva solicitud para unirse a una sala")
                 .withMessage("El usuario " + notificacionSala.getRemitente().getNombre() +
-                        " te ha propuesto unirse a la sala " + notificacionSala.getSalaID())
+                        " te ha propuesto unirte a la sala " + notificacionSala.getSalaID())
                 .withAction1("Cancelar", customActivity -> true)
                 .withAction2("Aceptar", customActivity -> {
                     // Comprobar en que actividad se encuentra el usuario

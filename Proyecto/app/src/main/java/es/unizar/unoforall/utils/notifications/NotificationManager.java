@@ -69,9 +69,9 @@ public class NotificationManager {
             UUID keyAction2 = (UUID) intent.getSerializableExtra(ACTION_2_KEY_ID);
             UUID keyAction3 = (UUID) intent.getSerializableExtra(ACTION_3_KEY_ID);
 
-            Function<CustomActivity, Boolean> function1 = actionsMap.remove(keyAction1);
-            Function<CustomActivity, Boolean> function2 = actionsMap.remove(keyAction2);
-            Function<CustomActivity, Boolean> function3 = actionsMap.remove(keyAction3);
+            Function<CustomActivity, Boolean> function1 = actionsMap.get(keyAction1);
+            Function<CustomActivity, Boolean> function2 = actionsMap.get(keyAction2);
+            Function<CustomActivity, Boolean> function3 = actionsMap.get(keyAction3);
 
             if(function1 != null){
                 customActivity.runOnUiThread(() -> {
