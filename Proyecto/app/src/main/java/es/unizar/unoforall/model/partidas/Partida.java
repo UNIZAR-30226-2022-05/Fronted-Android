@@ -168,7 +168,7 @@ public class Partida {
 		}
 		//participantes.size()==configuracion.getMaxParticipantes()-numIAs
 		PartidaJugada pj = new PartidaJugada(pa,participantes);
-		//error = PartidasDAO.insertarPartidaAcabada(pj);
+		error = "no se ha hecho";// PartidasDAO.insertarPartidaAcabada(pj);
 		return error;
 	}
 	

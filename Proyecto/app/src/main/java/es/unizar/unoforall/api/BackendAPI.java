@@ -3,7 +3,6 @@ package es.unizar.unoforall.api;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.UUID;
@@ -11,7 +10,6 @@ import java.util.function.Consumer;
 
 import es.unizar.unoforall.InicioActivity;
 import es.unizar.unoforall.PrincipalActivity;
-import es.unizar.unoforall.R;
 import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.ListaUsuarios;
@@ -41,6 +39,9 @@ public class BackendAPI{
     private static CustomActivity currentActivity = null;
     public static void setCurrentActivity(CustomActivity currentActivity){
         BackendAPI.currentActivity = currentActivity;
+    }
+    public static CustomActivity getCurrentActivity(){
+        return currentActivity;
     }
 
     private final Activity activity;

@@ -2,10 +2,7 @@ package es.unizar.unoforall;
 
 import androidx.appcompat.app.AlertDialog;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,12 +13,12 @@ import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.SetIPDialogBuilder;
+import es.unizar.unoforall.utils.notifications.NotificationManager;
 import es.unizar.unoforall.utils.ActivityType;
 
 public class InicioActivity extends CustomActivity {
 
     private static final int CAMBIAR_IP_ID = 0;
-    private static final String CHANNEL_ID = "unoforall";
 
     @Override
     public ActivityType getType(){
@@ -34,13 +31,13 @@ public class InicioActivity extends CustomActivity {
         setContentView(R.layout.activity_inicio);
         setTitle(R.string.app_name);
 
-        createNotificationChannel();
-
-        Button botonRegistro = (Button)findViewById(R.id.botonRegistro);
-        Button botonLogin = (Button)findViewById(R.id.botonLogin);
+        Button botonRegistro = findViewById(R.id.botonRegistro);
+        Button botonLogin = findViewById(R.id.botonLogin);
 
         botonRegistro.setOnClickListener(v -> startActivityForResult(new Intent(InicioActivity.this, RegisterActivity.class), 0));
         botonLogin.setOnClickListener(v->startActivityForResult(new Intent(InicioActivity.this, LoginActivity.class), 0));
+
+        NotificationManager.initialize(this);
     }
 
     @Override
@@ -78,23 +75,9 @@ public class InicioActivity extends CustomActivity {
         builder.create().show();
     }
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channelName);
-            String description = getString(R.string.channelDescription);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    public static String getChannelId() {
-        return CHANNEL_ID;
+    @Override
+    protected void onDestroy() {
+        NotificationManager.close(this);
+        super.onDestroy();
     }
 }

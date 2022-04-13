@@ -80,9 +80,6 @@
     <string name="invitarAmigos">Invitar amigos</string>
     <string name="abandonarSala">Abandonar sala</string>
     <string name="listo">Listo</string>
-    
-    <string name="channelName">Canal de notificaciones</string>
-    <string name="channelDescription">Recibir notificaciones</string>
 
     <string name="peticionesRecibidas">Peticiones recibidas</string>
     <string name="peticionesEnviadas">Peticiones enviadas</string>
