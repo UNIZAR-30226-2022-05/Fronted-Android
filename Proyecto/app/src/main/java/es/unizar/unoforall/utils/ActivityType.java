@@ -10,5 +10,7 @@ public enum ActivityType {
     AMIGOS,
     CREAR_SALA,
     BUSCAR_SALA,
-    SALA;
+
+    SALA,
+    PARTIDA;
 }

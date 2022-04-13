@@ -44,18 +44,14 @@ public class BackendAPI{
         return currentActivity;
     }
 
-    private final Activity activity;
+    private final CustomActivity activity;
     private final UsuarioDbAdapter usuarioDbAdapter;
 
-    public BackendAPI(Activity activity){
+    public BackendAPI(CustomActivity activity){
         this.activity = activity;
         this.usuarioDbAdapter = new UsuarioDbAdapter(this.activity).open();
     }
-
-    private void mostrarMensaje(String mensaje){
-        Toast.makeText(activity, mensaje, Toast.LENGTH_SHORT).show();
-    }
-
+    
     public void login(String correo, String contrasennaHash){
         RestAPI api = new RestAPI(activity,"/api/login");
         api.addParameter("correo", correo);
@@ -78,7 +74,7 @@ public class BackendAPI{
                 });
                 wsAPI.openConnection(activity, () -> loginPaso2(respuestaLogin.getClaveInicio()));
             }else{
-                mostrarMensaje(respuestaLogin.getErrorInfo());
+                activity.mostrarMensaje(respuestaLogin.getErrorInfo());
             }
         });
     }
@@ -88,7 +84,7 @@ public class BackendAPI{
             BackendAPI.sesionID = sesionID;
 
             obtenerUsuarioVO(usuarioVO -> {
-                mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
+                activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
 
                 // Iniciar la actividad principal
                 Intent intent = new Intent(activity, PrincipalActivity.class);
@@ -112,7 +108,7 @@ public class BackendAPI{
                 builder.setNegativeButton(() -> registerCancel(correo));
                 builder.show();
             }else{
-                mostrarMensaje(resp);
+                activity.mostrarMensaje(resp);
             }
         });
     }
@@ -129,7 +125,7 @@ public class BackendAPI{
                 builder.setError(error);
                 builder.show();
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
             }
         });
     }
@@ -137,7 +133,7 @@ public class BackendAPI{
         RestAPI api = new RestAPI(activity, "/api/registerCancel");
         api.addParameter("correo", correo);
         api.openConnection();
-        api.setOnObjectReceived(Boolean.class, exito -> mostrarMensaje("Registro cancelado"));
+        api.setOnObjectReceived(Boolean.class, exito -> activity.mostrarMensaje("Registro cancelado"));
     }
 
     public void restablecerContrasenna(String correo){
@@ -150,10 +146,10 @@ public class BackendAPI{
                 //Si no ha habido error
                 CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(activity);
                 builder.setPositiveButton(codigo -> restablecerContrasennaPaso2(correo, codigo, builder));
-                builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+                builder.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
                 builder.show();
             }else{
-                mostrarMensaje(resp);
+                activity.mostrarMensaje(resp);
             }
         });
     }
@@ -167,10 +163,10 @@ public class BackendAPI{
                 // Si no ha habido error
                 ResetPasswordDialogBuilder builder2 = new ResetPasswordDialogBuilder(activity);
                 builder2.setPositiveButton(password -> restablecerContrasennaPaso3(correo, password));
-                builder2.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+                builder2.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
                 builder2.show();
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
                 builder.setError("Código incorrecto");
                 builder.show();
             }
@@ -185,10 +181,10 @@ public class BackendAPI{
         api.setOnObjectReceived(String.class, error -> {
             if(error == null){
                 //Si no ha habido error
-                mostrarMensaje("Contraseña cambiada correctamente");
+                activity.mostrarMensaje("Contraseña cambiada correctamente");
                 login(correo, contrasennaHash);
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
             }
         });
     }
@@ -201,7 +197,7 @@ public class BackendAPI{
             if(usuarioVO.isExito()){
                 consumer.accept(usuarioVO);
             }else{
-                mostrarMensaje("Se ha producido un error al obtener el usuario");
+                activity.mostrarMensaje("Se ha producido un error al obtener el usuario");
             }
         });
     }
@@ -212,7 +208,7 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado() || (listaUsuarios.getError() != null && !listaUsuarios.getError().equals("null"))){
-                mostrarMensaje(listaUsuarios.getError());
+                activity.mostrarMensaje(listaUsuarios.getError());
             }else{
                 consumer.accept(listaUsuarios.getUsuarios().get(0));
             }
@@ -229,7 +225,7 @@ public class BackendAPI{
                 // No ha habido errores
                 iniciarUnirseSala(respuestaSala.getSalaID());
             }else{
-                mostrarMensaje(respuestaSala.getErrorInfo());
+                activity.mostrarMensaje(respuestaSala.getErrorInfo());
             }
         });
     }
@@ -237,7 +233,7 @@ public class BackendAPI{
     public void unirseSalaPorID(){
         SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
         builder.setPositiveButton(salaID -> iniciarUnirseSala(salaID));
-        builder.setNegativeButton(() -> mostrarMensaje("Búsqueda de sala por ID cancelada"));
+        builder.setNegativeButton(() -> activity.mostrarMensaje("Búsqueda de sala por ID cancelada"));
         builder.show();
     }
 
@@ -250,7 +246,7 @@ public class BackendAPI{
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
-                mostrarMensaje(sala.getError());
+                activity.mostrarMensaje(sala.getError());
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
                 activity.finish();
             }else{
@@ -258,7 +254,7 @@ public class BackendAPI{
             }
         });
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
-        mostrarMensaje("Te has unido a la sala");
+        activity.mostrarMensaje("Te has unido a la sala");
     }
     public void listoSala(UUID salaID){
         wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
@@ -266,7 +262,7 @@ public class BackendAPI{
     public void salirSala(UUID salaID){
         wsAPI.unsubscribe("/topic/salas/" + salaID);
         wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
-        mostrarMensaje("Has salido de la sala");
+        activity.mostrarMensaje("Has salido de la sala");
     }
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
@@ -294,7 +290,7 @@ public class BackendAPI{
                     modificarCuentaPaso2(nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
                 }
             });
-            builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+            builder.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
             builder.show();
         });
     }
@@ -314,7 +310,7 @@ public class BackendAPI{
                 builder2.setNegativeButton(() -> cancelModificarCuenta());
                 builder2.show();
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
                 builder.show();
             }
         });
@@ -332,7 +328,7 @@ public class BackendAPI{
                 closeWebSocketAPI();
                 login(correo, contrasennaHash);
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
                 if(!error.equals("SESION_EXPIRADA")){
                     builder.setError("Código incorrecto");
                     builder.show();
@@ -344,7 +340,7 @@ public class BackendAPI{
         RestAPI api = new RestAPI(activity, "/api/actualizarCancel");
         api.addParameter("sesionID", sesionID);
         api.openConnection();
-        api.setOnObjectReceived(String.class, error -> mostrarMensaje("Operación cancelada"));
+        api.setOnObjectReceived(String.class, error -> activity.mostrarMensaje("Operación cancelada"));
     }
 
     public void borrarCuenta(){
@@ -358,17 +354,17 @@ public class BackendAPI{
                     if(error == null || error.equals("BORRADA")){
                         // No ha habido error
                         usuarioDbAdapter.deleteUsuario(usuarioVO.getCorreo());
-                        mostrarMensaje("Cuenta borrada");
+                        activity.mostrarMensaje("Cuenta borrada");
                         BackendAPI.closeWebSocketAPI();
                         Intent intent = new Intent(activity, InicioActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         activity.startActivityForResult(intent, 0);
                     }else{
-                        mostrarMensaje(error);
+                        activity.mostrarMensaje(error);
                     }
                 });
             });
-            builder.setNegativeButton(() -> mostrarMensaje("Borrado cancelado"));
+            builder.setNegativeButton(() -> activity.mostrarMensaje("Borrado cancelado"));
             builder.show();
         });
     }
@@ -379,7 +375,7 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado()){
-                mostrarMensaje(listaUsuarios.getError());
+                activity.mostrarMensaje(listaUsuarios.getError());
             }else{
                 consumer.accept(listaUsuarios);
             }
@@ -391,7 +387,7 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado()){
-                mostrarMensaje(listaUsuarios.getError());
+                activity.mostrarMensaje(listaUsuarios.getError());
             }else{
                 consumer.accept(listaUsuarios);
             }
@@ -403,7 +399,7 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado()){
-                mostrarMensaje(listaUsuarios.getError());
+                activity.mostrarMensaje(listaUsuarios.getError());
             }else{
                 consumer.accept(listaUsuarios);
             }
@@ -422,7 +418,7 @@ public class BackendAPI{
                 }
             });
         });
-        builder.setNegativeButton(() -> mostrarMensaje("Envío cancelado"));
+        builder.setNegativeButton(() -> activity.mostrarMensaje("Envío cancelado"));
         builder.show();
     }
     private void enviarPeticion2(String correo, Runnable runnable){
@@ -439,9 +435,9 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> {
             if(error != null){
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
             }else{
-                mostrarMensaje("Petición aceptada");
+                activity.mostrarMensaje("Petición aceptada");
             }
         });
     }
@@ -452,9 +448,9 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> {
             if(error != null){
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
             }else{
-                mostrarMensaje("Petición cancelada");
+                activity.mostrarMensaje("Petición cancelada");
             }
         });
     }
@@ -464,7 +460,7 @@ public class BackendAPI{
         builder.setPositiveButton(correo -> {
             buscarUsuarioVO(correo, usuarioVO -> {
                 wsAPI.sendObject("/app/notifSala/" + usuarioVO.getId(), salaID);
-                mostrarMensaje("Invitación enviada");
+                activity.mostrarMensaje("Invitación enviada");
             });
         });
         builder.show();
