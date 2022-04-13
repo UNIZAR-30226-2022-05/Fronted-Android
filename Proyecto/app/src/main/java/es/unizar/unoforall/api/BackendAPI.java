@@ -16,6 +16,7 @@ import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
@@ -28,6 +29,7 @@ import es.unizar.unoforall.utils.dialogs.PeticionAmistadDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SeleccionAmigoDialogBuilder;
+import es.unizar.unoforall.utils.notifications.Notificaciones;
 import es.unizar.unoforall.utils.tasks.Task;
 
 public class BackendAPI{
@@ -84,6 +86,16 @@ public class BackendAPI{
             BackendAPI.sesionID = sesionID;
 
             obtenerUsuarioVO(usuarioVO -> {
+                // Suscribirse a las notificaciones de sala
+                wsAPI.subscribe(activity, "/topic/notifSala/" + usuarioVO.getId(),
+                        NotificacionSala.class, notificacionSala ->
+                            Notificaciones.mostrarNotificacionSala(activity, notificacionSala));
+
+                // Suscribirse a las notificaciones de amigos
+                wsAPI.subscribe(activity, "/topic/notifAmistad/" + usuarioVO.getId(),
+                        UsuarioVO.class, usuarioVO2 ->
+                            Notificaciones.mostrarNotificacionAmigo(activity, usuarioVO2));
+
                 activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
 
                 // Iniciar la actividad principal
