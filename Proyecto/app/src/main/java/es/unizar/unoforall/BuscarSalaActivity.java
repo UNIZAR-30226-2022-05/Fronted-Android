@@ -12,16 +12,23 @@ import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.FilterSearchDialogBuilder;
 import es.unizar.unoforall.utils.list_adapters.SalaListAdapter;
 
-public class BuscarSalaActivity extends AppCompatActivity {
+public class BuscarSalaActivity extends CustomActivity {
 
     private ListView listViewSalas;
     private SwipeRefreshLayout pullToRefresh;
 
     private BackendAPI api;
     private ConfigSala configSala;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.BUSCAR_SALA;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +74,5 @@ public class BuscarSalaActivity extends AppCompatActivity {
             }
             pullToRefresh.setRefreshing(false);
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        actualizarSalas();
     }
 }

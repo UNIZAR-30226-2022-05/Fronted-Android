@@ -1,7 +1,6 @@
 package es.unizar.unoforall;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -15,12 +14,19 @@ import android.widget.Toast;
 
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.SetIPDialogBuilder;
+import es.unizar.unoforall.utils.ActivityType;
 
-public class InicioActivity extends AppCompatActivity {
+public class InicioActivity extends CustomActivity {
 
     private static final int CAMBIAR_IP_ID = 0;
     private static final String CHANNEL_ID = "unoforall";
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.INICIO;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +39,8 @@ public class InicioActivity extends AppCompatActivity {
         Button botonRegistro = (Button)findViewById(R.id.botonRegistro);
         Button botonLogin = (Button)findViewById(R.id.botonLogin);
 
-        botonRegistro.setOnClickListener(v -> startActivity(new Intent(InicioActivity.this, RegisterActivity.class)));
-        botonLogin.setOnClickListener(v->startActivity(new Intent(InicioActivity.this, LoginActivity.class)));
+        botonRegistro.setOnClickListener(v -> startActivityForResult(new Intent(InicioActivity.this, RegisterActivity.class), 0));
+        botonLogin.setOnClickListener(v->startActivityForResult(new Intent(InicioActivity.this, LoginActivity.class), 0));
     }
 
     @Override
