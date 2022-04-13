@@ -2,8 +2,12 @@ package es.unizar.unoforall;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +45,8 @@ public class SalaActivity extends AppCompatActivity {
 
     private TextView salaTipoTextView;
 
+    private static final int notificacionSala = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +82,7 @@ public class SalaActivity extends AppCompatActivity {
         Button invitarAmigos = findViewById(R.id.invitarAmigosButton);
         invitarAmigos.setOnClickListener(view -> {
             new BackendAPI(this).invitarAmigoSala(salaID);
+            mandarNotificacionSala();
         });
 
         api = new BackendAPI(this);
@@ -153,6 +160,26 @@ public class SalaActivity extends AppCompatActivity {
             dialog.dismiss();
         });
         builder.create().show();
+    }
+
+    private void mandarNotificacionSala(){
+        Intent intent = new Intent(this, SalaActivity.class);
+        intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, InicioActivity.getChannelId())
+                .setSmallIcon(R.drawable.ic_logouno)
+                .setContentTitle("Te han invitado a una sala")
+                .setContentText("Pulsa la notificación para unirte a la sala")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(notificacionSala, builder.build());
     }
 
     @Override
