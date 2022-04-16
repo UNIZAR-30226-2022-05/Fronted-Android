@@ -1,4 +1,4 @@
-package es.unizar.unoforall.utils;
+package es.unizar.unoforall.utils.list_adapters;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -18,13 +18,14 @@ import es.unizar.unoforall.R;
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
+import es.unizar.unoforall.utils.CustomActivity;
 
 public class SalaListAdapter extends ArrayAdapter<Map.Entry<UUID, Sala>> {
 
     private final int resourceLayout;
-    private final Activity activity;
+    private final CustomActivity activity;
 
-    public SalaListAdapter(Activity activity, Map<UUID, Sala> salas){
+    public SalaListAdapter(CustomActivity activity, Map<UUID, Sala> salas){
         super(activity, R.layout.salas_row, new ArrayList<>(salas.entrySet()));
         this.resourceLayout = R.layout.salas_row;
         this.activity = activity;

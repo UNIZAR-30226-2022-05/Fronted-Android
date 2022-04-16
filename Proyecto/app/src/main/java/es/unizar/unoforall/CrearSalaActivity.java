@@ -19,11 +19,18 @@ import java.util.UUID;
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ReglasEspeciales;
+import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.CustomActivity;
 
-public class CrearSalaActivity extends AppCompatActivity {
+public class CrearSalaActivity extends CustomActivity {
 
     private ConfigSala configSala;
     private ReglasEspeciales reglasEspeciales;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.CREAR_SALA;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,9 +118,8 @@ public class CrearSalaActivity extends AppCompatActivity {
 
         Button confirmarSalaButton = findViewById(R.id.confirmarSalaButton);
         confirmarSalaButton.setOnClickListener(view -> {
-            UUID sesionID = PrincipalActivity.getSesionID();
             BackendAPI api = new BackendAPI(this);
-            api.crearSala(sesionID, configSala);
+            api.crearSala(configSala);
         });
 
     }
@@ -144,13 +150,5 @@ public class CrearSalaActivity extends AppCompatActivity {
                     configSala.setMaxParticipantes(4);
                     break;
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Volver a la pantalla principal cuando se salga de la sala creada
-        finish();
     }
 }

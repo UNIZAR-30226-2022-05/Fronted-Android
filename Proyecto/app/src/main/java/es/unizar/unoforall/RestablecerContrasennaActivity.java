@@ -1,20 +1,22 @@
 package es.unizar.unoforall;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.api.RestAPI;
+import es.unizar.unoforall.utils.CustomActivity;
+import es.unizar.unoforall.utils.ActivityType;
 
-public class RestablecerContrasennaActivity extends AppCompatActivity {
+public class RestablecerContrasennaActivity extends CustomActivity {
 
     private EditText correoEditText;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.RESTABLECER_CONTRASENNA;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

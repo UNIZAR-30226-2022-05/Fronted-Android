@@ -1,18 +1,17 @@
 package es.unizar.unoforall;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.HashUtils;
+import es.unizar.unoforall.utils.ActivityType;
 
 
-public class RegisterActivity extends AppCompatActivity{
+public class RegisterActivity extends CustomActivity {
 
     private EditText nombreUsuarioEditText;
     private EditText correoEditText;
@@ -20,6 +19,11 @@ public class RegisterActivity extends AppCompatActivity{
     private EditText contrasennaBisEditText;
 
     private Button registerButton;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.REGISTER;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity{
             }
 
             if(!contrasenna.equals(contrasennaBis)){
-                Toast.makeText(RegisterActivity.this, getString(R.string.errorContrasegnas), Toast.LENGTH_SHORT).show();
+                contrasennaBisEditText.setError(getString(R.string.errorContrasegnas));
                 return;
             }
 

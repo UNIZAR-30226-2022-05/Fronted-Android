@@ -1,18 +1,17 @@
 package es.unizar.unoforall;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,11 +20,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.api.WebSocketAPI;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.Sala;
+import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.CustomActivity;
+import es.unizar.unoforall.utils.ImageManager;
 
-public class SalaActivity extends AppCompatActivity {
+public class SalaActivity extends CustomActivity {
 
     public static final String KEY_SALA_ID = "id_sala";
     private static final int MAX_PARTICIPANTES_SALA = 4;
@@ -38,6 +39,11 @@ public class SalaActivity extends AppCompatActivity {
     private LinearLayout[] layoutUsuarios;
 
     private TextView salaTipoTextView;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.SALA;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +61,10 @@ public class SalaActivity extends AppCompatActivity {
         numUsuariosTextView = findViewById(R.id.numUsuariosTextView);
         numUsuariosListosTextView = findViewById(R.id.numUsuariosListosTextView);
         layoutUsuarios = new LinearLayout[] {
-                findViewById(R.id.layoutUsuario1),
-                findViewById(R.id.layoutUsuario2),
-                findViewById(R.id.layoutUsuario3),
-                findViewById(R.id.layoutUsuario4)
+            findViewById(R.id.layoutUsuario1),
+            findViewById(R.id.layoutUsuario2),
+            findViewById(R.id.layoutUsuario3),
+            findViewById(R.id.layoutUsuario4)
         };
 
         Button abandonarSalaButton = findViewById(R.id.abandonarSalaButton);
@@ -73,7 +79,7 @@ public class SalaActivity extends AppCompatActivity {
 
         Button invitarAmigos = findViewById(R.id.invitarAmigosButton);
         invitarAmigos.setOnClickListener(view -> {
-            // Mostrar la lista de amigos en un dialog
+            new BackendAPI(this).invitarAmigoSala(salaID);
         });
 
         api = new BackendAPI(this);
@@ -129,6 +135,12 @@ public class SalaActivity extends AppCompatActivity {
                 }else{
                     ((TextView) view).setText(usuario.getNombre());
                 }
+            }else if(view instanceof ImageView){
+                if(usuario == null){
+                    ImageManager.setImage((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
+                }else{
+                    ImageManager.setImage((ImageView) view, usuario.getAvatar());
+                }
             }
         }
     }
@@ -139,7 +151,9 @@ public class SalaActivity extends AppCompatActivity {
         builder.setMessage("¿Quieres salir de la sala?");
         builder.setPositiveButton("Sí", (dialog, which) -> {
             api.salirSala(salaID);
-            super.onBackPressed();
+            Intent intent = new Intent(this, PrincipalActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivityForResult(intent, 0);
         });
         builder.setNegativeButton("No", (dialog, which) -> {
             dialog.dismiss();

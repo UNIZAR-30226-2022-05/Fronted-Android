@@ -13,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UnoForAll"
         android:usesCleartextTraffic="true">
+        <service android:name=".utils.notifications.NotificationManager$NotificationActionService" />
+        <activity
+            android:name=".AmigosActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SalaActivity"
             android:screenOrientation="portrait" />
@@ -37,7 +41,7 @@
         <activity
             android:name=".InicioActivity"
             android:exported="true"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

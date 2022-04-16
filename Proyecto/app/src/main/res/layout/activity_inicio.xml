@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -29,7 +28,7 @@
             android:text="@string/register"
             android:textColor="@color/white"
             app:rippleColor="#1A2351"
-            android:layout_marginEnd="40dp"/>
+            android:layout_marginEnd="32dp"/>
 
         <Button
             android:id="@+id/botonLogin"

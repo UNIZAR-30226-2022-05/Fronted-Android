@@ -1,7 +1,6 @@
 package es.unizar.unoforall;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,13 +9,22 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
+import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.SetIPDialogBuilder;
+import es.unizar.unoforall.utils.notifications.NotificationManager;
+import es.unizar.unoforall.utils.ActivityType;
 
-public class InicioActivity extends AppCompatActivity {
+public class InicioActivity extends CustomActivity {
 
     private static final int CAMBIAR_IP_ID = 0;
+
+    @Override
+    public ActivityType getType(){
+        return ActivityType.INICIO;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +32,13 @@ public class InicioActivity extends AppCompatActivity {
         setContentView(R.layout.activity_inicio);
         setTitle(R.string.app_name);
 
-        Button botonRegistro = (Button)findViewById(R.id.botonRegistro);
-        Button botonLogin = (Button)findViewById(R.id.botonLogin);
+        Button botonRegistro = findViewById(R.id.botonRegistro);
+        Button botonLogin = findViewById(R.id.botonLogin);
 
-        botonRegistro.setOnClickListener(v -> startActivity(new Intent(InicioActivity.this, RegisterActivity.class)));
-        botonLogin.setOnClickListener(v->startActivity(new Intent(InicioActivity.this, LoginActivity.class)));
+        botonRegistro.setOnClickListener(v -> startActivityForResult(new Intent(InicioActivity.this, RegisterActivity.class), 0));
+        botonLogin.setOnClickListener(v->startActivityForResult(new Intent(InicioActivity.this, LoginActivity.class), 0));
+
+        NotificationManager.initialize(this);
     }
 
     @Override
@@ -64,5 +74,12 @@ public class InicioActivity extends AppCompatActivity {
            dialog.dismiss();
         });
         builder.create().show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        NotificationManager.close(this);
+        BackendAPI.closeWebSocketAPI();
+        super.onDestroy();
     }
 }

@@ -1,10 +1,14 @@
 package es.unizar.unoforall.model.salas;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.Partida;
 
 public class Sala {	
 	//Para devolver una sala que no existe
@@ -14,6 +18,7 @@ public class Sala {
 	private ConfigSala configuracion;
 	
 	private boolean enPartida;
+	private Partida partida;
 	
 	//Identificador de cada usuario con su VO
 	private HashMap<UUID, UsuarioVO> participantes;
@@ -25,6 +30,7 @@ public class Sala {
 		participantes_listos = new HashMap<>();
 		noExiste = true;
 		setError(mensajeError);
+		partida = null;
 	}
 	
 	public Sala(ConfigSala configuracion) {
@@ -33,7 +39,23 @@ public class Sala {
 		this.setEnPartida(false);
 		this.noExiste = false;
 	}
+	
+	public void setEnPartida(boolean enPartida) {
+		if (this.enPartida != enPartida) {
+			this.enPartida = enPartida;
+			
+			if (this.enPartida) {  // comienza una partida
+				List<UUID> jugadoresID = new ArrayList<>();
+				participantes.forEach((k,v) -> jugadoresID.add(k));
+				this.partida = new Partida(jugadoresID, configuracion);
+			} else {			   // termina una partida
+				this.partida = null;
+			}
+		}
+		
+	}
 
+	
 	public ConfigSala getConfiguracion() {
 		return configuracion;
 	}
@@ -41,12 +63,8 @@ public class Sala {
 	public boolean isEnPartida() {
 		return enPartida;
 	}
-
-	public void setEnPartida(boolean enPartida) {
-		this.enPartida = enPartida;
-	}
 	
-		// Devuelve false si no es posible añadir un nuevo participante
+	// Devuelve false si no es posible añadir un nuevo participante
 	public boolean nuevoParticipante(UsuarioVO participante) {
 		if(participantes.size() < configuracion.getMaxParticipantes()) {
 			participantes.putIfAbsent(participante.getId(), participante);
@@ -57,15 +75,35 @@ public class Sala {
 		}
 	}
 	
-	// Devuelve false si no es posible añadir un nuevo participante
+	
 	public void eliminarParticipante(UUID participanteID) {
-		participantes.remove(participanteID);
-		participantes_listos.remove(participanteID);
+		if(participantes.containsKey(participanteID)) {
+			participantes.remove(participanteID);
+			participantes_listos.remove(participanteID);
+			
+			if (this.enPartida)	 {
+				partida.expulsarJugador(participanteID);
+			}
+		}
 	}
 	
-	public void nuevoParticipanteListo(UUID participanteID) {
+	// Devuelve true si todos los participantes ya están listos, y por tanto la
+	// partida ha comenzado
+	public boolean nuevoParticipanteListo(UUID participanteID) {
 		if(participantes.containsKey(participanteID)) {
 			participantes_listos.put(participanteID, true);
+			boolean todosListos = true;
+			for (Map.Entry<UUID, Boolean> entry : participantes_listos.entrySet()) {
+				if (entry.getValue() == false) { 
+					todosListos = false; 
+				}
+			}
+			if (todosListos) {
+				setEnPartida(true);
+			}
+			return todosListos;
+		} else {
+			return false;
 		}
 	}
 	
@@ -117,4 +155,9 @@ public class Sala {
 	public void setError(String error) {
 		this.error = error;
 	}
+
+	public Partida getPartida() {
+		return partida;
+	}
+
 }

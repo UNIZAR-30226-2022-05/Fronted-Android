@@ -12,36 +12,48 @@ import es.unizar.unoforall.InicioActivity;
 import es.unizar.unoforall.PrincipalActivity;
 import es.unizar.unoforall.SalaActivity;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
+import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.salas.ConfigSala;
+import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ModifyAccountDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.PeticionAmistadDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.SeleccionAmigoDialogBuilder;
+import es.unizar.unoforall.utils.notifications.Notificaciones;
+import es.unizar.unoforall.utils.tasks.Task;
 
 public class BackendAPI{
     private static final String VACIO = "VACIO";
 
+    private static String sesionID = null;
     private static WebSocketAPI wsAPI = null;
 
-    private final Activity activity;
+    private static CustomActivity currentActivity = null;
+    public static void setCurrentActivity(CustomActivity currentActivity){
+        BackendAPI.currentActivity = currentActivity;
+    }
+    public static CustomActivity getCurrentActivity(){
+        return currentActivity;
+    }
+
+    private final CustomActivity activity;
     private final UsuarioDbAdapter usuarioDbAdapter;
 
-    public BackendAPI(Activity activity){
+    public BackendAPI(CustomActivity activity){
         this.activity = activity;
         this.usuarioDbAdapter = new UsuarioDbAdapter(this.activity).open();
     }
-
-    private void mostrarMensaje(String mensaje){
-        Toast.makeText(activity, mensaje, Toast.LENGTH_SHORT).show();
-    }
-
+    
     public void login(String correo, String contrasennaHash){
         RestAPI api = new RestAPI(activity,"/api/login");
         api.addParameter("correo", correo);
@@ -62,20 +74,34 @@ public class BackendAPI{
                     t.printStackTrace();
                     closeWebSocketAPI();
                 });
-                wsAPI.openConnection(activity, () -> {
-                    Intent intent = new Intent(activity, PrincipalActivity.class);
-                    intent.putExtra(PrincipalActivity.KEY_CLAVE_INICIO, respuestaLogin.getClaveInicio());
-                    activity.startActivity(intent);
-                });
+                wsAPI.openConnection(activity, () -> loginPaso2(respuestaLogin.getClaveInicio()));
             }else{
-                mostrarMensaje(respuestaLogin.getErrorInfo());
+                activity.mostrarMensaje(respuestaLogin.getErrorInfo());
             }
         });
     }
-    public void loginPaso2(UUID claveInicio, Consumer<UUID> consumer){
-        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, UUID.class, sesionID -> {
+    private void loginPaso2(UUID claveInicio){
+        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, String.class, sesionID -> {
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
-            consumer.accept(sesionID);
+            BackendAPI.sesionID = sesionID;
+
+            obtenerUsuarioVO(usuarioVO -> {
+                // Suscribirse a las notificaciones de sala
+                wsAPI.subscribe(activity, "/topic/notifSala/" + usuarioVO.getId(),
+                        NotificacionSala.class, notificacionSala ->
+                            Notificaciones.mostrarNotificacionSala(notificacionSala));
+
+                // Suscribirse a las notificaciones de amigos
+                wsAPI.subscribe(activity, "/topic/notifAmistad/" + usuarioVO.getId(),
+                        UsuarioVO.class, usuarioVO2 ->
+                            Notificaciones.mostrarNotificacionAmigo(usuarioVO2));
+
+                activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
+
+                // Iniciar la actividad principal
+                Intent intent = new Intent(activity, PrincipalActivity.class);
+                activity.startActivityForResult(intent, 0);
+            });
         });
         wsAPI.sendObject("/app/conectarse/" + claveInicio, VACIO);
     }
@@ -94,7 +120,7 @@ public class BackendAPI{
                 builder.setNegativeButton(() -> registerCancel(correo));
                 builder.show();
             }else{
-                mostrarMensaje(resp);
+                activity.mostrarMensaje(resp);
             }
         });
     }
@@ -111,7 +137,7 @@ public class BackendAPI{
                 builder.setError(error);
                 builder.show();
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
             }
         });
     }
@@ -119,7 +145,7 @@ public class BackendAPI{
         RestAPI api = new RestAPI(activity, "/api/registerCancel");
         api.addParameter("correo", correo);
         api.openConnection();
-        api.setOnObjectReceived(Boolean.class, exito -> mostrarMensaje("Registro cancelado"));
+        api.setOnObjectReceived(Boolean.class, exito -> activity.mostrarMensaje("Registro cancelado"));
     }
 
     public void restablecerContrasenna(String correo){
@@ -132,10 +158,10 @@ public class BackendAPI{
                 //Si no ha habido error
                 CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(activity);
                 builder.setPositiveButton(codigo -> restablecerContrasennaPaso2(correo, codigo, builder));
-                builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+                builder.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
                 builder.show();
             }else{
-                mostrarMensaje(resp);
+                activity.mostrarMensaje(resp);
             }
         });
     }
@@ -149,10 +175,10 @@ public class BackendAPI{
                 // Si no ha habido error
                 ResetPasswordDialogBuilder builder2 = new ResetPasswordDialogBuilder(activity);
                 builder2.setPositiveButton(password -> restablecerContrasennaPaso3(correo, password));
-                builder2.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+                builder2.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
                 builder2.show();
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
                 builder.setError("Código incorrecto");
                 builder.show();
             }
@@ -167,30 +193,43 @@ public class BackendAPI{
         api.setOnObjectReceived(String.class, error -> {
             if(error == null){
                 //Si no ha habido error
-                mostrarMensaje("Contraseña cambiada correctamente");
+                activity.mostrarMensaje("Contraseña cambiada correctamente");
                 login(correo, contrasennaHash);
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
             }
         });
     }
 
-    public void obtenerUsuarioVO(UUID sesionID, Consumer<UsuarioVO> consumer){
+    public void obtenerUsuarioVO(Consumer<UsuarioVO> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sesionID", sesionID);
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             if(usuarioVO.isExito()){
                 consumer.accept(usuarioVO);
             }else{
-                mostrarMensaje("Se ha producido un error al obtener el usuario");
+                activity.mostrarMensaje("Se ha producido un error al obtener el usuario");
+            }
+        });
+    }
+    public void buscarUsuarioVO(String correo, Consumer<UsuarioVO> consumer){
+        RestAPI api = new RestAPI(activity, "/api/buscarAmigo");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("amigo", correo);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado() || (listaUsuarios.getError() != null && !listaUsuarios.getError().equals("null"))){
+                activity.mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios.getUsuarios().get(0));
             }
         });
     }
 
-    public void crearSala(UUID sesionID, ConfigSala configSala){
+    public void crearSala(ConfigSala configSala){
         RestAPI api = new RestAPI(activity, "/api/crearSala");
-        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("sesionID", sesionID);
         api.addParameter("configuracion", configSala);
         api.openConnection();
         api.setOnObjectReceived(RespuestaSala.class, respuestaSala -> {
@@ -198,7 +237,7 @@ public class BackendAPI{
                 // No ha habido errores
                 iniciarUnirseSala(respuestaSala.getSalaID());
             }else{
-                mostrarMensaje(respuestaSala.getErrorInfo());
+                activity.mostrarMensaje(respuestaSala.getErrorInfo());
             }
         });
     }
@@ -206,7 +245,7 @@ public class BackendAPI{
     public void unirseSalaPorID(){
         SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
         builder.setPositiveButton(salaID -> iniciarUnirseSala(salaID));
-        builder.setNegativeButton(() -> mostrarMensaje("Búsqueda de sala por ID cancelada"));
+        builder.setNegativeButton(() -> activity.mostrarMensaje("Búsqueda de sala por ID cancelada"));
         builder.show();
     }
 
@@ -219,7 +258,7 @@ public class BackendAPI{
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
-                mostrarMensaje(sala.getError());
+                activity.mostrarMensaje(sala.getError());
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
                 activity.finish();
             }else{
@@ -227,7 +266,7 @@ public class BackendAPI{
             }
         });
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
-        mostrarMensaje("Te has unido a la sala");
+        activity.mostrarMensaje("Te has unido a la sala");
     }
     public void listoSala(UUID salaID){
         wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
@@ -235,20 +274,20 @@ public class BackendAPI{
     public void salirSala(UUID salaID){
         wsAPI.unsubscribe("/topic/salas/" + salaID);
         wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
-        mostrarMensaje("Has salido de la sala");
+        activity.mostrarMensaje("Has salido de la sala");
     }
 
-    public void obtenerSalasFiltro(UUID sesionID, ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
+    public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
         RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
-        api.addParameter("sesionID", sesionID.toString());
+        api.addParameter("sesionID", sesionID);
         api.addParameter("configuracion", filtro);
         api.openConnection();
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
-    public void modificarCuenta(UUID sesionID){
+    public void modificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sesionID", sesionID);
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             ModifyAccountDialogBuilder builder = new ModifyAccountDialogBuilder(activity);
@@ -258,20 +297,19 @@ public class BackendAPI{
                 if(contrasenna == null){
                     // Si no se ha cambiado la contraseña,
                     //   se envía la anterior
-                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, usuarioVO.getContrasenna(), builder);
+                    modificarCuentaPaso2(nombreUsuario, correo, usuarioVO.getContrasenna(), builder);
                 }else{
-                    modificarCuentaPaso2(sesionID, nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
+                    modificarCuentaPaso2(nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
                 }
             });
-            builder.setNegativeButton(() -> mostrarMensaje("Operación cancelada"));
+            builder.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
             builder.show();
         });
     }
-    private void modificarCuentaPaso2(UUID sesionID,
-                                      String nombreUsuario, String correo, String contrasennaHash,
+    private void modificarCuentaPaso2(String nombreUsuario, String correo, String contrasennaHash,
                                       ModifyAccountDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepOne");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sesionID", sesionID);
         api.addParameter("correoNuevo", correo);
         api.addParameter("nombre", nombreUsuario);
         api.addParameter("contrasenna", contrasennaHash);
@@ -280,29 +318,29 @@ public class BackendAPI{
             if(error == null){
                 // Si no ha habido error
                 CodeConfirmDialogBuilder builder2 = new CodeConfirmDialogBuilder(activity);
-                builder2.setPositiveButton(codigo -> modificarCuentaPaso3(sesionID, codigo, correo, contrasennaHash, builder2));
-                builder2.setNegativeButton(() -> cancelModificarCuenta(sesionID));
+                builder2.setPositiveButton(codigo -> modificarCuentaPaso3(codigo, correo, contrasennaHash, builder2));
+                builder2.setNegativeButton(() -> cancelModificarCuenta());
                 builder2.show();
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
                 builder.show();
             }
         });
     }
-    private void modificarCuentaPaso3(UUID sesionID, int codigo,
+    private void modificarCuentaPaso3(int codigo,
                                       String correo, String contrasennaHash,
                                       CodeConfirmDialogBuilder builder){
         RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepTwo");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sesionID", sesionID);
         api.addParameter("codigo", codigo);
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> {
             if(error == null){
                 // Cerrar sesión y volverla a iniciar
-                activity.finish();
+                closeWebSocketAPI();
                 login(correo, contrasennaHash);
             }else{
-                mostrarMensaje(error);
+                activity.mostrarMensaje(error);
                 if(!error.equals("SESION_EXPIRADA")){
                     builder.setError("Código incorrecto");
                     builder.show();
@@ -310,37 +348,134 @@ public class BackendAPI{
             }
         });
     }
-    private void cancelModificarCuenta(UUID sesionID){
+    private void cancelModificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/actualizarCancel");
-        api.addParameter("sessionID", sesionID.toString());
+        api.addParameter("sesionID", sesionID);
         api.openConnection();
-        api.setOnObjectReceived(String.class, error -> mostrarMensaje("Operación cancelada"));
+        api.setOnObjectReceived(String.class, error -> activity.mostrarMensaje("Operación cancelada"));
     }
 
-    public void borrarCuenta(UUID sesionID){
-        obtenerUsuarioVO(sesionID, usuarioVO -> {
+    public void borrarCuenta(){
+        obtenerUsuarioVO(usuarioVO -> {
             DeleteAccountDialogBuilder builder = new DeleteAccountDialogBuilder(activity);
             builder.setPositiveRunnable(() -> {
                 RestAPI api = new RestAPI(activity, "/api/borrarCuenta");
-                api.addParameter("sessionID", sesionID.toString());
+                api.addParameter("sesionID", sesionID);
                 api.openConnection();
                 api.setOnObjectReceived(String.class, error -> {
                     if(error == null || error.equals("BORRADA")){
                         // No ha habido error
                         usuarioDbAdapter.deleteUsuario(usuarioVO.getCorreo());
-                        mostrarMensaje("Cuenta borrada");
+                        activity.mostrarMensaje("Cuenta borrada");
                         BackendAPI.closeWebSocketAPI();
                         Intent intent = new Intent(activity, InicioActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        activity.startActivity(intent);
+                        activity.startActivityForResult(intent, 0);
                     }else{
-                        mostrarMensaje(error);
+                        activity.mostrarMensaje(error);
                     }
                 });
             });
-            builder.setNegativeButton(() -> mostrarMensaje("Borrado cancelado"));
+            builder.setNegativeButton(() -> activity.mostrarMensaje("Borrado cancelado"));
             builder.show();
         });
+    }
+
+    public void obtenerAmigos(Consumer<ListaUsuarios> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarAmigos");
+        api.addParameter("sesionID", sesionID);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado()){
+                activity.mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios);
+            }
+        });
+    }
+    public void obtenerPeticionesRecibidas(Consumer<ListaUsuarios> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarPeticionesRecibidas");
+        api.addParameter("sesionID", sesionID);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado()){
+                activity.mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios);
+            }
+        });
+    }
+    public void obtenerPeticionesEnviadas(Consumer<ListaUsuarios> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarPeticionesEnviadas");
+        api.addParameter("sesionID", sesionID);
+        api.openConnection();
+        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+            if(listaUsuarios.isExpirado()){
+                activity.mostrarMensaje(listaUsuarios.getError());
+            }else{
+                consumer.accept(listaUsuarios);
+            }
+        });
+    }
+
+    public void enviarPeticion(Runnable runnable){
+        PeticionAmistadDialogBuilder builder = new PeticionAmistadDialogBuilder(activity);
+        builder.setPositiveButton(correo -> {
+            obtenerUsuarioVO(usuarioPrincipal -> {
+                if(correo.equals(usuarioPrincipal.getCorreo())){
+                    builder.setError("No puedes enviarte una solicitud a ti mismo");
+                    builder.show();
+                }else{
+                    enviarPeticion2(correo, runnable);
+                }
+            });
+        });
+        builder.setNegativeButton(() -> activity.mostrarMensaje("Envío cancelado"));
+        builder.show();
+    }
+    private void enviarPeticion2(String correo, Runnable runnable){
+        buscarUsuarioVO(correo, usuarioVO -> {
+            wsAPI.sendObject("/app/notifAmistad/" + usuarioVO.getId(), VACIO);
+            Task.runDelayedTask(() -> runnable.run(), 300);
+        });
+    }
+
+    public void aceptarPeticion(UsuarioVO usuario){
+        RestAPI api = new RestAPI(activity, "/api/aceptarPeticionAmistad");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("amigo", usuario.getId());
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error != null){
+                activity.mostrarMensaje(error);
+            }else{
+                activity.mostrarMensaje("Petición aceptada");
+            }
+        });
+    }
+    public void rechazarPeticion(UsuarioVO usuario){
+        RestAPI api = new RestAPI(activity, "/api/cancelarPeticionAmistad");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("amigo", usuario.getId());
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error != null){
+                activity.mostrarMensaje(error);
+            }else{
+                activity.mostrarMensaje("Petición rechazada");
+            }
+        });
+    }
+
+    public void invitarAmigoSala(UUID salaID){
+        SeleccionAmigoDialogBuilder builder = new SeleccionAmigoDialogBuilder(activity);
+        builder.setPositiveButton(correo -> {
+            buscarUsuarioVO(correo, usuarioVO -> {
+                wsAPI.sendObject("/app/notifSala/" + usuarioVO.getId(), salaID);
+                activity.mostrarMensaje("Invitación enviada");
+            });
+        });
+        builder.show();
     }
 
     public static synchronized void closeWebSocketAPI(){

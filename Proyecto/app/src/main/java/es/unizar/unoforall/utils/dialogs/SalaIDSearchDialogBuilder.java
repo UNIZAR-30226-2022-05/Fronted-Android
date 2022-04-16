@@ -13,7 +13,7 @@ import es.unizar.unoforall.R;
 
 public class SalaIDSearchDialogBuilder{
     private final Activity activity;
-    private final EditText salaIDEditTExt;
+    private final EditText salaIDEditText;
 
     private Runnable positiveRunnable;
     private Runnable negativeRunnable;
@@ -21,20 +21,20 @@ public class SalaIDSearchDialogBuilder{
     public SalaIDSearchDialogBuilder(Activity activity){
         this.activity = activity;
 
-        this.salaIDEditTExt = new EditText(activity);
-        this.salaIDEditTExt.setHint("ID de la sala");
+        this.salaIDEditText = new EditText(activity);
+        this.salaIDEditText.setHint("ID de la sala");
 
         this.positiveRunnable = () -> {};
         this.negativeRunnable = () -> {};
     }
 
     public void setError(String errror){
-        this.salaIDEditTExt.setError(errror);
+        this.salaIDEditText.setError(errror);
     }
 
     public void setPositiveButton(Consumer<UUID> consumer){
         this.positiveRunnable = () -> {
-            String salaIDString = salaIDEditTExt.getText().toString();
+            String salaIDString = salaIDEditText.getText().toString();
             if(salaIDString.isEmpty()){
                 setError(activity.getString(R.string.campoVacio));
                 show();
@@ -55,15 +55,15 @@ public class SalaIDSearchDialogBuilder{
     }
 
     public void show(){
-        ViewParent parent = salaIDEditTExt.getParent();
+        ViewParent parent = salaIDEditText.getParent();
         if(parent != null){
-            ((ViewGroup) parent).removeView(salaIDEditTExt);
+            ((ViewGroup) parent).removeView(salaIDEditText);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Búsqueda de sala por ID");
         builder.setMessage("Introduzca el ID de la sala que desea buscar");
-        builder.setView(salaIDEditTExt);
+        builder.setView(salaIDEditText);
         builder.setPositiveButton("Buscar", (dialog, which) -> positiveRunnable.run());
         builder.setNegativeButton("Cancelar", (dialog, which) -> negativeRunnable.run());
         builder.setOnCancelListener(dialog -> negativeRunnable.run());

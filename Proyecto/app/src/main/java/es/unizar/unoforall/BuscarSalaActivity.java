@@ -10,19 +10,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
-import es.unizar.unoforall.model.salas.Sala;
+import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.FilterSearchDialogBuilder;
-import es.unizar.unoforall.utils.SalaListAdapter;
+import es.unizar.unoforall.utils.list_adapters.SalaListAdapter;
 
-public class BuscarSalaActivity extends AppCompatActivity {
+public class BuscarSalaActivity extends CustomActivity {
 
-    private UUID sesionID;
-    private HashMap<UUID, Sala> salasIniciales;
     private ListView listViewSalas;
     private SwipeRefreshLayout pullToRefresh;
 
@@ -30,12 +26,16 @@ public class BuscarSalaActivity extends AppCompatActivity {
     private ConfigSala configSala;
 
     @Override
+    public ActivityType getType(){
+        return ActivityType.BUSCAR_SALA;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buscar_sala);
         setTitle(R.string.busquedaDeSalas);
 
-        sesionID = PrincipalActivity.getSesionID();
         listViewSalas = findViewById(R.id.listViewSalas);
 
         api = new BackendAPI(this);
@@ -65,7 +65,7 @@ public class BuscarSalaActivity extends AppCompatActivity {
 
     private void actualizarSalas(){
         pullToRefresh.setRefreshing(true);
-        api.obtenerSalasFiltro(sesionID, configSala, respuestaSalas -> {
+        api.obtenerSalasFiltro(configSala, respuestaSalas -> {
             if(!respuestaSalas.isExito()){
                 Toast.makeText(this, "Se ha producido un error al obtener las salas", Toast.LENGTH_SHORT).show();
             }else{
@@ -74,11 +74,5 @@ public class BuscarSalaActivity extends AppCompatActivity {
             }
             pullToRefresh.setRefreshing(false);
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        actualizarSalas();
     }
 }

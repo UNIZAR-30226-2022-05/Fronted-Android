@@ -1,8 +1,6 @@
 package es.unizar.unoforall;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import java.util.UUID;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,11 +11,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
-import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.utils.CustomActivity;
+import es.unizar.unoforall.utils.ActivityType;
 
-public class PrincipalActivity extends AppCompatActivity {
-
-    public static final String KEY_CLAVE_INICIO = "claveInicio";
+public class PrincipalActivity extends CustomActivity {
 
     private static final int MODIFICAR_CUENTA_ID = 0;
     private static final int MODIFICAR_ASPECTO_ID = 1;
@@ -26,22 +23,6 @@ public class PrincipalActivity extends AppCompatActivity {
     private static final int VER_HISTORIAL_ID = 4;
     private static final int BORRAR_CUENTA_ID = 5;
 
-    private static UUID sesionID;
-    public static UUID getSesionID(){
-        return sesionID;
-    }
-    public static void setSesionID(UUID sesionID){
-        PrincipalActivity.sesionID = sesionID;
-    }
-
-    private static UsuarioVO usuario;
-    public static UsuarioVO getUsuario(){
-        return usuario;
-    }
-    public static void setUsuario(UsuarioVO usuario){
-        PrincipalActivity.usuario = usuario;
-    }
-
     private static boolean sesionIniciada = false;
 
     private Button crearSalaButton;
@@ -49,10 +30,10 @@ public class PrincipalActivity extends AppCompatActivity {
 
     private void inicializarButtons(){
         crearSalaButton = findViewById(R.id.crearSalaButton);
-        crearSalaButton.setOnClickListener(v -> startActivity(new Intent(this, CrearSalaActivity.class)));
+        crearSalaButton.setOnClickListener(v -> startActivityForResult(new Intent(this, CrearSalaActivity.class), 0));
 
         buscarSalaButton = findViewById(R.id.buscarSalaPublicaButton);
-        buscarSalaButton.setOnClickListener(v -> startActivity(new Intent(this, BuscarSalaActivity.class)));
+        buscarSalaButton.setOnClickListener(v -> startActivityForResult(new Intent(this, BuscarSalaActivity.class), 0));
     }
     private void setButtonsEnabled(boolean enabled){
         crearSalaButton.setEnabled(enabled);
@@ -67,25 +48,19 @@ public class PrincipalActivity extends AppCompatActivity {
     }
 
     @Override
+    public ActivityType getType(){
+        return ActivityType.PRINCIPAL;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
         setTitle(R.string.pantallaPrincipal);
 
         inicializarButtons();
-        setButtonsEnabled(false);
-
-        UUID claveInicio = (UUID) this.getIntent().getSerializableExtra(KEY_CLAVE_INICIO);
-        BackendAPI api = new BackendAPI(this);
-        api.loginPaso2(claveInicio, sesionID -> {
-            PrincipalActivity.sesionID = sesionID;
-            api.obtenerUsuarioVO(sesionID, usuarioVO -> {
-                PrincipalActivity.usuario = usuarioVO;
-                Toast.makeText(this, "Hola " + usuario.getNombre() + ", has iniciado sesión correctamente", Toast.LENGTH_SHORT).show();
-                sesionIniciada = true;
-                setButtonsEnabled(true);
-            });
-        });
+        setButtonsEnabled(true);
+        sesionIniciada = true;
     }
 
     @Override
@@ -108,10 +83,14 @@ public class PrincipalActivity extends AppCompatActivity {
 
         switch(item.getItemId()){
             case MODIFICAR_CUENTA_ID:
-                new BackendAPI(this).modificarCuenta(sesionID);
+                new BackendAPI(this).modificarCuenta();
                 break;
             case BORRAR_CUENTA_ID:
-                new BackendAPI(this).borrarCuenta(sesionID);
+                new BackendAPI(this).borrarCuenta();
+                break;
+            case GESTIONAR_AMIGOS_ID:
+                Intent intent = new Intent(this, AmigosActivity.class);
+                startActivityForResult(intent, 0);
                 break;
             default:
                 Toast.makeText(this, "No implementado todavía", Toast.LENGTH_SHORT).show();
@@ -132,17 +111,11 @@ public class PrincipalActivity extends AppCompatActivity {
             BackendAPI.closeWebSocketAPI();
             Intent intent = new Intent(this, InicioActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            startActivityForResult(intent, 0);
         });
         builder.setNegativeButton("No", (dialog, which) -> {
             dialog.dismiss();
         });
         builder.create().show();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        BackendAPI.closeWebSocketAPI();
     }
 }
