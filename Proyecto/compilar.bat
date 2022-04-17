@@ -20,7 +20,9 @@ if NOT "%ERRORLEVEL%" == "0" (
 copy ".\app\build\outputs\apk\debug\app-debug.apk" .\unoforall.apk
 
 title Compilacion completada
-
+echo.
+echo.
+echo.
 pause
 
 rem Para limpiar los archivos de compilación, usar: gradlew.bat clean
