@@ -1,5 +1,7 @@
 Para exportar los iconos:
 
+0- Instalar InkScape
+
 1- Seleccionar el icono deseado del archivo "Set graficos.svg"
 2- Copiarlo y pegarlo en una nueva ventana de InkScape
 3- Pulsar CTRL + SHIFT + R para ajustar el lienzo
