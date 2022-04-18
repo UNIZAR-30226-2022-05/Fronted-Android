@@ -1,10 +1,7 @@
 package es.unizar.unoforall;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
@@ -14,7 +11,7 @@ import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
-import es.unizar.unoforall.utils.dialogs.FilterSearchDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.ReglasFilterDialogBuilder;
 import es.unizar.unoforall.utils.list_adapters.SalaListAdapter;
 
 public class BuscarSalaActivity extends CustomActivity {
@@ -49,7 +46,7 @@ public class BuscarSalaActivity extends CustomActivity {
 
         Button busquedaAvanzadaButton = findViewById(R.id.busquedaConFiltros);
         busquedaAvanzadaButton.setOnClickListener(view -> {
-            FilterSearchDialogBuilder builder = new FilterSearchDialogBuilder(this, this.configSala);
+            ReglasFilterDialogBuilder builder = new ReglasFilterDialogBuilder(this, this.configSala);
             builder.setPositiveButton(configSala -> {
                 this.configSala = configSala;
                 actualizarSalas();

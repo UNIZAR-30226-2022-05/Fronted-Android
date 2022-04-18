@@ -22,7 +22,7 @@ import es.unizar.unoforall.R;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.ReglasEspeciales;
 
-public class FilterSearchDialogBuilder{
+public class ReglasFilterDialogBuilder {
     private static final int PADDING = 25;
     private final Activity activity;
 
@@ -48,7 +48,7 @@ public class FilterSearchDialogBuilder{
     private Runnable positiveRunnable;
     private Runnable negativeRunnable;
 
-    public FilterSearchDialogBuilder(Activity activity, ConfigSala configSala){
+    public ReglasFilterDialogBuilder(Activity activity, ConfigSala configSala){
         this.activity = activity;
 
         this.mainView = LayoutInflater.from(activity).inflate(R.layout.dialog_busqueda_salas, null);
