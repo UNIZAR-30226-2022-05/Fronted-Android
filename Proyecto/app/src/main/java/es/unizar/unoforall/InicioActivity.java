@@ -32,12 +32,6 @@ public class InicioActivity extends CustomActivity {
         setContentView(R.layout.activity_inicio);
         setTitle(R.string.app_name);
 
-        if(0==0){
-            Intent intent = new Intent(this, PartidaActivity.class);
-            startActivity(intent);
-            return;
-        }
-
         Button botonRegistro = findViewById(R.id.botonRegistro);
         Button botonLogin = findViewById(R.id.botonLogin);
 
@@ -45,6 +39,11 @@ public class InicioActivity extends CustomActivity {
         botonLogin.setOnClickListener(v->startActivityForResult(new Intent(InicioActivity.this, LoginActivity.class), 0));
 
         NotificationManager.initialize(this);
+
+        if(0==0){
+            Intent intent = new Intent(this, PartidaActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
