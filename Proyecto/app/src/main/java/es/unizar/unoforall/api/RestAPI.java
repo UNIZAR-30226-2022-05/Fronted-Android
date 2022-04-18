@@ -1,8 +1,6 @@
 package es.unizar.unoforall.api;
 
-import android.app.Activity;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,12 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import es.unizar.unoforall.utils.CustomActivity;
+
 public class RestAPI{
     private static String SERVER_URL = "http://192.168.1.100";
     private static final int HTTP_OK = 200;
     private static final int CONNECTION_TIMEOUT_MS = 3000;
 
-    private final Activity activity;
+    private final CustomActivity activity;
     private final Map<String, String> parameters;
     private final String fullIP;
     private HttpURLConnection conexion;
@@ -33,7 +33,7 @@ public class RestAPI{
         RestAPI.SERVER_URL = "http://" + serverIP;
     }
 
-    public RestAPI(Activity activity, String seccion){
+    public RestAPI(CustomActivity activity, String seccion){
         this.activity = activity;
         this.parameters = new HashMap<>();
         this.fullIP = SERVER_URL + seccion;
@@ -44,7 +44,7 @@ public class RestAPI{
             ex.printStackTrace();
             close();
             activity.runOnUiThread(() ->
-                    Toast.makeText(activity, "RestAPI: Se ha producido un error de conexión", Toast.LENGTH_LONG).show());
+                    activity.mostrarMensaje("RestAPI: Se ha producido un error de conexión"));
         };
     }
 

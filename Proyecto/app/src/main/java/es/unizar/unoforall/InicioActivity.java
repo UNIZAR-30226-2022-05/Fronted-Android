@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
@@ -55,7 +54,7 @@ public class InicioActivity extends CustomActivity {
             builder.setPositiveButton(serverIP -> {
                 RestAPI.setServerIP(serverIP);
                 WebSocketAPI.setServerIP(serverIP);
-                Toast.makeText(this, "IP cambiada con éxito a " + serverIP, Toast.LENGTH_SHORT).show();
+                mostrarMensaje("IP cambiada con éxito a " + serverIP);
             });
             builder.show();
         }

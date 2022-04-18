@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.utils.CustomActivity;
@@ -93,7 +92,7 @@ public class PrincipalActivity extends CustomActivity {
                 startActivityForResult(intent, 0);
                 break;
             default:
-                Toast.makeText(this, "No implementado todavía", Toast.LENGTH_SHORT).show();
+                mostrarMensaje("No implementado todavía");
         }
         return super.onOptionsItemSelected(item);
     }

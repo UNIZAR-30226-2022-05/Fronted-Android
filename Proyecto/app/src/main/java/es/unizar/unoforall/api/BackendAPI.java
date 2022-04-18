@@ -1,9 +1,7 @@
 package es.unizar.unoforall.api;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.widget.Toast;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -71,6 +69,7 @@ public class BackendAPI{
 
                 wsAPI = new WebSocketAPI();
                 wsAPI.setOnError((t, i) -> {
+                    activity.mostrarMensaje(t.getMessage());
                     t.printStackTrace();
                     closeWebSocketAPI();
                 });

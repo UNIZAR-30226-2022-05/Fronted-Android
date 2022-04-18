@@ -5,7 +5,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
@@ -64,7 +63,7 @@ public class BuscarSalaActivity extends CustomActivity {
         pullToRefresh.setRefreshing(true);
         api.obtenerSalasFiltro(configSala, respuestaSalas -> {
             if(!respuestaSalas.isExito()){
-                Toast.makeText(this, "Se ha producido un error al obtener las salas", Toast.LENGTH_SHORT).show();
+                mostrarMensaje("Se ha producido un error al obtener las salas");
             }else{
                 SalaListAdapter adapter = new SalaListAdapter(this, respuestaSalas.getSalas());
                 listViewSalas.setAdapter(adapter);

@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
@@ -123,7 +122,7 @@ public class LoginActivity extends CustomActivity {
             builder.setPositiveButton("Aceptar", (dialog, which) ->  {
                 mDbHelper.deleteUsuario(correo);
                 filldata();
-                Toast.makeText(this, "El usuario " + correo + " ha sido borrado", Toast.LENGTH_SHORT).show();
+                mostrarMensaje("El usuario " + correo + " ha sido borrado");
             });
             builder.setNegativeButton("Cancelar", (dialog, which) -> {
                dialog.dismiss();
