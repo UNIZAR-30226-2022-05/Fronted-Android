@@ -2,7 +2,14 @@ Para exportar los iconos:
 
 1- Seleccionar el icono deseado del archivo "Set graficos.svg"
 2- Copiarlo y pegarlo en una nueva ventana de InkScape
-3- Pulsar CTRL + SHIFT + R
-4- Guardar
-5- Si el archivo da problemas, usar la página https://www.svgminify.com/
+3- Pulsar CTRL + SHIFT + R para ajustar el lienzo
+4- Pulsar CTRL + SHIFT + S para guardar el icono con el nombre deseado
+
+NOTA: Para ir más rápido, se puede pulsar SUPR después de guardarlo
+        para que se borre el nuevo lienzo y poder pegar otro icono
+        
+NOTA2: No pegar un icono sobre otro porque al guardarse se guardarán
+        ambos en el mismo fichero
+
+NOTA3: Si el archivo da problemas, usar la página https://www.svgminify.com/
         para reducirlo
