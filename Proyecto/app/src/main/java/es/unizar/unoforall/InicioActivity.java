@@ -11,6 +11,7 @@ import android.widget.Button;
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
+import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.SetIPDialogBuilder;
 import es.unizar.unoforall.utils.notifications.NotificationManager;
@@ -30,6 +31,12 @@ public class InicioActivity extends CustomActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio);
         setTitle(R.string.app_name);
+
+        if(0==0){
+            Intent intent = new Intent(this, PartidaActivity.class);
+            startActivity(intent);
+            return;
+        }
 
         Button botonRegistro = findViewById(R.id.botonRegistro);
         Button botonLogin = findViewById(R.id.botonLogin);

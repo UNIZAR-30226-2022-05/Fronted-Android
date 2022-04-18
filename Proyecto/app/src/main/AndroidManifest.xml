@@ -13,7 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UnoForAll"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".PartidaActivity"
+            android:screenOrientation="portrait" />
+
         <service android:name=".utils.notifications.NotificationManager$NotificationActionService" />
+
         <activity
             android:name=".AmigosActivity"
             android:screenOrientation="portrait" />
