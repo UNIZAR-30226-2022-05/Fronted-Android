@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,18 +23,22 @@ import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
+import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 
 public class SalaActivity extends CustomActivity {
 
     public static final String KEY_SALA_ID = "id_sala";
     private static final int MAX_PARTICIPANTES_SALA = 4;
+    private static final int VER_REGLAS_ID = 0;
 
     private BackendAPI api;
     private UUID salaID;
+    private Sala sala;
 
     private TextView numUsuariosTextView;
     private TextView numUsuariosListosTextView;
@@ -88,6 +94,8 @@ public class SalaActivity extends CustomActivity {
 
     @SuppressLint("SetTextI18n")
     private void updateWidgets(Sala sala){
+        this.sala = sala;
+
         for(int i=0; i<MAX_PARTICIPANTES_SALA; i++){
             if(i < sala.getConfiguracion().getMaxParticipantes()){
                 layoutUsuarios[i].setVisibility(View.VISIBLE);
@@ -159,6 +167,24 @@ public class SalaActivity extends CustomActivity {
             dialog.dismiss();
         });
         builder.create().show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        boolean result = super.onCreateOptionsMenu(menu);
+        menu.add(Menu.NONE, VER_REGLAS_ID, Menu.NONE, "Ver reglas de la sala");
+        return result;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case VER_REGLAS_ID:
+                ReglasViewDialogBuilder builder = new ReglasViewDialogBuilder(this, sala.getConfiguracion());
+                builder.show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
