@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
-import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
@@ -145,9 +144,9 @@ public class SalaActivity extends CustomActivity {
                 }
             }else if(view instanceof ImageView){
                 if(usuario == null){
-                    ImageManager.setImage((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
+                    ImageManager.setImagePerfil((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
                 }else{
-                    ImageManager.setImage((ImageView) view, usuario.getAvatar());
+                    ImageManager.setImagePerfil((ImageView) view, usuario.getAvatar());
                 }
             }
         }

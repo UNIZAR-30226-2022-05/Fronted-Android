@@ -1,7 +1,6 @@
 package es.unizar.unoforall.utils.list_adapters;
 
 import android.app.Activity;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +44,7 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
 
         nombreTextView.setText(nombre);
         correoTextView.setText(correo);
-        ImageManager.setImage(imageView, imageID);
+        ImageManager.setImagePerfil(imageView, imageID);
 
         return view;
     }
