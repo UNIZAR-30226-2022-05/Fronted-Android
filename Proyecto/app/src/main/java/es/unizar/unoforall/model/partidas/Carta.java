@@ -1,5 +1,6 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.util.Objects;
 
 public class Carta implements Comparable<Carta> {
 	
@@ -31,6 +32,58 @@ public class Carta implements Comparable<Carta> {
 		}
 	}
 	
+	public boolean esDelColor(Color color) {
+		return this.color==color;
+	}
+	
+	public boolean esDelTipo(Tipo tipo) {
+		return this.tipo==tipo;
+	}
+	
+	public static boolean esNumero(Tipo tipo) {
+		if(tipo.ordinal()<10) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static boolean compartenTipo(Carta c1, Carta c2) {
+		boolean respuesta = c1.getTipo()==c2.getTipo();
+		return respuesta;
+	}
+	
+	public static boolean compartenColor(Carta c1, Carta c2) {
+		boolean respuesta = c1.getColor()==c2.getColor();
+		return respuesta;
+	}
+	
+	//Solo para las numéricas
+	public static boolean sonConsecutivas(Carta c1, Carta c2) {
+		return compartenColor(c1,c2) &&
+				(c1.getTipo().ordinal()==c2.getTipo().ordinal()-1 || 
+				c1.getTipo().equals(Carta.Tipo.n9) && c2.getTipo().equals(Carta.Tipo.n0));
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(color, tipo);
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Carta other = (Carta) obj;
+		return color == other.color && tipo == other.tipo;
+	}
+
+
 	public Tipo getTipo() {
 		return tipo;
 	}
@@ -62,6 +115,6 @@ public class Carta implements Comparable<Carta> {
 	
 	@Override
 	public String toString() {
-		return "Carta [tipo=" + tipo + ", color=" + color + "]";
+		return "Carta [tipo=" + tipo + ", color=" + color + "]\n";
 	}
 }
