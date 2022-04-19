@@ -1,9 +1,10 @@
 package es.unizar.unoforall.utils;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.widget.ImageView;
 
-import androidx.appcompat.content.res.AppCompatResources;
+import java.util.HashMap;
 
 import es.unizar.unoforall.R;
 import es.unizar.unoforall.model.partidas.Carta;
@@ -13,6 +14,11 @@ public class ImageManager{
     public static int INVALID_RESOURCE_ID = -1;
     public static int IA_IMAGE_ID = -1;
     public static int DEFAULT_IMAGE_ID = -2;
+
+    private static final HashMap<Carta, Integer> defaultCardsMap = new HashMap<>();
+    private static final HashMap<Carta, Integer> altCardsMap = new HashMap<>();
+
+    private static final int DISABLED_CARD_COLOR = Color.parseColor("#5550545c");
 
     // Pre: -2 <= imageID <= 6
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -57,47 +63,71 @@ public class ImageManager{
 
     // Convendría guardar un Hashmap de Carta asociado a resourceID
     //      para que el acceso en tiempo sea menor
-    public static void setImagenCarta(ImageView imageView, Carta carta, boolean normalMode){
-        int resourceID = INVALID_RESOURCE_ID;
-        switch(carta.getColor()){
-            case comodin:
-                resourceID = getResourceComodin(carta.getTipo(), normalMode);
-                break;
-            case rojo:
-                resourceID = getResourceRojo(carta.getTipo(), normalMode);
-                break;
-            case azul:
-                resourceID = getResourceAzul(carta.getTipo(), normalMode);
-                break;
-            case verde:
-                resourceID = getResourceVerde(carta.getTipo(), normalMode);
-                break;
-            case amarillo:
-                resourceID = getResourceAmarillo(carta.getTipo(), normalMode);
-                break;
+    public static void setImagenCarta(ImageView imageView, Carta carta, boolean defaultMode, boolean isDisabled, boolean isVisible){
+        if(defaultCardsMap.isEmpty() || altCardsMap.isEmpty()){
+            for(Carta.Color color : Carta.Color.values()){
+                for(Carta.Tipo tipo : Carta.Tipo.values()){
+                    Carta aux = new Carta(tipo, color);
+                    int resourceIDdefault = getResourceCarta(aux, true);
+                    int resourceIDalt = getResourceCarta(aux, false);
+                    if(resourceIDdefault != INVALID_RESOURCE_ID){
+                        defaultCardsMap.put(aux, resourceIDdefault);
+                    }
+                    if(resourceIDalt != INVALID_RESOURCE_ID){
+                        altCardsMap.put(aux, resourceIDalt);
+                    }
+                }
+            }
         }
 
-        imageView.setImageResource(resourceID);
+        if(isVisible){
+            if(defaultMode){
+                imageView.setImageResource(defaultCardsMap.get(carta));
+            }else{
+                imageView.setImageResource(altCardsMap.get(carta));
+            }
+
+            if(isDisabled){
+                imageView.setColorFilter(DISABLED_CARD_COLOR);
+            }
+        }else{
+            imageView.setImageResource(getResourceRevesCarta(defaultMode));
+        }
     }
 
-    private static int getResourceRevesCarta(boolean normalMode){
-        if(normalMode){
+    public static void setImagenMazoCartas(ImageView imageView, boolean defaultMode){
+        imageView.setImageResource(getResourceMazoCartas(defaultMode));
+    }
+
+    private static int getResourceCarta(Carta carta, boolean defaultMode){
+        switch(carta.getColor()){
+            case comodin: return getResourceComodin(carta.getTipo(), defaultMode);
+            case rojo: return getResourceRojo(carta.getTipo(), defaultMode);
+            case azul: return getResourceAzul(carta.getTipo(), defaultMode);
+            case verde: return getResourceVerde(carta.getTipo(), defaultMode);
+            case amarillo: return getResourceAmarillo(carta.getTipo(), defaultMode);
+            default: return INVALID_RESOURCE_ID;
+        }
+    }
+
+    private static int getResourceRevesCarta(boolean defaultMode){
+        if(defaultMode){
             return R.drawable.carta_reves;
         }else{
             return R.drawable.carta_alt_reves;
         }
     }
 
-    private static int getResourceMazoCartas(boolean normalMode){
-        if(normalMode){
+    private static int getResourceMazoCartas(boolean defaultMode){
+        if(defaultMode){
             return R.drawable.carta_mazo;
         }else{
             return R.drawable.carta_alt_mazo;
         }
     }
 
-    private static int getResourceComodin(Carta.Tipo tipo, boolean normalMode){
-        if(normalMode){
+    private static int getResourceComodin(Carta.Tipo tipo, boolean defaultMode){
+        if(defaultMode){
             switch (tipo){
                 case cambioColor: return R.drawable.comodin_cambio_color;
                 case mas4: return R.drawable.comodin_mas4;
@@ -112,8 +142,8 @@ public class ImageManager{
         }
     }
 
-    private static int getResourceRojo(Carta.Tipo tipo, boolean normalMode){
-        if(normalMode){
+    private static int getResourceRojo(Carta.Tipo tipo, boolean defaultMode){
+        if(defaultMode){
             switch (tipo){
                 case n0: return R.drawable.rojo_0;
                 case n1: return R.drawable.rojo_1;
@@ -160,8 +190,8 @@ public class ImageManager{
         }
     }
 
-    private static int getResourceAzul(Carta.Tipo tipo, boolean normalMode){
-        if(normalMode){
+    private static int getResourceAzul(Carta.Tipo tipo, boolean defaultMode){
+        if(defaultMode){
             switch (tipo){
                 case n0: return R.drawable.azul_0;
                 case n1: return R.drawable.azul_1;
@@ -208,8 +238,8 @@ public class ImageManager{
         }
     }
 
-    private static int getResourceVerde(Carta.Tipo tipo, boolean normalMode){
-        if(normalMode){
+    private static int getResourceVerde(Carta.Tipo tipo, boolean defaultMode){
+        if(defaultMode){
             switch (tipo){
                 case n0: return R.drawable.verde_0;
                 case n1: return R.drawable.verde_1;
@@ -256,8 +286,8 @@ public class ImageManager{
         }
     }
 
-    private static int getResourceAmarillo(Carta.Tipo tipo, boolean normalMode){
-        if(normalMode){
+    private static int getResourceAmarillo(Carta.Tipo tipo, boolean defaultMode){
+        if(defaultMode){
             switch (tipo){
                 case n0: return R.drawable.amarillo_0;
                 case n1: return R.drawable.amarillo_1;

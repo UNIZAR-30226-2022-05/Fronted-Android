@@ -1,9 +1,14 @@
 package es.unizar.unoforall;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.system.ErrnoException;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import es.unizar.unoforall.model.partidas.Carta;
 import es.unizar.unoforall.utils.ImageManager;
@@ -12,38 +17,46 @@ import es.unizar.unoforall.utils.tasks.Task;
 
 public class PartidaActivity extends AppCompatActivity {
 
+    private static final int JUGADOR_ABAJO = 0;
+    private static final int JUGADOR_IZQUIERDA = 1;
+    private static final int JUGADOR_ARRIBA = 2;
+    private static final int JUGADOR_DERECHA = 3;
+
+    private LinearLayout[] layoutBarajasJugadores;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_partida);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
-        ImageView imageView = findViewById(R.id.cartaDePrueba);
+        LinearLayout layoutAbajo = findViewById(R.id.barajaJugadorAbajo);
+        LinearLayout layoutArriba = findViewById(R.id.barajaJugadorArriba);
+        LinearLayout layoutDerecha = findViewById(R.id.barajaJugadorDerecha);
+        LinearLayout layoutIzquierda = findViewById(R.id.barajaJugadorIzquierda);
+        layoutBarajasJugadores = new LinearLayout[] {layoutAbajo, layoutIzquierda, layoutArriba, layoutDerecha};
 
-        Task.runPeriodicTask(new CancellableRunnable() {
-            private int tipoID = 0;
-            private int colorID = 0;
-            private boolean normalMode = true;
-            private Carta carta = new Carta(Carta.Tipo.values()[tipoID], Carta.Color.values()[colorID]);
-            @Override
-            public void run() {
-                runOnUiThread(() -> {
-                    if(tipoID >= Carta.Tipo.values().length){
-                        tipoID = 0;
-                        colorID++;
-                        if(colorID == Carta.Color.comodin.ordinal()){
-                            tipoID = Carta.Tipo.cambioColor.ordinal();
-                        }
-                        if(colorID >= Carta.Color.values().length){
-                            colorID = 0;
-                            normalMode = !normalMode;
-                        }
-                    }
-                    carta.setTipo(Carta.Tipo.values()[tipoID]);
-                    carta.setColor(Carta.Color.values()[colorID]);
-                    ImageManager.setImagenCarta(imageView, carta, normalMode);
-                    tipoID++;
-                });
-            }
-        }, 0, 250);
+        for(Carta.Tipo tipo : Carta.Tipo.values()){
+            Carta carta = new Carta(tipo, Carta.Color.verde);
+            addCarta(JUGADOR_ABAJO, carta, true, false, true);
+            addCarta(JUGADOR_IZQUIERDA, carta, true, false, false);
+            addCarta(JUGADOR_DERECHA, carta, true, false, false);
+            addCarta(JUGADOR_ARRIBA, carta, true, false, false);
+        }
+    }
+
+    private void addCarta(int jugador, Carta carta, boolean defaultMode, boolean isDisabled, boolean isVisible){
+        ImageView imageView = new ImageView(this);
+        ImageManager.setImagenCarta(imageView, carta, defaultMode, isDisabled, isVisible);
+        if(jugador != JUGADOR_ABAJO){
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(150, -2));
+        }
+        layoutBarajasJugadores[jugador].addView(imageView);
+    }
+
+    private void resetCartas(int jugador){
+        layoutBarajasJugadores[jugador].removeAllViews();
     }
 }
