@@ -253,21 +253,6 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/rojo_1" />
 
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rojo_1" />
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rojo_0" />
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rojo_0" />
-
         </LinearLayout>
     </HorizontalScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

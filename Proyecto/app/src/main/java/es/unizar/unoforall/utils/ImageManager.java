@@ -61,8 +61,14 @@ public class ImageManager{
         imageView.setImageResource(resourceID);
     }
 
-    // Convendría guardar un Hashmap de Carta asociado a resourceID
-    //      para que el acceso en tiempo sea menor
+
+    public static HashMap<Carta, Integer> getDefaultCardsMap(){
+        return defaultCardsMap;
+    }
+    public static HashMap<Carta, Integer> getAltCardsMap(){
+        return altCardsMap;
+    }
+
     public static void setImagenCarta(ImageView imageView, Carta carta, boolean defaultMode, boolean isDisabled, boolean isVisible){
         if(defaultCardsMap.isEmpty() || altCardsMap.isEmpty()){
             for(Carta.Color color : Carta.Color.values()){

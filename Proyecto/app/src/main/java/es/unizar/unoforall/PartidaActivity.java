@@ -10,6 +10,10 @@ import android.system.ErrnoException;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Set;
+
 import es.unizar.unoforall.model.partidas.Carta;
 import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.tasks.CancellableRunnable;
@@ -38,13 +42,33 @@ public class PartidaActivity extends AppCompatActivity {
         LinearLayout layoutIzquierda = findViewById(R.id.barajaJugadorIzquierda);
         layoutBarajasJugadores = new LinearLayout[] {layoutAbajo, layoutIzquierda, layoutArriba, layoutDerecha};
 
-        for(Carta.Tipo tipo : Carta.Tipo.values()){
+        /*for(Carta.Tipo tipo : Carta.Tipo.values()){
             Carta carta = new Carta(tipo, Carta.Color.verde);
             addCarta(JUGADOR_ABAJO, carta, true, false, true);
             addCarta(JUGADOR_IZQUIERDA, carta, true, false, false);
             addCarta(JUGADOR_DERECHA, carta, true, false, false);
             addCarta(JUGADOR_ARRIBA, carta, true, false, false);
-        }
+        }*/
+
+        test();
+    }
+
+    private void test(){
+        // Para inicializar el HashMap
+        ImageManager.setImagenCarta(new ImageView(this), new Carta(Carta.Tipo.n0, Carta.Color.verde), true, false, true);
+        Task.runPeriodicTask(new CancellableRunnable() {
+            private ArrayList<Carta> defaultCards = new ArrayList<>(ImageManager.getDefaultCardsMap().keySet());
+            @Override
+            public void run() {
+                runOnUiThread(() -> {
+                    for(int i=0;i<4;i++)resetCartas(i);
+                    for(int i=0;i<5;i++){
+                        Carta carta = defaultCards.get(new Random().nextInt(defaultCards.size()));
+                        for(int j=0;j<4;j++) addCarta(j, carta, true, false, true);
+                    }
+                });
+            }
+        }, 0, 1000);
     }
 
     private void addCarta(int jugador, Carta carta, boolean defaultMode, boolean isDisabled, boolean isVisible){
