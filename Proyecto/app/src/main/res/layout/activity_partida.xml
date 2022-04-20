@@ -60,6 +60,7 @@
     <HorizontalScrollView
         android:layout_width="200dp"
         android:layout_height="75dp"
+        android:rotation="180"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -71,8 +72,7 @@
             android:id="@+id/barajaJugadorArriba"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:rotation="180">
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="50dp"
@@ -255,4 +255,24 @@
 
         </LinearLayout>
     </HorizontalScrollView>
+
+    <ImageView
+        android:id="@+id/cartaMostrar"
+        android:layout_width="50dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="220dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/carta_reves" />
+
+    <ImageView
+        android:id="@+id/mazoDescarte"
+        android:layout_width="50dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="220dp"
+        android:layout_marginEnd="120dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/carta_mazo" />
 </androidx.constraintlayout.widget.ConstraintLayout>

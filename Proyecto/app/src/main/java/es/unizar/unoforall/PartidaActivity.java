@@ -1,18 +1,15 @@
 package es.unizar.unoforall;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.system.ErrnoException;
+import android.view.View;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Set;
 
 import es.unizar.unoforall.model.partidas.Carta;
 import es.unizar.unoforall.utils.ImageManager;
@@ -54,10 +51,10 @@ public class PartidaActivity extends AppCompatActivity {
     }
 
     private void test(){
-        // Para inicializar el HashMap
+        // Para inicializar el HashMap es necesario usar al menos una carta
         ImageManager.setImagenCarta(new ImageView(this), new Carta(Carta.Tipo.n0, Carta.Color.verde), true, false, true);
-        Task.runPeriodicTask(new CancellableRunnable() {
-            private ArrayList<Carta> defaultCards = new ArrayList<>(ImageManager.getDefaultCardsMap().keySet());
+        Task.runDelayedTask(new CancellableRunnable() {
+            private final ArrayList<Carta> defaultCards = new ArrayList<>(ImageManager.getDefaultCardsMap().keySet());
             @Override
             public void run() {
                 runOnUiThread(() -> {
@@ -68,7 +65,7 @@ public class PartidaActivity extends AppCompatActivity {
                     }
                 });
             }
-        }, 0, 1000);
+        }, 0);
     }
 
     private void addCarta(int jugador, Carta carta, boolean defaultMode, boolean isDisabled, boolean isVisible){
