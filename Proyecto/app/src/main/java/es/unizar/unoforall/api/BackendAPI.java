@@ -285,6 +285,7 @@ public class BackendAPI{
                 // Se ha producido un error
                 activity.mostrarMensaje(sala.getError());
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
+                activity.setResult(0);
                 activity.finish();
             }else{
                 salaActual = sala;

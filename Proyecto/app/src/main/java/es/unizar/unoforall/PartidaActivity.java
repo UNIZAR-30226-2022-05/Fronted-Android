@@ -186,7 +186,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 setNumCartas(i, jugador.getMano().size());
                 jugador.getMano().sort(Carta::compareTo);
                 for(Carta carta : jugador.getMano()){
-                    addCarta(i, carta);
+                    addCarta(i, jugadorID, carta);
                 }
             }
         }
@@ -246,7 +246,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         ImageManager.setImagenMazoCartas(mazoRobar, defaultMode, isDisabled);
     }
 
-    private void addCarta(int jugadorID, Carta carta){
+    private void addCarta(int jugadorLayoutID, int jugadorID, Carta carta){
         boolean isDisabled = jugadorID == jugadorActualID && !esTurnoDelJugadorActual();
         boolean isVisible = carta.isVisiblePor(jugadorActualID) || jugadorID == jugadorActualID;
 
@@ -268,7 +268,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             });
         }
 
-        layoutBarajasJugadores[jugadorID].addView(imageView);
+        layoutBarajasJugadores[jugadorLayoutID].addView(imageView);
     }
 
     private void resetCartas(int jugadorLayoutID){
@@ -358,7 +358,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                         for(int j=0;j<4;j++){
                             Carta carta = cartaOriginal.clone();
                             carta.marcarVisible(j);
-                            addCarta(j, carta);
+                            addCarta(j, j, carta);
                         }
                     }
                 });
