@@ -1,36 +1,41 @@
 package es.unizar.unoforall;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.UUID;
 
-import es.unizar.unoforall.api.RestAPI;
-import es.unizar.unoforall.api.WebSocketAPI;
+import es.unizar.unoforall.api.BackendAPI;
+import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Carta;
+import es.unizar.unoforall.model.partidas.Jugador;
+import es.unizar.unoforall.model.partidas.Partida;
+import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
-import es.unizar.unoforall.utils.dialogs.SetIPDialogBuilder;
+import es.unizar.unoforall.utils.SalaReceiver;
+import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 import es.unizar.unoforall.utils.tasks.CancellableRunnable;
 import es.unizar.unoforall.utils.tasks.Task;
 
-public class PartidaActivity extends CustomActivity {
+public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
-    private static final int OPCION_0_ID = 0;
-    private static final int OPCION_1_ID = 1;
-    private static final int OPCION_2_ID = 2;
+    private static final int PAUSAR_ID = 0;
+    private static final int ABANDONAR_ID = 1;
+    private static final int VER_REGLAS_ID = 2;
 
     private static final int JUGADOR_ABAJO = 0;
     private static final int JUGADOR_IZQUIERDA = 1;
@@ -48,6 +53,10 @@ public class PartidaActivity extends CustomActivity {
     private TextView[] nombresJugadores;
     private TextView[] contadoresCartasJugadores;
 
+    private int jugadorActualID = -1;
+    private UUID salaID;
+    private Sala sala;
+
     @Override
     public ActivityType getType() {
         return ActivityType.PARTIDA;
@@ -62,6 +71,8 @@ public class PartidaActivity extends CustomActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        salaID = (UUID) getIntent().getSerializableExtra(SalaActivity.KEY_SALA_ID);
 
         layoutBarajasJugadores = new LinearLayout[] {
                 findViewById(R.id.barajaJugadorAbajo),
@@ -100,11 +111,39 @@ public class PartidaActivity extends CustomActivity {
                 findViewById(R.id.contadorCartasJugadorArriba),
                 findViewById(R.id.contadorCartasJugadorDerecha)
         };
-
-        test();
     }
 
-    public void setSentido(boolean sentidoHorario){
+    @Override
+    public void manageSala(Sala sala){
+        this.sala = sala;
+        actualizarPantallaPartida(sala);
+    }
+
+    private void actualizarPantallaPartida(Sala sala){
+        Partida partida = sala.getPartida();
+        for(int i=0;i<partida.getJugadores().size();i++){
+            Jugador jugador = partida.getJugadores().get(i);
+            int turnoActual = partida.getTurno();
+            if(jugador.isEsIA()){
+                setImagenJugador(i, ImageManager.IA_IMAGE_ID);
+                setNombreJugador(i, "IA_" + i, turnoActual == i);
+            }else{
+                UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
+                setImagenJugador(i, usuarioVO.getAvatar());
+                setNombreJugador(i, usuarioVO.getNombre(), turnoActual == i);
+                if(jugadorActualID == -1 && usuarioVO.getId().equals(BackendAPI.getUsuarioID())){
+                    jugadorActualID = i;
+                }
+            }
+            setNumCartas(i, jugador.getMano().size());
+            for(Carta carta : jugador.getMano()){
+                addCarta(i, carta);
+            }
+        }
+        setSentido(partida.isSentidoHorario());
+    }
+
+    private void setSentido(boolean sentidoHorario){
         if(sentidoHorario){
             sentido.setImageResource(R.drawable.ic_sentido_horario);
         }else{
@@ -112,34 +151,47 @@ public class PartidaActivity extends CustomActivity {
         }
     }
 
-    public void setNombreJugador(int jugador, String nombre, boolean turnoActivo){
+    private void setImagenJugador(int jugadorID, int imageID){
+        ImageManager.setImagePerfil(imagenesJugadores[jugadorID], imageID);
+    }
+
+    private void setNombreJugador(int jugadorID, String nombre, boolean turnoActivo){
         if(nombre.length() > MAX_LONG_NOMBRE){
             nombre = nombre.substring(0, MAX_LONG_NOMBRE-3) + "...";
         }
 
-        nombresJugadores[jugador].setText(nombre);
+        nombresJugadores[jugadorID].setText(nombre);
         if(turnoActivo){
-            nombresJugadores[jugador].setTextColor(TURNO_ACTIVO_COLOR);
+            nombresJugadores[jugadorID].setTextColor(TURNO_ACTIVO_COLOR);
         }else{
-            nombresJugadores[jugador].setTextColor(TURNO_INACTIVO_COLOR);
+            nombresJugadores[jugadorID].setTextColor(TURNO_INACTIVO_COLOR);
         }
     }
 
-    public void setNumCartas(int jugador, int numCartas){
-        contadoresCartasJugadores[jugador].setText(numCartas + "");
+    private void setNumCartas(int jugadorID, int numCartas){
+        contadoresCartasJugadores[jugadorID].setText(numCartas + "");
     }
 
-    private void addCarta(int jugador, Carta carta, boolean defaultMode, boolean isDisabled, boolean isVisible){
+    private void addCarta(int jugadorID, Carta carta){
+        boolean defaultMode = true;
+        boolean isDisabled = false;
+        boolean isVisible = carta.isVisiblePor(jugadorActualID);
+
         ImageView imageView = new ImageView(this);
         ImageManager.setImagenCarta(imageView, carta, defaultMode, isDisabled, isVisible);
-        if(jugador != JUGADOR_ABAJO){
+        if(jugadorID != JUGADOR_ABAJO){
             imageView.setLayoutParams(new LinearLayout.LayoutParams(150, -2));
         }
-        layoutBarajasJugadores[jugador].addView(imageView);
+
+        if(jugadorID == jugadorActualID){
+            imageView.setOnClickListener(view -> mostrarMensaje("Has pulsado en la carta " + carta));
+        }
+
+        layoutBarajasJugadores[jugadorID].addView(imageView);
     }
 
-    private void resetCartas(int jugador){
-        layoutBarajasJugadores[jugador].removeAllViews();
+    private void resetCartas(int jugadorID){
+        layoutBarajasJugadores[jugadorID].removeAllViews();
     }
 
     private void resetCartas() {
@@ -149,39 +201,61 @@ public class PartidaActivity extends CustomActivity {
         resetCartas(JUGADOR_DERECHA);
     }
 
+    private void abandonarPartida(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Abandonar partida");
+        builder.setMessage("¿Quieres abandonar la partida?");
+        builder.setPositiveButton("Sí", (dialog, which) -> {
+            new BackendAPI(this).salirSala(this.salaID);
+            Intent intent = new Intent(this, PrincipalActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivityForResult(intent, 0);
+        });
+        builder.setNegativeButton("No", (dialog, which) -> {
+            dialog.dismiss();
+        });
+        builder.create().show();
+    }
+
     @Override
     public void onBackPressed(){
-        super.onBackPressed();
+        abandonarPartida();
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(Menu.NONE, OPCION_0_ID, Menu.NONE, "OPCIÓN 0");
-        menu.add(Menu.NONE, OPCION_1_ID, Menu.NONE, "OPCIÓN 1");
-        menu.add(Menu.NONE, OPCION_2_ID, Menu.NONE, "OPCIÓN 2");
+        menu.add(Menu.NONE, PAUSAR_ID, Menu.NONE, "Pausar partida");
+        menu.add(Menu.NONE, ABANDONAR_ID, Menu.NONE, "Abandonar partida");
+        menu.add(Menu.NONE, VER_REGLAS_ID, Menu.NONE, "Ver reglas de la sala");
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         mostrarMensaje(item.getItemId() + "");
         switch(item.getItemId()) {
-            case OPCION_0_ID:
-                mostrarMensaje("OPCIÓN 0");
+            case PAUSAR_ID:
+                mostrarMensaje("Pausar partida");
                 return true;
-            case OPCION_1_ID:
-                mostrarMensaje("OPCIÓN 1");
+            case ABANDONAR_ID:
+                abandonarPartida();
                 return true;
-            case OPCION_2_ID:
-                mostrarMensaje("OPCIÓN 2");
-                return true;
+            case VER_REGLAS_ID:
+                if(this.sala == null){
+                    mostrarMensaje("La sala no puede ser null");
+                    return false;
+                }else{
+                    new ReglasViewDialogBuilder(this, this.sala.getConfiguracion()).show();
+                    return true;
+                }
         }
         return super.onContextItemSelected(item);
     }
 
     private void test(){
         // Para inicializar el HashMap es necesario usar al menos una carta
+        jugadorActualID = JUGADOR_ABAJO;
         ImageManager.setImagenCarta(new ImageView(this), new Carta(Carta.Tipo.n0, Carta.Color.verde), true, false, true);
         Task.runDelayedTask(new CancellableRunnable() {
             private final ArrayList<Carta> defaultCards = new ArrayList<>(ImageManager.getDefaultCardsMap().keySet());
@@ -190,8 +264,12 @@ public class PartidaActivity extends CustomActivity {
                 runOnUiThread(() -> {
                     resetCartas();
                     for(int i=0;i<5;i++){
-                        Carta carta = defaultCards.get(new Random().nextInt(defaultCards.size()));
-                        for(int j=0;j<4;j++) addCarta(j, carta, true, false, true);
+                        Carta cartaOriginal = defaultCards.get(new Random().nextInt(defaultCards.size()));
+                        for(int j=0;j<4;j++){
+                            Carta carta = cartaOriginal.clone();
+                            carta.marcarVisible(j);
+                            addCarta(j, carta);
+                        }
                     }
                 });
             }

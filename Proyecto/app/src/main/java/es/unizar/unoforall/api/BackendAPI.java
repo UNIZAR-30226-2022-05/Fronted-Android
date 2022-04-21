@@ -19,6 +19,7 @@ import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.utils.CustomActivity;
+import es.unizar.unoforall.utils.SalaReceiver;
 import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
@@ -35,6 +36,11 @@ public class BackendAPI{
 
     private static String sesionID = null;
     private static WebSocketAPI wsAPI = null;
+
+    private static UUID usuarioID = null;
+    public static UUID getUsuarioID(){
+        return usuarioID;
+    }
 
     private static CustomActivity currentActivity = null;
     public static void setCurrentActivity(CustomActivity currentActivity){
@@ -95,6 +101,7 @@ public class BackendAPI{
                         UsuarioVO.class, usuarioVO2 ->
                             Notificaciones.mostrarNotificacionAmigo(usuarioVO2));
 
+                usuarioID = usuarioVO.getId();
                 activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
 
                 // Iniciar la actividad principal
@@ -253,7 +260,7 @@ public class BackendAPI{
         intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
         activity.startActivityForResult(intent,0);
     }
-    public void unirseSala(UUID salaID, Consumer<Sala> consumer){
+    public void unirseSala(UUID salaID){
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
@@ -261,7 +268,9 @@ public class BackendAPI{
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
                 activity.finish();
             }else{
-                consumer.accept(sala);
+                if(currentActivity instanceof SalaReceiver){
+                    ((SalaReceiver) currentActivity).manageSala(sala);
+                }
             }
         });
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);

@@ -39,11 +39,6 @@ public class InicioActivity extends CustomActivity {
         botonLogin.setOnClickListener(v->startActivityForResult(new Intent(InicioActivity.this, LoginActivity.class), 0));
 
         NotificationManager.initialize(this);
-
-        if(0==0){
-            Intent intent = new Intent(this, PartidaActivity.class);
-            startActivity(intent);
-        }
     }
 
     @Override

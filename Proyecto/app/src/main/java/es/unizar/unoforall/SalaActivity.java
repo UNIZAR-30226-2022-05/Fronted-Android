@@ -27,9 +27,10 @@ import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
+import es.unizar.unoforall.utils.SalaReceiver;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 
-public class SalaActivity extends CustomActivity {
+public class SalaActivity extends CustomActivity implements SalaReceiver {
 
     public static final String KEY_SALA_ID = "id_sala";
     private static final int MAX_PARTICIPANTES_SALA = 4;
@@ -88,7 +89,18 @@ public class SalaActivity extends CustomActivity {
         });
 
         api = new BackendAPI(this);
-        api.unirseSala(salaID, sala -> updateWidgets(sala));
+        api.unirseSala(salaID);
+    }
+
+    @Override
+    public void manageSala(Sala sala){
+        if(sala.isEnPartida()){
+            Intent intent = new Intent(this, PartidaActivity.class);
+            intent.putExtra(KEY_SALA_ID, salaID);
+            startActivityForResult(intent, 0);
+        }else{
+            updateWidgets(sala);
+        }
     }
 
     @SuppressLint("SetTextI18n")
