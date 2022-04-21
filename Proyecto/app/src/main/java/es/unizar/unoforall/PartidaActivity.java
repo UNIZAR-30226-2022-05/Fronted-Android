@@ -15,7 +15,6 @@ import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
@@ -52,10 +51,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private ImageView[] imagenesJugadores;
     private TextView[] nombresJugadores;
     private TextView[] contadoresCartasJugadores;
+    private ImageView cartaDelMedio;
+    private ImageView mazoRobar;
 
     private int jugadorActualID = -1;
-    private UUID salaID;
-    private Sala sala;
 
     @Override
     public ActivityType getType() {
@@ -71,8 +70,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
-        salaID = (UUID) getIntent().getSerializableExtra(SalaActivity.KEY_SALA_ID);
 
         layoutBarajasJugadores = new LinearLayout[] {
                 findViewById(R.id.barajaJugadorAbajo),
@@ -111,17 +108,32 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 findViewById(R.id.contadorCartasJugadorArriba),
                 findViewById(R.id.contadorCartasJugadorDerecha)
         };
+
+        cartaDelMedio = findViewById(R.id.cartaDelMedio);
+        mazoRobar = findViewById(R.id.mazoRobar);
+
+        mazoRobar.setOnClickListener(view -> {
+            mostrarMensaje("Has robado una carta");
+        });
+
+        // Borrar las cartas que están por defecto
+        resetCartas();
+        manageSala(BackendAPI.getSalaActual());
     }
 
     @Override
     public void manageSala(Sala sala){
-        this.sala = sala;
         actualizarPantallaPartida(sala);
     }
 
     private void actualizarPantallaPartida(Sala sala){
         Partida partida = sala.getPartida();
-        for(int i=0;i<partida.getJugadores().size();i++){
+        jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
+
+        // Falta posicionar los jugadores de forma adecuada en el caso de sólo 2 jugadores
+        //  uno en frente del otro
+        int numJugadores = partida.getJugadores().size();
+        for(int i=0, j=0; j<numJugadores; i = (i + 1) % numJugadores, j++){
             Jugador jugador = partida.getJugadores().get(i);
             int turnoActual = partida.getTurno();
             if(jugador.isEsIA()){
@@ -131,16 +143,15 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
                 setImagenJugador(i, usuarioVO.getAvatar());
                 setNombreJugador(i, usuarioVO.getNombre(), turnoActual == i);
-                if(jugadorActualID == -1 && usuarioVO.getId().equals(BackendAPI.getUsuarioID())){
-                    jugadorActualID = i;
-                }
             }
             setNumCartas(i, jugador.getMano().size());
+            jugador.getMano().sort(Carta::compareTo);
             for(Carta carta : jugador.getMano()){
                 addCarta(i, carta);
             }
         }
         setSentido(partida.isSentidoHorario());
+        setCartaDelMedio(partida.getUltimaCartaJugada());
     }
 
     private void setSentido(boolean sentidoHorario){
@@ -172,10 +183,18 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         contadoresCartasJugadores[jugadorID].setText(numCartas + "");
     }
 
+    private void setCartaDelMedio(Carta carta){
+        ImageManager.setImagenCarta(cartaDelMedio, carta, true, false, true);
+    }
+
+    private void setMazoRobar(){
+        ImageManager.setImagenMazoCartas(mazoRobar, true);
+    }
+
     private void addCarta(int jugadorID, Carta carta){
         boolean defaultMode = true;
         boolean isDisabled = false;
-        boolean isVisible = carta.isVisiblePor(jugadorActualID);
+        boolean isVisible = carta.isVisiblePor(jugadorActualID) || jugadorID == jugadorActualID;
 
         ImageView imageView = new ImageView(this);
         ImageManager.setImagenCarta(imageView, carta, defaultMode, isDisabled, isVisible);
@@ -206,7 +225,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         builder.setTitle("Abandonar partida");
         builder.setMessage("¿Quieres abandonar la partida?");
         builder.setPositiveButton("Sí", (dialog, which) -> {
-            new BackendAPI(this).salirSala(this.salaID);
+            new BackendAPI(this).salirSala(BackendAPI.getSalaActualID());
             Intent intent = new Intent(this, PrincipalActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivityForResult(intent, 0);
@@ -233,7 +252,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        mostrarMensaje(item.getItemId() + "");
         switch(item.getItemId()) {
             case PAUSAR_ID:
                 mostrarMensaje("Pausar partida");
@@ -242,11 +260,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 abandonarPartida();
                 return true;
             case VER_REGLAS_ID:
-                if(this.sala == null){
+                if(BackendAPI.getSalaActual() == null){
                     mostrarMensaje("La sala no puede ser null");
                     return false;
                 }else{
-                    new ReglasViewDialogBuilder(this, this.sala.getConfiguracion()).show();
+                    new ReglasViewDialogBuilder(this, BackendAPI.getSalaActual().getConfiguracion()).show();
                     return true;
                 }
         }

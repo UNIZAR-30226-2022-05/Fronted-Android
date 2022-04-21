@@ -42,6 +42,15 @@ public class BackendAPI{
         return usuarioID;
     }
 
+    private static Sala salaActual = null;
+    public static Sala getSalaActual(){
+        return salaActual;
+    }
+    private static UUID salaActualID = null;
+    public static UUID getSalaActualID(){
+        return salaActualID;
+    }
+
     private static CustomActivity currentActivity = null;
     public static void setCurrentActivity(CustomActivity currentActivity){
         BackendAPI.currentActivity = currentActivity;
@@ -268,6 +277,8 @@ public class BackendAPI{
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
                 activity.finish();
             }else{
+                salaActual = sala;
+                salaActualID = salaID;
                 if(currentActivity instanceof SalaReceiver){
                     ((SalaReceiver) currentActivity).manageSala(sala);
                 }
@@ -280,6 +291,8 @@ public class BackendAPI{
         wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
     }
     public void salirSala(UUID salaID){
+        salaActual = null;
+        salaActualID = null;
         wsAPI.unsubscribe("/topic/salas/" + salaID);
         wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
         activity.mostrarMensaje("Has salido de la sala");

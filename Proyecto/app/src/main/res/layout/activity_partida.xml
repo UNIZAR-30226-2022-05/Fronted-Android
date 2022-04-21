@@ -176,7 +176,7 @@
     </HorizontalScrollView>
 
     <ImageView
-        android:id="@+id/cartaMostrar"
+        android:id="@+id/cartaDelMedio"
         android:layout_width="75dp"
         android:layout_height="112.5dp"
         android:layout_marginStart="90dp"
@@ -186,14 +186,17 @@
         app:srcCompat="@drawable/carta_reves" />
 
     <ImageView
-        android:id="@+id/mazoDescarte"
+        android:id="@+id/mazoRobar"
         android:layout_width="75dp"
         android:layout_height="112.5dp"
         android:layout_marginTop="220dp"
         android:layout_marginEnd="90dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/carta_mazo" />
+        app:srcCompat="@drawable/carta_mazo"
+
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"/>
 
     <ImageView
         android:id="@+id/botonUNO"

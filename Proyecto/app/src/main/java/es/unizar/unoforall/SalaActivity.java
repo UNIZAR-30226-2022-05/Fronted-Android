@@ -38,7 +38,6 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
 
     private BackendAPI api;
     private UUID salaID;
-    private Sala sala;
 
     private TextView numUsuariosTextView;
     private TextView numUsuariosListosTextView;
@@ -105,8 +104,6 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
 
     @SuppressLint("SetTextI18n")
     private void updateWidgets(Sala sala){
-        this.sala = sala;
-
         for(int i=0; i<MAX_PARTICIPANTES_SALA; i++){
             if(i < sala.getConfiguracion().getMaxParticipantes()){
                 layoutUsuarios[i].setVisibility(View.VISIBLE);
@@ -191,7 +188,7 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
             case VER_REGLAS_ID:
-                ReglasViewDialogBuilder builder = new ReglasViewDialogBuilder(this, sala.getConfiguracion());
+                ReglasViewDialogBuilder builder = new ReglasViewDialogBuilder(this, BackendAPI.getSalaActual().getConfiguracion());
                 builder.show();
                 break;
         }

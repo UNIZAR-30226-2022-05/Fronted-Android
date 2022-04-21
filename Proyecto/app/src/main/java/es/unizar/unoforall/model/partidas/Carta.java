@@ -157,8 +157,8 @@ public class Carta implements Comparable<Carta> {
 			return result;
 		}
 	}
-
-	@Override
+    
+    @Override
 	public Carta clone(){
 		Carta copia = new Carta();
 		copia.color = this.color;

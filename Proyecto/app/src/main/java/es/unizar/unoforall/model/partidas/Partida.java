@@ -92,7 +92,7 @@ public class Partida {
 				}
 			}
 		}
-		Collections.shuffle(this.mazo); //PARA DEBUG
+		Collections.shuffle(this.mazo); 
 		
 		
 		// Cartas jugadas
@@ -105,7 +105,8 @@ public class Partida {
 			this.jugadores.add(new Jugador(jID));
 		}
 			// Se crean las IA
-		for(int i = 0; i < getNumIAs(); i++) {
+		int numIAs = configuracion.getMaxParticipantes() - jugadoresID.size();
+		for(int i = 0; i < numIAs; i++) {
 			this.jugadores.add(new Jugador());
 		}
 			// Se crean las manos de todos los jugadores
@@ -145,7 +146,7 @@ public class Partida {
 	}
 	
 	//FUNCIONA
-	// Comprueba si una carta especial debe incluirse en el mazo o no segÃºn las
+	// Comprueba si una carta especial debe incluirse en el mazo o no según las
 	// reglas
 	private boolean compruebaIncluirMazo(Carta.Tipo tipo) {
 		if (tipo == Carta.Tipo.rayosX && !configuracion.getReglas().isCartaRayosX()) {
@@ -179,22 +180,6 @@ public class Partida {
 	//FUNCIONA
 	private Jugador siguienteJugador() {
 		if (this.sentidoHorario) {
-			if (this.turno == this.jugadores.size() - 1) {
-				return this.jugadores.get(0);
-			} else {
-				return this.jugadores.get(this.turno + 1);
-			}
-		} else {
-			if (this.turno == 0) {
-				return this.jugadores.get(this.jugadores.size() - 1);
-			} else {
-				return this.jugadores.get(this.turno - 1);
-			}
-		}
-	}
-	
-	private Jugador anteriorJugador() {
-		if (!this.sentidoHorario) { //Sentido antihorario
 			if (this.turno == this.jugadores.size() - 1) {
 				return this.jugadores.get(0);
 			} else {
@@ -356,7 +341,7 @@ public class Partida {
 			default:
 				break;
 		}
-		this.cartasJugadas.add(c); //La aÃ±ade al final (por implementaciones de rellenar y robar del mazo);
+		this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
 		this.jugadores.get(turno).getMano().remove(c);
 		if(	configuracion.getReglas().isEvitarEspecialFinal() && 
 				this.jugadores.get(turno).getMano().size()==1 &&
@@ -457,7 +442,7 @@ public class Partida {
 		}
 		
 		
-		//eventos asÃ­ncronos: emojis, botÃ³n de UNO, tiempo, votaciÃ³n pausa
+		//eventos asíncronos: emojis, botón de UNO, tiempo, votación pausa
 	}
 	
 	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
@@ -581,8 +566,15 @@ public class Partida {
 	}
 	
 	public int getNumIAs() {
-		return configuracion.getMaxParticipantes() - this.jugadores.size();
+		int numIAs = 0;
+		for (Jugador j : this.jugadores) {
+			if (j.isEsIA()) {
+				numIAs++;
+			}
+		}
+		return numIAs;
 	}
+	
 	
 	/**************************************************************************/
 	// Para los FRONTENDs
@@ -681,7 +673,7 @@ public class Partida {
 				//FUNCIONA
 			} else { //Cartas con efecto o en general sin poder jugar varias cartas
 				if (jugada.getCartas().size()>1) {
-					valida = false; //Solo se puede jugar una si no son nÃºmeros. (o si no se permite jugar mÃ¡s de una).
+					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
 				}else { //Decía true aun con más de una carta sin este else
 					return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
 							|| jugada.getCartas().get(0).esDelColor(getUltimaCartaJugada().getColor());
@@ -696,7 +688,7 @@ public class Partida {
 	}
 	
 	// Se debe mirar en cada turno, y cuando devuelva true ya se puede desconectar
-	// del buzÃ³n de la partida con websockets
+	// del buzón de la partida con websockets
 	public boolean estaTerminada() {
 		return this.terminada;
 	}
