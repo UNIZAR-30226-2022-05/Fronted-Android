@@ -193,10 +193,7 @@
         android:layout_marginEnd="90dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/carta_mazo"
-
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"/>
+        app:srcCompat="@drawable/carta_mazo"/>
 
     <ImageView
         android:id="@+id/botonUNO"

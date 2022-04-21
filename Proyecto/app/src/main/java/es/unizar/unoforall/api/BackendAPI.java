@@ -13,6 +13,7 @@ import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
@@ -66,7 +67,10 @@ public class BackendAPI{
         this.activity = activity;
         this.usuarioDbAdapter = new UsuarioDbAdapter(this.activity).open();
     }
-    
+
+    //
+    //  LOGIN, REGISTRO Y RECUPERACIÓN DE CONTRASEÑA
+    //
     public void login(String correo, String contrasennaHash){
         RestAPI api = new RestAPI(activity,"/api/login");
         api.addParameter("correo", correo);
@@ -216,6 +220,9 @@ public class BackendAPI{
         });
     }
 
+    //
+    //  OBTENCIÓN DE USUARIOS
+    //
     public void obtenerUsuarioVO(Consumer<UsuarioVO> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
         api.addParameter("sesionID", sesionID);
@@ -242,6 +249,9 @@ public class BackendAPI{
         });
     }
 
+    //
+    //  GESTIÓN DE SALAS
+    //
     public void crearSala(ConfigSala configSala){
         RestAPI api = new RestAPI(activity, "/api/crearSala");
         api.addParameter("sesionID", sesionID);
@@ -306,6 +316,9 @@ public class BackendAPI{
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
+    //
+    //  MODIFICACIÓN DE CUENTA
+    //
     public void modificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
         api.addParameter("sesionID", sesionID);
@@ -376,6 +389,9 @@ public class BackendAPI{
         api.setOnObjectReceived(String.class, error -> activity.mostrarMensaje("Operación cancelada"));
     }
 
+    //
+    //  BORRADO DE CUENTA
+    //
     public void borrarCuenta(){
         obtenerUsuarioVO(usuarioVO -> {
             DeleteAccountDialogBuilder builder = new DeleteAccountDialogBuilder(activity);
@@ -402,6 +418,9 @@ public class BackendAPI{
         });
     }
 
+    //
+    //  GESTIÓN DE AMIGOS
+    //
     public void obtenerAmigos(Consumer<ListaUsuarios> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarAmigos");
         api.addParameter("sesionID", sesionID);
@@ -497,6 +516,13 @@ public class BackendAPI{
             });
         });
         builder.show();
+    }
+
+    //
+    //  GESTIÓN DE PARTIDAS
+    //
+    public void enviarJugada(Jugada jugada){
+        wsAPI.sendObject("/app/partidas/turnos/" + salaActualID, jugada);
     }
 
     public static synchronized void closeWebSocketAPI(){

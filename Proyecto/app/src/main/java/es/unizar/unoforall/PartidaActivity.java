@@ -14,11 +14,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Carta;
+import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.partidas.Jugador;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.salas.Sala;
@@ -55,6 +57,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private ImageView mazoRobar;
 
     private int jugadorActualID = -1;
+
+    private boolean defaultMode;
 
     @Override
     public ActivityType getType() {
@@ -113,8 +117,17 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         mazoRobar = findViewById(R.id.mazoRobar);
 
         mazoRobar.setOnClickListener(view -> {
-            mostrarMensaje("Has robado una carta");
+            if(esTurnoDelJugadorActual()){
+                new BackendAPI(this).enviarJugada(new Jugada());
+                mostrarMensaje("Has robado una carta");
+            }else{
+                mostrarMensaje("Espera tu turno");
+            }
         });
+
+        // Si defaultMode = true, se mostrará el aspecto por defecto de las cartas.
+        //     Si no, se mostrará el aspecto alternativo.
+        defaultMode = true;
 
         // Borrar las cartas que están por defecto
         resetCartas();
@@ -128,10 +141,13 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     private void actualizarPantallaPartida(Sala sala){
         Partida partida = sala.getPartida();
-        jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
+        if(jugadorActualID == -1){
+            jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
+        }
 
+        resetCartas();
         // Falta posicionar los jugadores de forma adecuada en el caso de sólo 2 jugadores
-        //  uno en frente del otro
+        //  uno en frente del otro y quitar los layouts de los jugadores que sobren
         int numJugadores = partida.getJugadores().size();
         for(int i=0, j=0; j<numJugadores; i = (i + 1) % numJugadores, j++){
             Jugador jugador = partida.getJugadores().get(i);
@@ -152,6 +168,20 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
         setSentido(partida.isSentidoHorario());
         setCartaDelMedio(partida.getUltimaCartaJugada());
+        setMazoRobar(!esTurnoDelJugadorActual());
+    }
+
+    private boolean esTurnoDelJugadorActual(){
+        Sala sala = BackendAPI.getSalaActual();
+        if(sala == null){
+            return false;
+        }
+        Partida partida = sala.getPartida();
+        if(partida == null){
+            return false;
+        }
+
+        return jugadorActualID == partida.getTurno();
     }
 
     private void setSentido(boolean sentidoHorario){
@@ -184,16 +214,15 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void setCartaDelMedio(Carta carta){
-        ImageManager.setImagenCarta(cartaDelMedio, carta, true, false, true);
+        ImageManager.setImagenCarta(cartaDelMedio, carta, defaultMode, false, true);
     }
 
-    private void setMazoRobar(){
-        ImageManager.setImagenMazoCartas(mazoRobar, true);
+    private void setMazoRobar(boolean isDisabled){
+        ImageManager.setImagenMazoCartas(mazoRobar, defaultMode, isDisabled);
     }
 
     private void addCarta(int jugadorID, Carta carta){
-        boolean defaultMode = true;
-        boolean isDisabled = false;
+        boolean isDisabled = jugadorID == jugadorActualID && !esTurnoDelJugadorActual();
         boolean isVisible = carta.isVisiblePor(jugadorActualID) || jugadorID == jugadorActualID;
 
         ImageView imageView = new ImageView(this);
@@ -203,7 +232,15 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
 
         if(jugadorID == jugadorActualID){
-            imageView.setOnClickListener(view -> mostrarMensaje("Has pulsado en la carta " + carta));
+            imageView.setOnClickListener(view -> {
+                if(esTurnoDelJugadorActual()){
+                    Jugada jugada = new Jugada(new ArrayList<>(Arrays.asList(carta)));
+                    new BackendAPI(this).enviarJugada(jugada);
+                    mostrarMensaje("Has jugado una carta");
+                }else{
+                    mostrarMensaje("Espera tu turno");
+                }
+            });
         }
 
         layoutBarajasJugadores[jugadorID].addView(imageView);
