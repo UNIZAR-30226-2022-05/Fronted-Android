@@ -154,7 +154,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
         int numJugadores = partida.getJugadores().size();
         
-        // posicionesJugadores[i] es el ID del jugador que al que le corresponde el hueco i
+        // posicionesJugadores[i] es el ID del jugador al que le corresponde el hueco i
         //   en los layouts. Será -1 si ese hueco no debe ser rellenado
         int[] posicionesJugadores;
         if(numJugadores == 2){
