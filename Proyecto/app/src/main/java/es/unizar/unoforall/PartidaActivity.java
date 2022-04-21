@@ -49,6 +49,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private static final int MAX_LONG_NOMBRE = 16;
 
     private LinearLayout[] layoutBarajasJugadores;
+    private LinearLayout[] layoutJugadores;
     private ImageView sentido;
     private ImageView[] imagenesJugadores;
     private TextView[] nombresJugadores;
@@ -74,6 +75,12 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        layoutJugadores = new LinearLayout[] {
+                findViewById(R.id.layoutJugadorAbajo),
+                findViewById(R.id.layoutJugadorIzquierda),
+                findViewById(R.id.layoutJugadorArriba),
+                findViewById(R.id.layoutJugadorDerecha)};
 
         layoutBarajasJugadores = new LinearLayout[] {
                 findViewById(R.id.barajaJugadorAbajo),
@@ -145,27 +152,45 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
         }
 
-        resetCartas();
-        // Falta posicionar los jugadores de forma adecuada en el caso de sólo 2 jugadores
-        //  uno en frente del otro y quitar los layouts de los jugadores que sobren
         int numJugadores = partida.getJugadores().size();
-        for(int i=0, j=0; j<numJugadores; i = (i + 1) % numJugadores, j++){
-            Jugador jugador = partida.getJugadores().get(i);
-            int turnoActual = partida.getTurno();
-            if(jugador.isEsIA()){
-                setImagenJugador(i, ImageManager.IA_IMAGE_ID);
-                setNombreJugador(i, "IA_" + i, turnoActual == i);
-            }else{
-                UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
-                setImagenJugador(i, usuarioVO.getAvatar());
-                setNombreJugador(i, usuarioVO.getNombre(), turnoActual == i);
-            }
-            setNumCartas(i, jugador.getMano().size());
-            jugador.getMano().sort(Carta::compareTo);
-            for(Carta carta : jugador.getMano()){
-                addCarta(i, carta);
+        
+        // posicionesJugadores[i] es el ID del jugador que al que le corresponde el hueco i
+        //   en los layouts. Será -1 si ese hueco no debe ser rellenado
+        int[] posicionesJugadores;
+        if(numJugadores == 2){
+            posicionesJugadores = new int[] {jugadorActualID, -1, 1-jugadorActualID, -1};
+        }else{
+            posicionesJugadores = new int[] {-1, -1, -1, -1};
+            for(int i=0; i<numJugadores; i++){
+                posicionesJugadores[i] = (jugadorActualID + i) % numJugadores;
             }
         }
+
+        resetCartas();
+        for(int i=0; i<posicionesJugadores.length; i++){
+            int jugadorID = posicionesJugadores[i];
+            if(jugadorID == -1){
+                // Ocultar los layouts del jugador i
+                mostrarLayoutJugador(i, false);
+            }else{
+                Jugador jugador = partida.getJugadores().get(jugadorID);
+                int turnoActual = partida.getTurno();
+                if(jugador.isEsIA()){
+                    setImagenJugador(i, ImageManager.IA_IMAGE_ID);
+                    setNombreJugador(i, "IA_" + jugadorID, turnoActual == jugadorID);
+                }else{
+                    UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
+                    setImagenJugador(i, usuarioVO.getAvatar());
+                    setNombreJugador(i, usuarioVO.getNombre(), turnoActual == jugadorID);
+                }
+                setNumCartas(i, jugador.getMano().size());
+                jugador.getMano().sort(Carta::compareTo);
+                for(Carta carta : jugador.getMano()){
+                    addCarta(i, carta);
+                }
+            }
+        }
+        
         setSentido(partida.isSentidoHorario());
         setCartaDelMedio(partida.getUltimaCartaJugada());
         setMazoRobar(!esTurnoDelJugadorActual());
@@ -192,25 +217,25 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
     }
 
-    private void setImagenJugador(int jugadorID, int imageID){
-        ImageManager.setImagePerfil(imagenesJugadores[jugadorID], imageID);
+    private void setImagenJugador(int jugadorLayoutID, int imageID){
+        ImageManager.setImagePerfil(imagenesJugadores[jugadorLayoutID], imageID);
     }
 
-    private void setNombreJugador(int jugadorID, String nombre, boolean turnoActivo){
+    private void setNombreJugador(int jugadorLayoutID, String nombre, boolean turnoActivo){
         if(nombre.length() > MAX_LONG_NOMBRE){
             nombre = nombre.substring(0, MAX_LONG_NOMBRE-3) + "...";
         }
 
-        nombresJugadores[jugadorID].setText(nombre);
+        nombresJugadores[jugadorLayoutID].setText(nombre);
         if(turnoActivo){
-            nombresJugadores[jugadorID].setTextColor(TURNO_ACTIVO_COLOR);
+            nombresJugadores[jugadorLayoutID].setTextColor(TURNO_ACTIVO_COLOR);
         }else{
-            nombresJugadores[jugadorID].setTextColor(TURNO_INACTIVO_COLOR);
+            nombresJugadores[jugadorLayoutID].setTextColor(TURNO_INACTIVO_COLOR);
         }
     }
 
-    private void setNumCartas(int jugadorID, int numCartas){
-        contadoresCartasJugadores[jugadorID].setText(numCartas + "");
+    private void setNumCartas(int jugadorLayoutID, int numCartas){
+        contadoresCartasJugadores[jugadorLayoutID].setText(numCartas + "");
     }
 
     private void setCartaDelMedio(Carta carta){
@@ -246,8 +271,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         layoutBarajasJugadores[jugadorID].addView(imageView);
     }
 
-    private void resetCartas(int jugadorID){
-        layoutBarajasJugadores[jugadorID].removeAllViews();
+    private void resetCartas(int jugadorLayoutID){
+        layoutBarajasJugadores[jugadorLayoutID].removeAllViews();
     }
 
     private void resetCartas() {
@@ -255,6 +280,16 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         resetCartas(JUGADOR_IZQUIERDA);
         resetCartas(JUGADOR_ARRIBA);
         resetCartas(JUGADOR_DERECHA);
+    }
+
+    private void mostrarLayoutJugador(int jugadorLayoutID, boolean isVisible){
+        if(isVisible){
+            layoutJugadores[jugadorLayoutID].setVisibility(View.VISIBLE);
+            layoutBarajasJugadores[jugadorLayoutID].setVisibility(View.VISIBLE);
+        }else{
+            layoutJugadores[jugadorLayoutID].setVisibility(View.INVISIBLE);
+            layoutBarajasJugadores[jugadorLayoutID].setVisibility(View.INVISIBLE);
+        }
     }
 
     private void abandonarPartida(){

@@ -210,6 +210,7 @@
         android:clickable="true"/>
 
     <LinearLayout
+        android:id="@+id/layoutJugadorArriba"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -258,6 +259,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layoutJugadorDerecha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="52dp"
@@ -307,6 +309,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layoutJugadorIzquierda"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="76dp"
@@ -356,6 +359,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layoutJugadorAbajo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2.5dp"
