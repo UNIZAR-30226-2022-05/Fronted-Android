@@ -257,9 +257,11 @@ public class Partida {
 		efectoRayosX = false;
 		boolean esSalto = false;
 		boolean hayIntercambio = false;
+		boolean hayReversa = false;
+		
 		switch (c.getTipo()) {
 			case intercambio:
-				hayIntercambio = false;
+				hayIntercambio = true;
 				break;
 				
 			case mas2:
@@ -329,6 +331,7 @@ public class Partida {
 				
 			case reversa:
 				this.sentidoHorario = ! this.sentidoHorario;
+				hayReversa = true;
 				break;
 				
 			case salta:
@@ -360,7 +363,7 @@ public class Partida {
 		if (this.jugadores.get(turno).getMano().size()!=1) {
 			this.jugadores.get(turno).setProtegido_UNO(false);
 		}
-		if (esSalto) {
+		if (esSalto && !hayReversa) {
 			avanzarTurno();
 		}
 	}
@@ -510,16 +513,16 @@ public class Partida {
 								int random_color = new Random().nextInt(4);
 								switch(random_color) {
 									case 0:
-										cartaRobada.setColor(Carta.Color.amarillo);
+										c.setColor(Carta.Color.amarillo);
 										break;
 									case 1:
-										cartaRobada.setColor(Carta.Color.rojo);
+										c.setColor(Carta.Color.rojo);
 										break;
 									case 2:
-										cartaRobada.setColor(Carta.Color.azul);
+										c.setColor(Carta.Color.azul);
 										break;
 									case 3:
-										cartaRobada.setColor(Carta.Color.verde);
+										c.setColor(Carta.Color.verde);
 										break;
 								}
 							}
