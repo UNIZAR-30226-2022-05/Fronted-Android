@@ -199,15 +199,15 @@
         android:id="@+id/botonUNO"
         android:layout_width="93dp"
         android:layout_height="72dp"
-        android:layout_marginTop="112dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.625"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView3"
-        app:srcCompat="@drawable/ic_boton_uno"
-
+        android:layout_marginTop="116dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"/>
+        android:clickable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView3"
+        app:srcCompat="@drawable/ic_boton_uno" />
 
     <LinearLayout
         android:id="@+id/layoutJugadorArriba"
