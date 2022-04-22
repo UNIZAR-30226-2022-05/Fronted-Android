@@ -175,7 +175,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 new BackendAPI(this).pulsarBotonUNO();
                 mostrarMensaje("Has pulsado el botón UNO");
             }else {
-                mostrarMensaje("No puedes pulsar el botón de UNO ahora mismo");
+                mostrarMensaje("El botón UNO no tuvo efecto alguno");
             }
         });
 
