@@ -68,7 +68,7 @@ public class CodeConfirmDialogBuilder {
         builder.setView(codeEditText);
         builder.setPositiveButton("Confirmar", (dialog, which) -> positiveRunnable.run());
         builder.setNegativeButton("Cancelar", (dialog, which) -> negativeRunnable.run());
-        builder.setOnCancelListener(dialog -> negativeRunnable.run());
+        builder.setOnCancelListener(dialog -> show());
 
         builder.show();
     }
