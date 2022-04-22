@@ -73,7 +73,7 @@ public class ImageManager{
         return altCardsMap;
     }
 
-    public static void setImagenCarta(ImageView imageView, Carta carta, boolean defaultMode, boolean isDisabled, boolean isVisible){
+    public static void setImagenCarta(ImageView imageView, Carta carta, boolean defaultMode, boolean isEnabled, boolean isVisible, boolean isClickable){
         if(defaultCardsMap.isEmpty() || altCardsMap.isEmpty()){
             for(Carta.Color color : Carta.Color.values()){
                 for(Carta.Tipo tipo : Carta.Tipo.values()){
@@ -97,24 +97,25 @@ public class ImageManager{
                 imageView.setImageResource(altCardsMap.get(carta));
             }
 
-            setImageViewClickable(imageView, !isDisabled);
-            if(isDisabled){
-                imageView.setColorFilter(DISABLED_CARD_COLOR);
-            }else{
+            if(isEnabled){
                 imageView.setColorFilter(ENABLED_CARD_COLOR);
+            }else{
+                imageView.setColorFilter(DISABLED_CARD_COLOR);
             }
+
+            setImageViewClickable(imageView, isClickable);
         }else{
             imageView.setImageResource(getResourceRevesCarta(defaultMode));
         }
     }
 
-    public static void setImagenMazoCartas(ImageView imageView, boolean defaultMode, boolean isDisabled){
+    public static void setImagenMazoCartas(ImageView imageView, boolean defaultMode, boolean isEnabled){
         imageView.setImageResource(getResourceMazoCartas(defaultMode));
-        setImageViewClickable(imageView, !isDisabled);
-        if(isDisabled){
-            imageView.setColorFilter(DISABLED_CARD_COLOR);
-        }else{
+        setImageViewClickable(imageView, isEnabled);
+        if(isEnabled){
             imageView.setColorFilter(ENABLED_CARD_COLOR);
+        }else{
+            imageView.setColorFilter(DISABLED_CARD_COLOR);
         }
     }
 

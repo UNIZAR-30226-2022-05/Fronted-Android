@@ -184,9 +184,34 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     setNombreJugador(i, usuarioVO.getNombre(), turnoActual == jugadorID);
                 }
                 setNumCartas(i, jugador.getMano().size());
-                jugador.getMano().sort(Carta::compareTo);
+                if(jugadorActualID == jugadorID){
+                    jugador.getMano().sort((carta1, carta2) -> {
+                        boolean sePuedeUsarCarta1 = sePuedeUsarCarta(partida, carta1);
+                        boolean sePuedeUsarCarta2 = sePuedeUsarCarta(partida, carta2);
+                        if(sePuedeUsarCarta1 && !sePuedeUsarCarta2){
+                            return -1;
+                        }else if(!sePuedeUsarCarta1 && sePuedeUsarCarta2){
+                            return 1;
+                        }else{
+                            return carta1.compareTo(carta2);
+                        }
+                    });
+                }else{
+                    jugador.getMano().sort((carta1, carta2) -> {
+                        boolean sePuedeVerCarta1 = carta1.isVisiblePor(jugadorActualID);
+                        boolean sePuedeVerCarta2 = carta2.isVisiblePor(jugadorActualID);
+                        if(sePuedeVerCarta1 && !sePuedeVerCarta2){
+                            return -1;
+                        }else if(!sePuedeVerCarta1 && sePuedeVerCarta2){
+                            return 1;
+                        }else{
+                            return carta1.compareTo(carta2);
+                        }
+                    });
+                }
+
                 for(Carta carta : jugador.getMano()){
-                    addCarta(i, jugadorID, carta);
+                    addCarta(partida, i, jugadorID, carta);
                 }
             }
         }
@@ -239,24 +264,31 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void setCartaDelMedio(Carta carta){
-        ImageManager.setImagenCarta(cartaDelMedio, carta, defaultMode, false, true);
+        ImageManager.setImagenCarta(cartaDelMedio, carta, defaultMode, false, true, false);
     }
 
-    private void setMazoRobar(boolean isDisabled){
-        ImageManager.setImagenMazoCartas(mazoRobar, defaultMode, isDisabled);
+    private void setMazoRobar(boolean isEnabled){
+        ImageManager.setImagenMazoCartas(mazoRobar, defaultMode, isEnabled);
     }
 
-    private void addCarta(int jugadorLayoutID, int jugadorID, Carta carta){
-        boolean isDisabled = jugadorID == jugadorActualID && !esTurnoDelJugadorActual();
-        boolean isVisible = carta.isVisiblePor(jugadorActualID) || jugadorID == jugadorActualID;
+    private boolean sePuedeUsarCarta(Partida partida, Carta carta){
+        Carta cartaCentral = partida.getUltimaCartaJugada();
+        return carta.getColor() == Carta.Color.comodin
+                || cartaCentral.getTipo() == carta.getTipo()
+                || cartaCentral.getColor() == carta.getColor();
+    }
+
+    private void addCarta(Partida partida, int jugadorLayoutID, int jugadorID, Carta carta){
+        boolean isEnabled = jugadorID == jugadorActualID && esTurnoDelJugadorActual() && sePuedeUsarCarta(partida, carta);
+        boolean isVisible = jugadorID == jugadorActualID || carta.isVisiblePor(jugadorActualID);
 
         ImageView imageView = new ImageView(this);
-        ImageManager.setImagenCarta(imageView, carta, defaultMode, isDisabled, isVisible);
+        ImageManager.setImagenCarta(imageView, carta, defaultMode, isEnabled, isVisible, jugadorID == jugadorActualID && isEnabled);
         if(jugadorID != JUGADOR_ABAJO){
             imageView.setLayoutParams(new LinearLayout.LayoutParams(150, -2));
         }
 
-        if(jugadorID == jugadorActualID){
+        if(jugadorID == jugadorActualID && isEnabled){
             imageView.setOnClickListener(view -> {
                 if(esTurnoDelJugadorActual()){
                     Jugada jugada = new Jugada(new ArrayList<>(Arrays.asList(carta)));
@@ -341,7 +373,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private void test(){
         // Para inicializar el HashMap es necesario usar al menos una carta
         jugadorActualID = JUGADOR_ABAJO;
-        ImageManager.setImagenCarta(new ImageView(this), new Carta(Carta.Tipo.n0, Carta.Color.verde), true, false, true);
+        ImageManager.setImagenCarta(new ImageView(this), new Carta(Carta.Tipo.n0, Carta.Color.verde), true, false, true, false);
         Task.runDelayedTask(new CancellableRunnable() {
             private final ArrayList<Carta> defaultCards = new ArrayList<>(ImageManager.getDefaultCardsMap().keySet());
             @Override
@@ -353,7 +385,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                         for(int j=0;j<4;j++){
                             Carta carta = cartaOriginal.clone();
                             carta.marcarVisible(j);
-                            addCarta(j, j, carta);
+                            addCarta(BackendAPI.getSalaActual().getPartida(), j, j, carta);
                         }
                     }
                 });
