@@ -11,6 +11,8 @@ import java.util.UUID;
 import es.unizar.unoforall.model.salas.ConfigSala;
 
 public class Partida {
+	public final static int TIMEOUT_TURNO = 15*1000;  // 30 segundos
+	
 	private boolean hayError = false;
 	private String error = "";
 	
@@ -36,6 +38,9 @@ public class Partida {
 	private static final Object LOCK = new Object();
 	private static final int MAX_ROBO_ATTACK = 10;
 	
+	private UUID salaID = null;	
+	
+	
 	private class PosiblesTiposJugadas {
 		public boolean esEscalera;
 		public boolean esIguales;
@@ -59,13 +64,14 @@ public class Partida {
 	
 	
 		
-	public Partida(List<UUID> jugadoresID, ConfigSala configuracion) {
+	public Partida(List<UUID> jugadoresID, ConfigSala configuracion, UUID salaID) {
 		this.setHayError(false);
 		this.setError("");
 		this.turno = 0;
 		this.sentidoHorario = true;
 		this.configuracion = configuracion;
 		this.terminada = false;
+		this.salaID = salaID;
 				
 				
 		//Marcamos fecha de inicio
@@ -113,9 +119,6 @@ public class Partida {
 				j.getMano().add(robarCarta());	
 			}
 		}
-		
-		
-		
 	}
 
 
@@ -398,7 +401,7 @@ public class Partida {
 	public void ejecutarJugada(Jugada jugada) {
 		if(modoJugarCartaRobada) { //FUNCIONA
 			if(jugada.getCartas()!=null && jugada.getCartas().size()==1) {
-				juegaCarta(cartaRobada, jugada);
+				juegaCarta(jugada.getCartas().get(0), jugada);
 			}
 			cartaRobada=null;
 			modoJugarCartaRobada=false;
@@ -567,6 +570,7 @@ public class Partida {
 	//Cuando un jugador se pasa del tiempo de turno
 	public void saltarTurno() {
 		ejecutarJugada(new Jugada());
+		modoJugarCartaRobada = false;
 	}
 	
 	
@@ -853,7 +857,17 @@ public class Partida {
 		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
 		partidaResumida.cartaRobada = cartaRobada;
 		
+		partidaResumida.salaID = null;
+		
 		return partidaResumida;
+	}
+
+	public UUID getSalaID() {
+		return salaID;
+	}
+
+	public void setSalaID(UUID salaID) {
+		this.salaID = salaID;
 	}
 	
 	
