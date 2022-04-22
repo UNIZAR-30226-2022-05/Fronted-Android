@@ -529,7 +529,6 @@ public class BackendAPI{
     //  GESTIÓN DE PARTIDAS
     //
     public void enviarJugada(Jugada jugada){
-        System.out.println(jugada + " --> " + salaActual.getPartida().validarJugada(jugada));
         wsAPI.sendObject("/app/partidas/turnos/" + salaActualID, jugada);
     }
 
