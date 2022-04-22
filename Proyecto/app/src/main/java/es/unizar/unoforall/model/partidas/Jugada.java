@@ -7,24 +7,18 @@ public class Jugada {
 	private List<Carta> cartas;		//En el orden en el que se quieren tirar
 	private boolean robar;
 	private int jugadorObjetivo;
-	
+
 	// La jugada es robar
 	public Jugada() {
-		this.cartas = new ArrayList<>();;
+		this.cartas = new ArrayList<>();
 		this.robar = true;
 	}
-	
-	public Jugada(ArrayList<Carta> cartas) {
+
+	public Jugada(List<Carta> cartas) {
 		this.cartas = cartas;
 		this.robar = false;
 	}
-	
-	// Utilizar si la última carta es un cambio de color
-	public Jugada(ArrayList<Carta> cartas, Carta.Color nuevoColor) {
-		this.cartas = cartas;
-		this.robar = false;
-	}
-	
+
 	public int getJugadorObjetivo() {
 		return jugadorObjetivo;
 	}
@@ -54,6 +48,6 @@ public class Jugada {
 	public String toString() {
 		return "Jugada [cartas=" + cartas + ", robar=" + robar + "]";
 	}
-	
-	
+
+
 }
