@@ -241,11 +241,27 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/imagenJugadorArriba"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                app:srcCompat="@drawable/ic_iconoperfil" />
+            <FrameLayout
+                android:layout_width="35dp"
+                android:layout_height="35dp">
+
+                <ImageView
+                    android:id="@+id/imagenJugadorArriba"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    app:srcCompat="@drawable/ic_iconoperfil"
+                    android:layout_gravity="center"/>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/porcentajeJugadorArriba"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:indicatorColor="#C3C3C3"
+                    app:trackColor="@color/black"
+                    app:indicatorSize="35dp"
+                    app:trackThickness="3dp"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/nombreJugadorArriba"
@@ -275,11 +291,27 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/imagenJugadorDerecha"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                app:srcCompat="@drawable/ic_iconoperfil" />
+            <FrameLayout
+                android:layout_width="35dp"
+                android:layout_height="35dp">
+
+                <ImageView
+                    android:id="@+id/imagenJugadorDerecha"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    app:srcCompat="@drawable/ic_iconoperfil"
+                    android:layout_gravity="center"/>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/porcentajeJugadorDerecha"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:indicatorColor="#C3C3C3"
+                    app:trackColor="@color/black"
+                    app:indicatorSize="35dp"
+                    app:trackThickness="3dp"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/nombreJugadorDerecha"
@@ -343,11 +375,28 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/imagenJugadorIzquierda"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                app:srcCompat="@drawable/ic_iconoperfil" />
+
+            <FrameLayout
+                android:layout_width="35dp"
+                android:layout_height="35dp">
+
+                <ImageView
+                    android:id="@+id/imagenJugadorIzquierda"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    app:srcCompat="@drawable/ic_iconoperfil"
+                    android:layout_gravity="center"/>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/porcentajeJugadorIzquierda"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:indicatorColor="#C3C3C3"
+                    app:trackColor="@color/black"
+                    app:indicatorSize="35dp"
+                    app:trackThickness="3dp"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/nombreJugadorIzquierda"
@@ -371,11 +420,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView2">
 
-        <ImageView
-            android:id="@+id/imagenJugadorAbajo"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            app:srcCompat="@drawable/ic_iconoperfil" />
+        <FrameLayout
+            android:layout_width="35dp"
+            android:layout_height="35dp">
+
+            <ImageView
+                android:id="@+id/imagenJugadorAbajo"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:srcCompat="@drawable/ic_iconoperfil"
+                android:layout_gravity="center"/>
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/porcentajeJugadorAbajo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:indicatorColor="#C3C3C3"
+                app:trackColor="@color/black"
+                app:indicatorSize="35dp"
+                app:trackThickness="3dp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
 
         <TextView
             android:id="@+id/nombreJugadorAbajo"

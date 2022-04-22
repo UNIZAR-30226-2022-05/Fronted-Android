@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -53,6 +55,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private LinearLayout[] layoutBarajasJugadores;
     private LinearLayout[] layoutJugadores;
     private ImageView sentido;
+    private CircularProgressIndicator[] porcentajeJugadores;
     private ImageView[] imagenesJugadores;
     private TextView[] nombresJugadores;
     private TextView[] contadoresCartasJugadores;
@@ -109,6 +112,13 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         botonMenu.setOnClickListener(view -> view.showContextMenu(view.getX(), view.getY()));
 
         botonUNO = findViewById(R.id.botonUNO);
+
+        porcentajeJugadores = new CircularProgressIndicator[] {
+                findViewById(R.id.porcentajeJugadorAbajo),
+                findViewById(R.id.porcentajeJugadorIzquierda),
+                findViewById(R.id.porcentajeJugadorArriba),
+                findViewById(R.id.porcentajeJugadorDerecha)
+        };
 
         imagenesJugadores = new ImageView[] {
                 findViewById(R.id.imagenJugadorAbajo),
@@ -202,6 +212,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             }else{
                 Jugador jugador = partida.getJugadores().get(jugadorID);
                 int turnoActual = partida.getTurno();
+
+                if(turnoActual == jugadorID){
+                    mostrarTimerVisual(i);
+                }
+
                 if(jugador.isEsIA()){
                     setImagenJugador(i, ImageManager.IA_IMAGE_ID);
                     setNombreJugador(i, getIAName(jugadorID), turnoActual == jugadorID);
@@ -359,6 +374,43 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         resetCartas(JUGADOR_IZQUIERDA);
         resetCartas(JUGADOR_ARRIBA);
         resetCartas(JUGADOR_DERECHA);
+    }
+
+    private CancellableRunnable timerRunnable = null;
+    private void mostrarTimerVisual(int jugadorLayoutID){
+        if(timerRunnable != null){
+            timerRunnable.cancel();
+        }
+
+        final int incremento = 100; // Incrementar el porcentaje cada 100 ms
+        timerRunnable = new CancellableRunnable() {
+            int i = 0;
+            final int total = Partida.TIMEOUT_TURNO;
+            @Override
+            public void run() {
+                if(isCancelled()){
+                    return;
+                }
+
+                if(i <= total){
+                    setPorcentaje(jugadorLayoutID, (int) ((i * 100.0) / total));
+                }else{
+                    cancel();
+                }
+
+                i += incremento;
+            }
+        };
+        Task.runPeriodicTask(timerRunnable, 0, incremento);
+    }
+    private void setPorcentaje(int jugadorLayoutID, int porcentaje){
+        for(int i=0; i<porcentajeJugadores.length; i++){
+            if(i == jugadorLayoutID){
+                porcentajeJugadores[i].setProgress(porcentaje, true);
+            }else{
+                porcentajeJugadores[i].setProgress(0, false);
+            }
+        }
     }
 
     private void mostrarLayoutJugador(int jugadorLayoutID, boolean isVisible){
