@@ -296,15 +296,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Abandonar partida");
         builder.setMessage("¿Quieres abandonar la partida?");
-        builder.setPositiveButton("Sí", (dialog, which) -> {
-            new BackendAPI(this).salirSala(BackendAPI.getSalaActualID());
-            Intent intent = new Intent(this, PrincipalActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, 0);
-        });
-        builder.setNegativeButton("No", (dialog, which) -> {
-            dialog.dismiss();
-        });
+        builder.setPositiveButton("Sí", (dialog, which) ->
+                new BackendAPI(this).salirSala());
+        builder.setNegativeButton("No", (dialog, which) ->
+                dialog.dismiss());
         builder.create().show();
     }
 

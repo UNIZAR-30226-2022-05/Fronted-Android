@@ -32,12 +32,8 @@ import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 
 public class SalaActivity extends CustomActivity implements SalaReceiver {
 
-    public static final String KEY_SALA_ID = "id_sala";
     private static final int MAX_PARTICIPANTES_SALA = 4;
     private static final int VER_REGLAS_ID = 0;
-
-    private BackendAPI api;
-    private UUID salaID;
 
     private TextView numUsuariosTextView;
     private TextView numUsuariosListosTextView;
@@ -56,10 +52,8 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
         setContentView(R.layout.activity_sala);
         setTitle(R.string.sala);
 
-        salaID = (UUID) getIntent().getSerializableExtra(KEY_SALA_ID);
-
         TextView salaIDTextView = findViewById(R.id.salaIDTextView);
-        salaIDTextView.setText(salaID.toString());
+        salaIDTextView.setText(BackendAPI.getSalaActualID().toString());
 
         salaTipoTextView = findViewById(R.id.salaTipoTextView);
 
@@ -79,23 +73,21 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
         listoSala.setOnClickListener(view -> {
             listoSala.setEnabled(false);
             listoSala.setBackgroundColor(Color.LTGRAY);
-            api.listoSala(salaID);
+            new BackendAPI(this).listoSala();
         });
 
         Button invitarAmigos = findViewById(R.id.invitarAmigosButton);
         invitarAmigos.setOnClickListener(view -> {
-            new BackendAPI(this).invitarAmigoSala(salaID);
+            new BackendAPI(this).invitarAmigoSala();
         });
 
-        api = new BackendAPI(this);
-        api.unirseSala(salaID);
+        manageSala(BackendAPI.getSalaActual());
     }
 
     @Override
     public void manageSala(Sala sala){
         if(sala.isEnPartida()){
             Intent intent = new Intent(this, PartidaActivity.class);
-            intent.putExtra(KEY_SALA_ID, salaID);
             startActivityForResult(intent, 0);
         }else{
             updateWidgets(sala);
@@ -165,15 +157,8 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Salir de la sala");
         builder.setMessage("¿Quieres salir de la sala?");
-        builder.setPositiveButton("Sí", (dialog, which) -> {
-            api.salirSala(salaID);
-            Intent intent = new Intent(this, PrincipalActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, 0);
-        });
-        builder.setNegativeButton("No", (dialog, which) -> {
-            dialog.dismiss();
-        });
+        builder.setPositiveButton("Sí", (dialog, which) -> new BackendAPI(this).salirSala());
+        builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         builder.create().show();
     }
 

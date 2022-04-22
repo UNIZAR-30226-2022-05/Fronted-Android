@@ -260,7 +260,7 @@ public class BackendAPI{
         api.setOnObjectReceived(RespuestaSala.class, respuestaSala -> {
             if(respuestaSala.isExito()){
                 // No ha habido errores
-                iniciarUnirseSala(respuestaSala.getSalaID());
+                unirseSala(respuestaSala.getSalaID());
             }else{
                 activity.mostrarMensaje(respuestaSala.getErrorInfo());
             }
@@ -269,44 +269,50 @@ public class BackendAPI{
 
     public void unirseSalaPorID(){
         SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
-        builder.setPositiveButton(salaID -> iniciarUnirseSala(salaID));
+        builder.setPositiveButton(salaID -> unirseSala(salaID));
         builder.setNegativeButton(() -> activity.mostrarMensaje("Búsqueda de sala por ID cancelada"));
         builder.show();
     }
 
-    public void iniciarUnirseSala(UUID salaID){
-        Intent intent = new Intent(activity, SalaActivity.class);
-        intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
-        activity.startActivityForResult(intent,0);
-    }
     public void unirseSala(UUID salaID){
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
                 activity.mostrarMensaje(sala.getError());
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
-                activity.setResult(0);
                 activity.finish();
             }else{
                 salaActual = sala;
-                salaActualID = salaID;
+                if(salaActualID == null){
+                    salaActualID = salaID;
+                    Intent intent = new Intent(activity, SalaActivity.class);
+                    activity.startActivityForResult(intent,0);
+                    activity.mostrarMensaje("Te has unido a la sala");
+                }
+
                 if(currentActivity instanceof SalaReceiver){
                     ((SalaReceiver) currentActivity).manageSala(sala);
                 }
             }
         });
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
-        activity.mostrarMensaje("Te has unido a la sala");
     }
-    public void listoSala(UUID salaID){
-        wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
+    public void listoSala(){
+        wsAPI.sendObject("/app/salas/listo/" + salaActualID, VACIO);
     }
-    public void salirSala(UUID salaID){
-        salaActual = null;
-        salaActualID = null;
-        wsAPI.unsubscribe("/topic/salas/" + salaID);
-        wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
-        activity.mostrarMensaje("Has salido de la sala");
+    public void salirSala(){
+        if(salaActual == null){
+            activity.mostrarMensaje("La sala no puede ser null");
+        }else{
+            wsAPI.unsubscribe("/topic/salas/" + salaActualID);
+            wsAPI.sendObject("/app/salas/salir/" + salaActualID, VACIO);
+            activity.mostrarMensaje("Has salido de la sala");
+            salaActual = null;
+            salaActualID = null;
+            Intent intent = new Intent(activity, PrincipalActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            activity.startActivityForResult(intent, 0);
+        }
     }
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
@@ -508,11 +514,11 @@ public class BackendAPI{
         });
     }
 
-    public void invitarAmigoSala(UUID salaID){
+    public void invitarAmigoSala(){
         SeleccionAmigoDialogBuilder builder = new SeleccionAmigoDialogBuilder(activity);
         builder.setPositiveButton(correo -> {
             buscarUsuarioVO(correo, usuarioVO -> {
-                wsAPI.sendObject("/app/notifSala/" + usuarioVO.getId(), salaID);
+                wsAPI.sendObject("/app/notifSala/" + usuarioVO.getId(), salaActualID);
                 activity.mostrarMensaje("Invitación enviada");
             });
         });
