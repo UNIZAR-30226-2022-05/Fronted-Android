@@ -6,6 +6,7 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private TextView[] contadoresCartasJugadores;
     private ImageView cartaDelMedio;
     private ImageView mazoRobar;
+    private ImageView botonUNO;
 
     private int jugadorActualID = -1;
 
@@ -105,10 +107,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         registerForContextMenu(botonMenu);
         botonMenu.setOnClickListener(view -> view.showContextMenu(view.getX(), view.getY()));
 
-        ImageView botonUNO = findViewById(R.id.botonUNO);
-        botonUNO.setOnClickListener(view -> {
-            mostrarMensaje("Has pulsado el botón UNO");
-        });
+        botonUNO = findViewById(R.id.botonUNO);
 
         imagenesJugadores = new ImageView[] {
                 findViewById(R.id.imagenJugadorAbajo),
@@ -162,6 +161,22 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if(jugadorActualID == -1){
             jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
         }
+
+        botonUNO.setOnClickListener(view -> {
+            boolean sePuedePulsar = false;
+            for(Jugador jugador : partida.getJugadores()){
+                if(jugador.getMano().size() <= 2 && !jugador.isProtegido_UNO()){
+                    sePuedePulsar = true;
+                    break;
+                }
+            }
+            if(sePuedePulsar){
+                new BackendAPI(this).pulsarBotonUNO();
+                mostrarMensaje("Has pulsado el botón UNO");
+            }else {
+                mostrarMensaje("No puedes pulsar el botón de UNO ahora mismo");
+            }
+        });
 
         int numJugadores = partida.getJugadores().size();
         

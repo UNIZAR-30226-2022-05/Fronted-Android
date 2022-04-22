@@ -532,6 +532,10 @@ public class BackendAPI{
         wsAPI.sendObject("/app/partidas/turnos/" + salaActualID, jugada);
     }
 
+    public void pulsarBotonUNO(){
+        wsAPI.sendObject("/app/partidas/botonUNO/" + salaActualID, VACIO);
+    }
+
     public static synchronized void closeWebSocketAPI(){
         if(wsAPI != null){
             wsAPI.close();
