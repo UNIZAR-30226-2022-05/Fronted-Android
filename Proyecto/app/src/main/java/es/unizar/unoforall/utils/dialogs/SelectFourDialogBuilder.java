@@ -158,10 +158,10 @@ public class SelectFourDialogBuilder {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         if(this.isColorMenu){
             builder.setTitle("Seleccionar color");
-            builder.setMessage("Seleccione el color al que cambiar");
+            builder.setMessage("Selecciona el color al que cambiar");
         }else{
             builder.setTitle("Seleccionar rival");
-            builder.setMessage("Seleccione el jugador objetivo de la carta de intercambio");
+            builder.setMessage("Selecciona el jugador objetivo de la carta de intercambio");
         }
 
         builder.setView(mainView);

@@ -28,6 +28,7 @@ import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.SalaReceiver;
+import es.unizar.unoforall.utils.dialogs.CartaRobadaDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SelectFourDialogBuilder;
 import es.unizar.unoforall.utils.tasks.CancellableRunnable;
@@ -245,6 +246,12 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         setSentido(partida.isSentidoHorario());
         setCartaDelMedio(partida.getUltimaCartaJugada());
         setMazoRobar(esTurnoDelJugadorActual());
+
+        if(esTurnoDelJugadorActual() && partida.isModoJugarCartaRobada()){
+            CartaRobadaDialogBuilder builder =
+                    new CartaRobadaDialogBuilder(this, partida.getCartaRobada(), defaultMode, sala);
+            builder.show();
+        }
     }
 
     private boolean esTurnoDelJugadorActual(){
