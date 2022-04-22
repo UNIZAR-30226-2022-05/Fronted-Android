@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
@@ -145,9 +144,9 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
                 }
             }else if(view instanceof ImageView){
                 if(usuario == null){
-                    ImageManager.setImagePerfil((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
+                    ImageManager.setImagenPerfil((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
                 }else{
-                    ImageManager.setImagePerfil((ImageView) view, usuario.getAvatar());
+                    ImageManager.setImagenPerfil((ImageView) view, usuario.getAvatar());
                 }
             }
         }

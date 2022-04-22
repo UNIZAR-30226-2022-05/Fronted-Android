@@ -6,6 +6,7 @@ import android.graphics.PorterDuff;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.HashMap;
 
@@ -26,7 +27,7 @@ public class ImageManager{
 
     // Pre: -2 <= imageID <= 6
     @SuppressLint("UseCompatLoadingForDrawables")
-    public static void setImagePerfil(ImageView imageView, int imageID){
+    public static void setImagenPerfil(ImageView imageView, int imageID){
         if(imageID < -2 || imageID > 6){
             throw new IllegalArgumentException("ID de imagen inválido: " + imageID + ". Debe estar entre -1 y 6");
         }
@@ -63,6 +64,49 @@ public class ImageManager{
         }
 
         imageView.setImageResource(resourceID);
+    }
+
+    public static void setImagenColor(ImageView imageView, TextView textView, Carta.Color color, boolean defaultMode){
+        setImageViewClickable(imageView, true);
+        switch(color){
+            case rojo:
+                if(defaultMode){
+                    imageView.setImageResource(R.drawable.color_rojo);
+                    textView.setText("Rojo");
+                }else{
+                    imageView.setImageResource(R.drawable.color_rojo_alt);
+                    textView.setText("Azul claro");
+                }
+                break;
+            case amarillo:
+                if(defaultMode){
+                    imageView.setImageResource(R.drawable.color_amarillo);
+                    textView.setText("Amarillo");
+                }else{
+                    imageView.setImageResource(R.drawable.color_amarillo_alt);
+                    textView.setText("Azul oscuro");
+                }
+                break;
+            case verde:
+                if(defaultMode){
+                    imageView.setImageResource(R.drawable.color_verde);
+                    textView.setText("Verde");
+                }else{
+                    imageView.setImageResource(R.drawable.color_verde_alt);
+                    textView.setText("Rosa");
+                }
+                break;
+            case azul:
+                if(defaultMode){
+                    imageView.setImageResource(R.drawable.color_azul);
+                    textView.setText("Azul");
+                }else{
+                    imageView.setImageResource(R.drawable.color_azul_alt);
+                    textView.setText("Naranja");
+                }
+                break;
+
+        }
     }
 
 
@@ -120,7 +164,7 @@ public class ImageManager{
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private static void setImageViewClickable(ImageView imageView, boolean clickable){
+    public static void setImageViewClickable(ImageView imageView, boolean clickable){
         if(clickable){
             imageView.setOnTouchListener((v, event) -> {
 

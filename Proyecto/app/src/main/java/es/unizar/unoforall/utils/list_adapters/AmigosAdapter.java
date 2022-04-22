@@ -44,7 +44,7 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
 
         nombreTextView.setText(nombre);
         correoTextView.setText(correo);
-        ImageManager.setImagePerfil(imageView, imageID);
+        ImageManager.setImagenPerfil(imageView, imageID);
 
         return view;
     }

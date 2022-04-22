@@ -1,6 +1,5 @@
 package es.unizar.unoforall;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -29,6 +28,7 @@ import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.SalaReceiver;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.SelectFourDialogBuilder;
 import es.unizar.unoforall.utils.tasks.CancellableRunnable;
 import es.unizar.unoforall.utils.tasks.Task;
 
@@ -60,6 +60,17 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private int jugadorActualID = -1;
 
     private boolean defaultMode;
+
+    public static String getIAName(int jugadorID){
+        return "IA_" + jugadorID;
+    }
+
+    public static String acortarNombre(String nombre){
+        if(nombre.length() > MAX_LONG_NOMBRE){
+            nombre = nombre.substring(0, MAX_LONG_NOMBRE-3) + "...";
+        }
+        return nombre;
+    }
 
     @Override
     public ActivityType getType() {
@@ -177,7 +188,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 int turnoActual = partida.getTurno();
                 if(jugador.isEsIA()){
                     setImagenJugador(i, ImageManager.IA_IMAGE_ID);
-                    setNombreJugador(i, "IA_" + jugadorID, turnoActual == jugadorID);
+                    setNombreJugador(i, getIAName(jugadorID), turnoActual == jugadorID);
                 }else{
                     UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
                     setImagenJugador(i, usuarioVO.getAvatar());
@@ -211,14 +222,14 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 }
 
                 for(Carta carta : jugador.getMano()){
-                    addCarta(partida, i, jugadorID, carta);
+                    addCarta(sala, i, jugadorID, carta);
                 }
             }
         }
         
         setSentido(partida.isSentidoHorario());
         setCartaDelMedio(partida.getUltimaCartaJugada());
-        setMazoRobar(!esTurnoDelJugadorActual());
+        setMazoRobar(esTurnoDelJugadorActual());
     }
 
     private boolean esTurnoDelJugadorActual(){
@@ -243,15 +254,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void setImagenJugador(int jugadorLayoutID, int imageID){
-        ImageManager.setImagePerfil(imagenesJugadores[jugadorLayoutID], imageID);
+        ImageManager.setImagenPerfil(imagenesJugadores[jugadorLayoutID], imageID);
     }
 
     private void setNombreJugador(int jugadorLayoutID, String nombre, boolean turnoActivo){
-        if(nombre.length() > MAX_LONG_NOMBRE){
-            nombre = nombre.substring(0, MAX_LONG_NOMBRE-3) + "...";
-        }
-
-        nombresJugadores[jugadorLayoutID].setText(nombre);
+        nombresJugadores[jugadorLayoutID].setText(acortarNombre(nombre));
         if(turnoActivo){
             nombresJugadores[jugadorLayoutID].setTextColor(TURNO_ACTIVO_COLOR);
         }else{
@@ -278,8 +285,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 || cartaCentral.getColor() == carta.getColor();
     }
 
-    private void addCarta(Partida partida, int jugadorLayoutID, int jugadorID, Carta carta){
-        boolean isEnabled = jugadorID == jugadorActualID && esTurnoDelJugadorActual() && sePuedeUsarCarta(partida, carta);
+    private void addCarta(Sala sala, int jugadorLayoutID, int jugadorID, Carta carta){
+        boolean isEnabled = jugadorID == jugadorActualID && esTurnoDelJugadorActual() && sePuedeUsarCarta(sala.getPartida(), carta);
         boolean isVisible = jugadorID == jugadorActualID || carta.isVisiblePor(jugadorActualID);
 
         ImageView imageView = new ImageView(this);
@@ -291,9 +298,27 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if(jugadorID == jugadorActualID && isEnabled){
             imageView.setOnClickListener(view -> {
                 if(esTurnoDelJugadorActual()){
-                    Jugada jugada = new Jugada(new ArrayList<>(Arrays.asList(carta)));
-                    new BackendAPI(this).enviarJugada(jugada);
-                    mostrarMensaje("Has jugado una carta");
+                    if(carta.getColor() == Carta.Color.comodin){
+                        SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
+                                this,carta, defaultMode,
+                                jugada -> {
+                                    new BackendAPI(this).enviarJugada(jugada);
+                                    mostrarMensaje("Has jugado una carta comodín");
+                                });
+                        builder.show();
+                    }else if(carta.getTipo() == Carta.Tipo.intercambio){
+                        SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
+                                this, carta, sala,
+                                jugada -> {
+                                    new BackendAPI(this).enviarJugada(jugada);
+                                    mostrarMensaje("Has jugado una carta de intercambio");
+                                });
+                        builder.show();
+                    }else{
+                        Jugada jugada = new Jugada(Arrays.asList(carta));
+                        new BackendAPI(this).enviarJugada(jugada);
+                        mostrarMensaje("Has jugado una carta");
+                    }
                 }else{
                     mostrarMensaje("Espera tu turno");
                 }
@@ -385,7 +410,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                         for(int j=0;j<4;j++){
                             Carta carta = cartaOriginal.clone();
                             carta.marcarVisible(j);
-                            addCarta(BackendAPI.getSalaActual().getPartida(), j, j, carta);
+                            addCarta(BackendAPI.getSalaActual(), j, j, carta);
                         }
                     }
                 });

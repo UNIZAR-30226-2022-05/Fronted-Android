@@ -1,7 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:orientation="vertical"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-</LinearLayout>
+    <TableRow android:gravity="center">
+        <LinearLayout
+            android:id="@+id/layoutElemento0"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/imagenElemento0"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:srcCompat="@drawable/color_azul"/>
+            <TextView
+                android:id="@+id/textoElemento0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elemento0"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/layoutElemento1"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/imagenElemento1"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:srcCompat="@drawable/color_azul"/>
+            <TextView
+                android:id="@+id/textoElemento1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elemento1"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
+    </TableRow>
+    <TableRow android:gravity="center">
+        <LinearLayout
+            android:id="@+id/layoutElemento2"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/imagenElemento2"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:srcCompat="@drawable/color_azul"/>
+            <TextView
+                android:id="@+id/textoElemento2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elemento2"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/layoutElemento3"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/imagenElemento3"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:srcCompat="@drawable/color_azul"/>
+            <TextView
+                android:id="@+id/textoElemento3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elemento3"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
+    </TableRow>
+
+</TableLayout>
