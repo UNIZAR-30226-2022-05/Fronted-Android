@@ -376,6 +376,18 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if(jugadorID == jugadorActualID && isEnabled){
             imageView.setOnClickListener(view -> {
                 if(esTurnoDelJugadorActual()){
+                    if(sala.getConfiguracion().getReglas().isEvitarEspecialFinal()){
+                        List<Carta> cartas = sala.getPartida().getJugadorActual().getMano();
+                        if(cartas.size() == 2){
+                            int indiceCartaActual = cartas.indexOf(carta);
+                            int indiceOtraCarta = 1 - indiceCartaActual;
+                            Carta otraCarta = cartas.get(indiceOtraCarta);
+                            if(otraCarta.getColor() == Carta.Color.comodin){
+                                mostrarMensaje("Has sido penalizado por última carta comodín");
+                            }
+                        }
+                    }
+
                     if(carta.getColor() == Carta.Color.comodin){
                         SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
                                 this,carta, defaultMode,
