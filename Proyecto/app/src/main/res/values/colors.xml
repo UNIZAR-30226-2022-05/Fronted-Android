@@ -10,4 +10,6 @@
 
     <color name="azul">#FF007EC2</color>
     <color name="azul_oscuro">#FF004A71</color>
+
+    <color name="color_barra_progreso">#FFC3C3C3</color>
 </resources>

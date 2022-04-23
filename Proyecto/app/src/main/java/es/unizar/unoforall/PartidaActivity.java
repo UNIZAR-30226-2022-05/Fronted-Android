@@ -171,7 +171,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     private void actualizarPantallaPartida(Sala sala){
         if(!sala.isEnPartida()){
-            Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_LONG).show();
+            Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_INDEFINITE).show();
             return;
         }
 
@@ -190,7 +190,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
 
         int turnoActual = partida.getTurno();
-        boolean esNuevoTurno = turnoActual != turnoAnterior;
+        int numJugadores = partida.getJugadores().size();
+        boolean esNuevoTurno = turnoActual != turnoAnterior || numJugadores == 2;
 
         if(esNuevoTurno){
             turnoAnterior = turnoActual;
@@ -207,8 +208,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 sePuedePulsarBotonUNO = false;
             });
         }
-
-        int numJugadores = partida.getJugadores().size();
         
         // posicionesJugadores[i] es el ID del jugador al que le corresponde el hueco i
         //   en los layouts. Será -1 si ese hueco no debe ser rellenado
@@ -424,8 +423,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private void setPorcentaje(int jugadorLayoutID, int porcentaje){
         for(int i=0; i<porcentajeJugadores.length; i++){
             if(i == jugadorLayoutID){
+                porcentajeJugadores[i].setIndicatorColor(getColor(R.color.color_barra_progreso));
                 porcentajeJugadores[i].setProgress(porcentaje, true);
             }else{
+                porcentajeJugadores[i].setIndicatorColor(Color.BLACK);
                 porcentajeJugadores[i].setProgress(0, false);
             }
         }
