@@ -248,6 +248,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 }
                 setNumCartas(i, jugador.getMano().size());
                 if(jugadorActualID == jugadorID){
+                    if(jugador.isPenalizado_UNO()){
+                        mostrarMensaje("Has sido penalizado por no decir UNO");
+                    }
+
                     jugador.getMano().sort((carta1, carta2) -> {
                         boolean sePuedeUsarCarta1 = sePuedeUsarCarta(partida, carta1);
                         boolean sePuedeUsarCarta2 = sePuedeUsarCarta(partida, carta2);
