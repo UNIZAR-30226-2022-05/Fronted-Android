@@ -35,7 +35,7 @@
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:backgroundTint="#B61D1D"
-            android:src="@drawable/ic_solicitud_rechazar"
+            android:src="@drawable/ic_rechazar"
             app:rippleColor="#1A2351" />
 
         <ImageButton
@@ -43,7 +43,7 @@
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:backgroundTint="#2EC322"
-            android:src="@drawable/ic_solicitud_aceptar"
+            android:src="@drawable/ic_aceptar"
             app:rippleColor="#1A2351" />
     </LinearLayout>
 </LinearLayout>

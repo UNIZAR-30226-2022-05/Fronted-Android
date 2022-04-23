@@ -444,6 +444,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView2">
 
+            <ImageButton
+                android:id="@+id/cancelarJugadaButton"
+                android:visibility="invisible"
+                android:layout_width="50dp"
+                android:layout_height="40dp"
+                android:backgroundTint="#B61D1D"
+                android:src="@drawable/ic_rechazar"
+                app:rippleColor="#1A2351"
+                android:layout_marginEnd="10dp"/>
+
             <FrameLayout
                 android:layout_width="35dp"
                 android:layout_height="35dp">
@@ -490,6 +500,16 @@
                     android:textColor="@color/white"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/confirmarJugadaButton"
+                android:visibility="invisible"
+                android:layout_width="50dp"
+                android:layout_height="40dp"
+                android:backgroundTint="#2EC322"
+                android:src="@drawable/ic_aceptar"
+                app:rippleColor="#1A2351"
+                android:layout_marginStart="10dp"/>
         </LinearLayout>
 
         <ImageView
