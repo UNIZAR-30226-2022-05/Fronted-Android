@@ -442,7 +442,7 @@ public class Partida {
 		}
 		
 		//repite turno por ser dos jugadores
-		boolean reversaRepiteTurno = repeticionTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
+		boolean reversaRepiteTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
 		if (reversaRepiteTurno) {
 			repeticionTurno = true;
 		}
@@ -458,8 +458,6 @@ public class Partida {
 			}
 		}
 		
-		
-		//eventos asíncronos: emojis, botón de UNO, tiempo, votación pausa
 	}
 	
 	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
@@ -893,5 +891,7 @@ public class Partida {
 		this.repeticionTurno = repeticionTurno;
 	}
 
-	
+	public int getRoboAcumulado() {
+		return roboAcumulado;
+	}
 }
