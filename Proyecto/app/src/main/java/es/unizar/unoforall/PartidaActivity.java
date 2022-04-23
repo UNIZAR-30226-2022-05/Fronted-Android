@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +33,7 @@ import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.SalaReceiver;
 import es.unizar.unoforall.utils.dialogs.CartaRobadaDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.PartidaDialogManager;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SelectFourDialogBuilder;
 import es.unizar.unoforall.utils.tasks.CancellableRunnable;
@@ -66,6 +69,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private int jugadorActualID = -1;
 
     private boolean defaultMode;
+
+    private boolean sePuedePulsarBotonUNO;
+    private int turnoAnterior = -1;
 
     public static String getIAName(int jugadorID){
         return "IA_" + jugadorID;
@@ -164,6 +170,13 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void actualizarPantallaPartida(Sala sala){
+        if(!sala.isEnPartida()){
+            Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_INDEFINITE).show();
+            return;
+        }
+
+        PartidaDialogManager.dismissCurrentDialog();
+
         Partida partida = sala.getPartida();
         if(jugadorActualID == -1){
             jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
@@ -176,23 +189,25 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             ImageManager.setImagenFondo(mainView, usuarioActual.getAspectoTablero());
         }
 
-        botonUNO.setOnClickListener(view -> {
-            boolean sePuedePulsar = false;
-            for(Jugador jugador : partida.getJugadores()){
-                if(jugador.getMano().size() <= 2 && !jugador.isProtegido_UNO()){
-                    sePuedePulsar = true;
-                    break;
-                }
-            }
-            if(sePuedePulsar){
-                new BackendAPI(this).pulsarBotonUNO();
-                mostrarMensaje("Has pulsado el botón UNO");
-            }else {
-                mostrarMensaje("El botón UNO no tuvo efecto alguno");
-            }
-        });
-
+        int turnoActual = partida.getTurno();
         int numJugadores = partida.getJugadores().size();
+        boolean esNuevoTurno = turnoActual != turnoAnterior || numJugadores == 2;
+
+        if(esNuevoTurno){
+            turnoAnterior = turnoActual;
+            sePuedePulsarBotonUNO = true;
+            ImageManager.setImageViewEnable(botonUNO, true);
+            botonUNO.setOnClickListener(view -> {
+                if(sePuedePulsarBotonUNO){
+                    new BackendAPI(this).pulsarBotonUNO();
+                    mostrarMensaje("Has pulsado el botón UNO");
+                    ImageManager.setImageViewEnable(botonUNO, false);
+                }else {
+                    mostrarMensaje("Sólo puedes pulsar el botón de UNO una vez por turno");
+                }
+                sePuedePulsarBotonUNO = false;
+            });
+        }
         
         // posicionesJugadores[i] es el ID del jugador al que le corresponde el hueco i
         //   en los layouts. Será -1 si ese hueco no debe ser rellenado
@@ -214,9 +229,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 mostrarLayoutJugador(i, false);
             }else{
                 Jugador jugador = partida.getJugadores().get(jugadorID);
-                int turnoActual = partida.getTurno();
 
-                if(turnoActual == jugadorID){
+                if(turnoActual == jugadorID && esNuevoTurno){
                     mostrarTimerVisual(i);
                 }
 
@@ -388,7 +402,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         final int incremento = 100; // Incrementar el porcentaje cada 100 ms
         timerRunnable = new CancellableRunnable() {
             int i = 0;
-            final int total = Partida.TIMEOUT_TURNO;
+            final int total = Partida.TIMEOUT_TURNO-10*incremento;
             @Override
             public void run() {
                 if(isCancelled()){
@@ -409,8 +423,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private void setPorcentaje(int jugadorLayoutID, int porcentaje){
         for(int i=0; i<porcentajeJugadores.length; i++){
             if(i == jugadorLayoutID){
+                porcentajeJugadores[i].setIndicatorColor(getColor(R.color.color_barra_progreso));
                 porcentajeJugadores[i].setProgress(porcentaje, true);
             }else{
+                porcentajeJugadores[i].setIndicatorColor(Color.BLACK);
                 porcentajeJugadores[i].setProgress(0, false);
             }
         }
