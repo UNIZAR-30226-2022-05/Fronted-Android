@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -168,6 +170,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void actualizarPantallaPartida(Sala sala){
+        if(!sala.isEnPartida()){
+            Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_LONG).show();
+            return;
+        }
+
         PartidaDialogManager.dismissCurrentDialog();
 
         Partida partida = sala.getPartida();
