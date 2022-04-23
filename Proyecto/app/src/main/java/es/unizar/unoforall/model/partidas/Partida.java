@@ -34,6 +34,7 @@ public class Partida {
 	private int roboAcumulado = 0;
 	private boolean modoJugarCartaRobada = false;
 	private Carta cartaRobada = null;
+	private boolean repeticionTurno = false;
 	
 	private static final Object LOCK = new Object();
 	private static final int MAX_ROBO_ATTACK = 10;
@@ -364,6 +365,7 @@ public class Partida {
 		}
 		if (esSalto) {
 			avanzarTurno();
+			repeticionTurno = true;
 		}
 	}
 	
@@ -399,6 +401,7 @@ public class Partida {
 	/**************************************************************************/
 	
 	public void ejecutarJugada(Jugada jugada) {
+		repeticionTurno = false;
 		if(modoJugarCartaRobada) { //FUNCIONA
 			if(jugada.getCartas()!=null && jugada.getCartas().size()==1) {
 				juegaCarta(jugada.getCartas().get(0), jugada);
@@ -438,8 +441,13 @@ public class Partida {
 			
 		}
 		
-		if(!modoJugarCartaRobada && !modoAcumulandoRobo &&
-				!(getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa))) {
+		//repite turno por ser dos jugadores
+		boolean reversaRepiteTurno = repeticionTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
+		if (reversaRepiteTurno) {
+			repeticionTurno = true;
+		}
+		
+		if(!modoJugarCartaRobada && !reversaRepiteTurno) {
 			avanzarTurno();
 		}
 		
@@ -456,6 +464,7 @@ public class Partida {
 	
 	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
 		if (validarJugada(jugada) && 
+				this.jugadores.get(turno).getJugadorID() != null &&
 				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
 			ejecutarJugada(jugada);
 		}
@@ -570,7 +579,11 @@ public class Partida {
 	//Cuando un jugador se pasa del tiempo de turno
 	public void saltarTurno() {
 		ejecutarJugada(new Jugada());
-		modoJugarCartaRobada = false;
+		if (modoJugarCartaRobada) {
+			modoJugarCartaRobada = false;
+			avanzarTurno();
+		}
+		
 	}
 	
 	
@@ -581,7 +594,7 @@ public class Partida {
 	public void expulsarJugador(UUID jugadorID) {
 		//se sustituye por IA
 		for (Jugador j : jugadores) {
-			if(j.getJugadorID().equals(jugadorID)) {
+			if(!j.isEsIA() && j.getJugadorID().equals(jugadorID)) {
 				j.setEsIA(true);
 				j.setJugadorID(null);
 				break;
@@ -592,7 +605,8 @@ public class Partida {
 	
 	public void pulsarBotonUNO(UUID jugadorID) { 
 		for (int indice = 0; indice < jugadores.size(); indice++) {
-			if (jugadores.get(indice).getJugadorID().equals(jugadorID)) {
+			if (jugadores.get(indice).getJugadorID() != null && 
+					jugadores.get(indice).getJugadorID().equals(jugadorID)) {
 				pulsarBotonUNOInterno(indice);
 				break;
 			}
@@ -870,5 +884,14 @@ public class Partida {
 		this.salaID = salaID;
 	}
 	
+	
+	public boolean isRepeticionTurno() {
+		return repeticionTurno;
+	}
+
+	public void setRepeticionTurno(boolean repeticionTurno) {
+		this.repeticionTurno = repeticionTurno;
+	}
+
 	
 }
