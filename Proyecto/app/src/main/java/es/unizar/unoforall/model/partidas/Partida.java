@@ -197,10 +197,10 @@ public class Partida {
 	}
 	
 	private boolean compatibleAcumulador(Carta c) {
-		if ((configuracion.getReglas().isEncadenarRoboCartas() 
+		if ( (configuracion.getReglas().isEncadenarRoboCartas() 
 				&& (c.esDelTipo(Carta.Tipo.mas4) || c.esDelTipo(Carta.Tipo.mas2))) 
 			|| 
-			(configuracion.getReglas().isRedirigirRoboCartas() && c.esDelTipo(Carta.Tipo.reversa)) ) {
+			 (configuracion.getReglas().isRedirigirRoboCartas() && c.esDelTipo(Carta.Tipo.reversa)) ) {
 			return true;
 		} else {
 			return false;
@@ -339,7 +339,13 @@ public class Partida {
 		
 		this.cartasJugadas.add(c); //La añade al final (por implementaciones de rellenar y robar del mazo);
 		if (c.esDelTipo(Carta.Tipo.cambioColor) || c.esDelTipo(Carta.Tipo.mas4)) {
-			this.jugadores.get(turno).getMano().removeIf((carta) -> carta.esDelTipo(c.getTipo()));
+			for(int i = 0; i < this.jugadores.get(turno).getMano().size(); i++) {
+				if (this.jugadores.get(turno).getMano().get(i).esDelTipo(c.getTipo())) {
+					this.jugadores.get(turno).getMano().remove(i);
+					break;
+				}
+			}
+			
 		} else {
 			this.jugadores.get(turno).getMano().remove(c);
 		}
@@ -442,7 +448,10 @@ public class Partida {
 		}
 		
 		//repite turno por ser dos jugadores
-		boolean reversaRepiteTurno = getJugadores().size() == 2 && !jugada.isRobar() && jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
+		boolean reversaRepiteTurno = getJugadores().size() == 2 
+									&& !jugada.isRobar() 
+									&& !modoAcumulandoRobo
+									&& jugada.getCartas().get(0).esDelTipo(Carta.Tipo.reversa);
 		if (reversaRepiteTurno) {
 			repeticionTurno = true;
 		}
@@ -453,6 +462,7 @@ public class Partida {
 		
 		// Se comprueba si se ha acabado la partida
 		for (Jugador j : this.jugadores) {
+			j.setPenalizado_UNO(false);
 			if (j.getMano().size() == 0) {
 				this.terminada = true;
 			}
@@ -497,9 +507,9 @@ public class Partida {
 				if (modoAcumulandoRobo) {
 					for (Carta c : this.jugadores.get(turno).getMano()) {
 						if(compatibleAcumulador(c) && 
-								(Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
+								((Carta.compartenTipo(c, cartaCentral)) 	//Si la carta es usable según las reglas
 										|| Carta.compartenColor(getUltimaCartaJugada(),c)  
-										|| c.esDelTipo(Carta.Tipo.mas4)) {
+										|| c.esDelTipo(Carta.Tipo.mas4))) {
 							
 							List<Carta> listaCartas = new ArrayList<>();
 							listaCartas.add(c);
@@ -537,7 +547,6 @@ public class Partida {
 				
 				if (!validarJugada(jugadaIA)) {
 					System.err.println("ERROR: la IA ha elegido una jugada no válida");
-					return;
 				}
 				
 				if (!jugadaIA.isRobar() && 
@@ -545,7 +554,8 @@ public class Partida {
 					pulsarBotonUNOInterno(turno);		// Se protege
 				}
 				
-				if (jugadaIA.getCartas().get(0).esDelTipo(Carta.Tipo.intercambio)) {
+				if (!jugadaIA.isRobar() && 
+						jugadaIA.getCartas().get(0).esDelTipo(Carta.Tipo.intercambio)) {
 					int mejorJugador = 0;
 					int menorNumCartas = 300;
 						
@@ -626,6 +636,7 @@ public class Partida {
 				if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
 					j2.getMano().add(robarCarta());
 					j2.getMano().add(robarCarta());
+					j2.setPenalizado_UNO(true);
 				}	
 			}
 		}
@@ -868,6 +879,8 @@ public class Partida {
 		partidaResumida.roboAcumulado = roboAcumulado;
 		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
 		partidaResumida.cartaRobada = cartaRobada;
+		
+		partidaResumida.repeticionTurno = repeticionTurno;
 		
 		partidaResumida.salaID = null;
 		
