@@ -363,6 +363,26 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         return partida.validarJugada(jugada);
     }
 
+    private boolean comprobarEspecialFinal(Sala sala, Carta carta){
+        if(esTurnoDelJugadorActual()){
+            if(sala.getConfiguracion().getReglas().isEvitarEspecialFinal()){
+                List<Carta> cartas = sala.getPartida().getJugadorActual().getMano();
+                if(cartas.size() == 2){
+                    int indiceCartaActual = cartas.indexOf(carta);
+                    if(indiceCartaActual != -1){
+                        int indiceOtraCarta = 1 - indiceCartaActual;
+                        Carta otraCarta = cartas.get(indiceOtraCarta);
+                        if(otraCarta.getColor() == Carta.Color.comodin){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void addCarta(Sala sala, int jugadorLayoutID, int jugadorID, Carta carta){
         boolean isEnabled = jugadorID == jugadorActualID && esTurnoDelJugadorActual() && sePuedeUsarCarta(sala.getPartida(), carta);
         boolean isVisible = jugadorID == jugadorActualID || carta.isVisiblePor(jugadorActualID);
@@ -376,24 +396,17 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if(jugadorID == jugadorActualID && isEnabled){
             imageView.setOnClickListener(view -> {
                 if(esTurnoDelJugadorActual()){
-                    if(sala.getConfiguracion().getReglas().isEvitarEspecialFinal()){
-                        List<Carta> cartas = sala.getPartida().getJugadorActual().getMano();
-                        if(cartas.size() == 2){
-                            int indiceCartaActual = cartas.indexOf(carta);
-                            int indiceOtraCarta = 1 - indiceCartaActual;
-                            Carta otraCarta = cartas.get(indiceOtraCarta);
-                            if(otraCarta.getColor() == Carta.Color.comodin){
-                                mostrarMensaje("Has sido penalizado por última carta comodín");
-                            }
-                        }
-                    }
-
+                    boolean esEspecialFinal = comprobarEspecialFinal(sala, carta);
                     if(carta.getColor() == Carta.Color.comodin){
                         SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
                                 this,carta, defaultMode,
                                 jugada -> {
                                     new BackendAPI(this).enviarJugada(jugada);
-                                    mostrarMensaje("Has jugado una carta comodín");
+                                    if(esEspecialFinal){
+                                        mostrarMensaje("Has sido penalizado por última carta comodín");
+                                    }else{
+                                        mostrarMensaje("Has jugado una carta comodín");
+                                    }
                                 });
                         builder.show();
                     }else if(carta.getTipo() == Carta.Tipo.intercambio){
@@ -401,13 +414,21 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                                 this, carta, sala,
                                 jugada -> {
                                     new BackendAPI(this).enviarJugada(jugada);
-                                    mostrarMensaje("Has jugado una carta de intercambio");
+                                    if(esEspecialFinal){
+                                        mostrarMensaje("Has sido penalizado por última carta comodín");
+                                    }else{
+                                        mostrarMensaje("Has jugado una carta de intercambio");
+                                    }
                                 });
                         builder.show();
                     }else{
                         Jugada jugada = new Jugada(Arrays.asList(carta));
                         new BackendAPI(this).enviarJugada(jugada);
-                        mostrarMensaje("Has jugado una carta");
+                        if(esEspecialFinal){
+                            mostrarMensaje("Has sido penalizado por última carta comodín");
+                        }else{
+                            mostrarMensaje("Has jugado una carta");
+                        }
                     }
                 }else{
                     mostrarMensaje("Espera tu turno");
