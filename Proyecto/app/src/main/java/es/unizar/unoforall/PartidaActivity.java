@@ -153,10 +153,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             }
         });
 
-        // Si defaultMode = true, se mostrará el aspecto por defecto de las cartas.
-        //     Si no, se mostrará el aspecto alternativo.
-        defaultMode = true;
-
         // Borrar las cartas que están por defecto
         resetCartas();
         manageSala(BackendAPI.getSalaActual());
@@ -171,6 +167,13 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         Partida partida = sala.getPartida();
         if(jugadorActualID == -1){
             jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
+            UsuarioVO usuarioActual = sala.getParticipante(BackendAPI.getUsuarioID());
+
+            // Si defaultMode = true, se mostrará el aspecto por defecto de las cartas.
+            //     Si no, se mostrará el aspecto alternativo.
+            defaultMode = usuarioActual.getAspectoCartas() == 0;
+            View mainView = findViewById(R.id.layoutPantallaPartida);
+            ImageManager.setImagenFondo(mainView, usuarioActual.getAspectoTablero());
         }
 
         botonUNO.setOnClickListener(view -> {
