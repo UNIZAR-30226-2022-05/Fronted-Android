@@ -73,6 +73,6 @@ public class CartaRobadaDialogBuilder {
                     new BackendAPI(activity).enviarJugada(new Jugada()));
         builder.setOnCancelListener(dialog -> show());
 
-        builder.show();
+        PartidaDialogManager.setCurrentDialog(builder.show());
     }
 }

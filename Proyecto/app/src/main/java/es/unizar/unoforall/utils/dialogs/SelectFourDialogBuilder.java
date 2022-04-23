@@ -40,7 +40,7 @@ public class SelectFourDialogBuilder {
     private final TextView[] textoElementos;
 
     private Runnable negativeRunnable = () -> {};
-    private Dialog dialog;
+    private AlertDialog dialog;
 
     private SelectFourDialogBuilder(CustomActivity activity){
         this.activity = activity;
@@ -169,6 +169,7 @@ public class SelectFourDialogBuilder {
         builder.setOnCancelListener(dialog -> show());
 
         dialog = builder.create();
+        PartidaDialogManager.setCurrentDialog(dialog);
         dialog.show();
     }
 }

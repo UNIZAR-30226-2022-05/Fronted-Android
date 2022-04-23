@@ -31,6 +31,7 @@ import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.SalaReceiver;
 import es.unizar.unoforall.utils.dialogs.CartaRobadaDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.PartidaDialogManager;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SelectFourDialogBuilder;
 import es.unizar.unoforall.utils.tasks.CancellableRunnable;
@@ -66,6 +67,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private int jugadorActualID = -1;
 
     private boolean defaultMode;
+
+    private boolean sePuedePulsarBotonUNO;
+    private int turnoAnterior = -1;
 
     public static String getIAName(int jugadorID){
         return "IA_" + jugadorID;
@@ -164,6 +168,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void actualizarPantallaPartida(Sala sala){
+        PartidaDialogManager.dismissCurrentDialog();
+
         Partida partida = sala.getPartida();
         if(jugadorActualID == -1){
             jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
@@ -176,21 +182,24 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             ImageManager.setImagenFondo(mainView, usuarioActual.getAspectoTablero());
         }
 
-        botonUNO.setOnClickListener(view -> {
-            boolean sePuedePulsar = false;
-            for(Jugador jugador : partida.getJugadores()){
-                if(jugador.getMano().size() <= 2 && !jugador.isProtegido_UNO()){
-                    sePuedePulsar = true;
-                    break;
+        int turnoActual = partida.getTurno();
+        boolean esNuevoTurno = turnoActual != turnoAnterior;
+
+        if(esNuevoTurno){
+            turnoAnterior = turnoActual;
+            sePuedePulsarBotonUNO = true;
+            ImageManager.setImageViewEnable(botonUNO, true);
+            botonUNO.setOnClickListener(view -> {
+                if(sePuedePulsarBotonUNO){
+                    new BackendAPI(this).pulsarBotonUNO();
+                    mostrarMensaje("Has pulsado el botón UNO");
+                    ImageManager.setImageViewEnable(botonUNO, false);
+                }else {
+                    mostrarMensaje("Sólo puedes pulsar el botón de UNO una vez por turno");
                 }
-            }
-            if(sePuedePulsar){
-                new BackendAPI(this).pulsarBotonUNO();
-                mostrarMensaje("Has pulsado el botón UNO");
-            }else {
-                mostrarMensaje("El botón UNO no tuvo efecto alguno");
-            }
-        });
+                sePuedePulsarBotonUNO = false;
+            });
+        }
 
         int numJugadores = partida.getJugadores().size();
         
@@ -214,9 +223,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 mostrarLayoutJugador(i, false);
             }else{
                 Jugador jugador = partida.getJugadores().get(jugadorID);
-                int turnoActual = partida.getTurno();
 
-                if(turnoActual == jugadorID){
+                if(turnoActual == jugadorID && esNuevoTurno){
                     mostrarTimerVisual(i);
                 }
 
@@ -388,7 +396,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         final int incremento = 100; // Incrementar el porcentaje cada 100 ms
         timerRunnable = new CancellableRunnable() {
             int i = 0;
-            final int total = Partida.TIMEOUT_TURNO;
+            final int total = Partida.TIMEOUT_TURNO-10*incremento;
             @Override
             public void run() {
                 if(isCancelled()){

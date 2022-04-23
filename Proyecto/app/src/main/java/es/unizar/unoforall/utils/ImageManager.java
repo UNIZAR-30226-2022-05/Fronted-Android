@@ -171,12 +171,7 @@ public class ImageManager{
                 imageView.setImageResource(altCardsMap.get(carta));
             }
 
-            if(isEnabled){
-                imageView.setColorFilter(ENABLED_CARD_COLOR);
-            }else{
-                imageView.setColorFilter(DISABLED_CARD_COLOR);
-            }
-
+            setImageViewEnable(imageView, isEnabled);
             setImageViewClickable(imageView, isClickable);
         }else{
             imageView.setImageResource(getResourceRevesCarta(defaultMode));
@@ -186,11 +181,7 @@ public class ImageManager{
     public static void setImagenMazoCartas(ImageView imageView, boolean defaultMode, boolean isEnabled){
         imageView.setImageResource(getResourceMazoCartas(defaultMode));
         setImageViewClickable(imageView, isEnabled);
-        if(isEnabled){
-            imageView.setColorFilter(ENABLED_CARD_COLOR);
-        }else{
-            imageView.setColorFilter(DISABLED_CARD_COLOR);
-        }
+        setImageViewEnable(imageView, isEnabled);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -220,6 +211,14 @@ public class ImageManager{
             });
         }else{
             imageView.setOnTouchListener(null);
+        }
+    }
+
+    public static void setImageViewEnable(ImageView imageView, boolean isEnabled){
+        if(isEnabled){
+            imageView.setColorFilter(ENABLED_CARD_COLOR);
+        }else{
+            imageView.setColorFilter(DISABLED_CARD_COLOR);
         }
     }
 
