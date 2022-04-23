@@ -21,6 +21,7 @@ public class PrincipalActivity extends CustomActivity {
     private static final int VER_ESTADISTICAS_ID = 3;
     private static final int VER_HISTORIAL_ID = 4;
     private static final int BORRAR_CUENTA_ID = 5;
+    private static final int CERRAR_SESION_ID = 6;
 
     private static boolean sesionIniciada = false;
 
@@ -71,6 +72,7 @@ public class PrincipalActivity extends CustomActivity {
         menu.add(Menu.NONE, VER_ESTADISTICAS_ID, Menu.NONE, R.string.verEstadisticas);
         menu.add(Menu.NONE, VER_HISTORIAL_ID, Menu.NONE, R.string.verHistorial);
         menu.add(Menu.NONE, BORRAR_CUENTA_ID, Menu.NONE, R.string.borrarCuenta);
+        menu.add(Menu.NONE, CERRAR_SESION_ID, Menu.NONE, R.string.cerrarSesion);
         return result;
     }
 
@@ -91,6 +93,9 @@ public class PrincipalActivity extends CustomActivity {
                 Intent intent = new Intent(this, AmigosActivity.class);
                 startActivityForResult(intent, 0);
                 break;
+            case CERRAR_SESION_ID:
+                cerrarSesion();
+                break;
             default:
                 mostrarMensaje("No implementado todavía");
         }
@@ -99,6 +104,10 @@ public class PrincipalActivity extends CustomActivity {
 
     @Override
     public void onBackPressed(){
+        cerrarSesion();
+    }
+
+    private void cerrarSesion(){
         if(!sesionIniciada){
             return;
         }
