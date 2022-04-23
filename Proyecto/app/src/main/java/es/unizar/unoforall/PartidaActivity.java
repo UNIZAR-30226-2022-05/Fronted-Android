@@ -68,6 +68,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private ImageView mazoRobar;
     private ImageView botonUNO;
 
+    private View fondoJugadorActual;
+
     private int jugadorActualID = -1;
 
     private boolean defaultMode;
@@ -163,6 +165,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 mostrarMensaje("Espera tu turno");
             }
         });
+
+        fondoJugadorActual = findViewById(R.id.fondoJugadorActual);
+        fondoJugadorActual.setVisibility(View.INVISIBLE);
 
         // Borrar las cartas que están por defecto
         resetCartas();
@@ -288,6 +293,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         setMazoRobar(esTurnoDelJugadorActual());
 
         if(esTurnoDelJugadorActual()){
+            fondoJugadorActual.setVisibility(View.VISIBLE);
+
             if(partida.isModoJugarCartaRobada()){
                 CartaRobadaDialogBuilder builder =
                         new CartaRobadaDialogBuilder(this, partida.getCartaRobada(), defaultMode, sala);
@@ -307,6 +314,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     mostrarMensaje("Has robado " + partida.getRoboAcumulado() + " cartas");
                 }
             }
+        }else{
+            fondoJugadorActual.setVisibility(View.INVISIBLE);
         }
 
         if(!sala.isEnPartida()){
