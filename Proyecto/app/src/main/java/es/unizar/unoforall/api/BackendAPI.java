@@ -25,6 +25,7 @@ import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ModifyAccountDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.ModifyAspectDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.PeticionAmistadDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
@@ -534,6 +535,33 @@ public class BackendAPI{
 
     public void pulsarBotonUNO(){
         wsAPI.sendObject("/app/partidas/botonUNO/" + salaActualID, VACIO);
+    }
+
+    //PERSONALIZACION DE ASPECTO (avatar, cartas y fondo de pantalla)
+
+    public void cambiarPersonalizacionStepOne(){
+        RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
+        api.addParameter("sesionID", sesionID);
+        api.openConnection();
+        api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
+            ModifyAspectDialogBuilder builder = new ModifyAspectDialogBuilder(activity, usuarioVO);
+        });
+    }
+
+    public void cambiarPersonalizacionStepTwo(Integer avatar, Integer aspectoCartas, Integer aspectoFondo){
+        RestAPI api = new RestAPI(activity, "/api/cambiarAvatar");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("avatar", avatar);
+        api.addParameter("aspectoCartas", aspectoCartas);
+        api.addParameter("aspectoFondo", aspectoFondo);
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error.equals("nulo")){
+                activity.mostrarMensaje("Los cambios se han realizado correctamente");
+            } else {
+                activity.mostrarMensaje(error);
+            }
+        });
     }
 
     public static synchronized void closeWebSocketAPI(){
