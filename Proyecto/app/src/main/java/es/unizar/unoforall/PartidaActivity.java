@@ -19,6 +19,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import es.unizar.unoforall.api.BackendAPI;
@@ -170,11 +172,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void actualizarPantallaPartida(Sala sala){
-        if(!sala.isEnPartida()){
-            Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_INDEFINITE).show();
-            return;
-        }
-
         PartidaDialogManager.dismissCurrentDialog();
 
         Partida partida = sala.getPartida();
@@ -191,7 +188,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
         int turnoActual = partida.getTurno();
         int numJugadores = partida.getJugadores().size();
-        boolean esNuevoTurno = turnoActual != turnoAnterior || numJugadores == 2;
+        boolean esNuevoTurno = turnoActual != turnoAnterior || partida.isRepeticionTurno();
 
         if(esNuevoTurno){
             turnoAnterior = turnoActual;
@@ -230,7 +227,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             }else{
                 Jugador jugador = partida.getJugadores().get(jugadorID);
 
-                if(turnoActual == jugadorID && esNuevoTurno){
+                if(sala.isEnPartida() && turnoActual == jugadorID && esNuevoTurno){
                     mostrarTimerVisual(i);
                 }
 
@@ -279,10 +276,31 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         setCartaDelMedio(partida.getUltimaCartaJugada());
         setMazoRobar(esTurnoDelJugadorActual());
 
-        if(esTurnoDelJugadorActual() && partida.isModoJugarCartaRobada()){
-            CartaRobadaDialogBuilder builder =
-                    new CartaRobadaDialogBuilder(this, partida.getCartaRobada(), defaultMode, sala);
-            builder.show();
+        if(esTurnoDelJugadorActual()){
+            if(partida.isModoJugarCartaRobada()){
+                CartaRobadaDialogBuilder builder =
+                        new CartaRobadaDialogBuilder(this, partida.getCartaRobada(), defaultMode, sala);
+                builder.show();
+            }else if(partida.isModoAcumulandoRobo()){
+                boolean algunaCartaCompatible = false;
+                for(Carta carta : partida.getJugadorActual().getMano()){
+                    algunaCartaCompatible = partida.validarJugada(new Jugada(Collections.singletonList(carta)));
+                    if(algunaCartaCompatible){
+                        break;
+                    }
+                }
+
+                if(!algunaCartaCompatible){
+                    // Robar las cartas
+                    new BackendAPI(this).enviarJugada(new Jugada());
+                    mostrarMensaje("Has robado " + partida.getRoboAcumulado() + " cartas");
+                }
+            }
+        }
+
+        if(!sala.isEnPartida()){
+            Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_INDEFINITE).show();
+            // Mostrar dialog con los resultados
         }
     }
 
@@ -333,10 +351,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private boolean sePuedeUsarCarta(Partida partida, Carta carta){
-        Carta cartaCentral = partida.getUltimaCartaJugada();
-        return carta.getColor() == Carta.Color.comodin
-                || cartaCentral.getTipo() == carta.getTipo()
-                || cartaCentral.getColor() == carta.getColor();
+        Jugada jugada = new Jugada(Collections.singletonList(carta));
+        return partida.validarJugada(jugada);
     }
 
     private void addCarta(Sala sala, int jugadorLayoutID, int jugadorID, Carta carta){
