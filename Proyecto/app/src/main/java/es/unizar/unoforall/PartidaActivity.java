@@ -468,27 +468,4 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
         return super.onContextItemSelected(item);
     }
-
-    private void test(){
-        // Para inicializar el HashMap es necesario usar al menos una carta
-        jugadorActualID = JUGADOR_ABAJO;
-        ImageManager.setImagenCarta(new ImageView(this), new Carta(Carta.Tipo.n0, Carta.Color.verde), true, false, true, false);
-        Task.runDelayedTask(new CancellableRunnable() {
-            private final ArrayList<Carta> defaultCards = new ArrayList<>(ImageManager.getDefaultCardsMap().keySet());
-            @Override
-            public void run() {
-                runOnUiThread(() -> {
-                    resetCartas();
-                    for(int i=0;i<5;i++){
-                        Carta cartaOriginal = defaultCards.get(new Random().nextInt(defaultCards.size()));
-                        for(int j=0;j<4;j++){
-                            Carta carta = cartaOriginal.clone();
-                            carta.marcarVisible(j);
-                            addCarta(BackendAPI.getSalaActual(), j, j, carta);
-                        }
-                    }
-                });
-            }
-        }, 0);
-    }
 }

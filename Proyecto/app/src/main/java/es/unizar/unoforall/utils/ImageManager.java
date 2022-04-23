@@ -109,14 +109,6 @@ public class ImageManager{
         }
     }
 
-
-    public static HashMap<Carta, Integer> getDefaultCardsMap(){
-        return defaultCardsMap;
-    }
-    public static HashMap<Carta, Integer> getAltCardsMap(){
-        return altCardsMap;
-    }
-
     public static void setImagenCarta(ImageView imageView, Carta carta, boolean defaultMode, boolean isEnabled, boolean isVisible, boolean isClickable){
         if(defaultCardsMap.isEmpty() || altCardsMap.isEmpty()){
             for(Carta.Color color : Carta.Color.values()){
