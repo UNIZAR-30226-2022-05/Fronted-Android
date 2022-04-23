@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -80,18 +81,10 @@ public class ReglasFilterDialogBuilder {
         });
 
         switch(configSala.getMaxParticipantes()){
-            case 2:
-                radio2.setChecked(true);
-                break;
-            case 3:
-                radio3.setChecked(true);
-                break;
-            case 4:
-                radio4.setChecked(true);
-                break;
-            default:
-                radioCualquiera.setChecked(true);
-                break;
+            case 2: radio2.setChecked(true); break;
+            case 3: radio3.setChecked(true); break;
+            case 4: radio4.setChecked(true); break;
+            default: radioCualquiera.setChecked(true); break;
         }
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
@@ -99,6 +92,24 @@ public class ReglasFilterDialogBuilder {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.modoJuegoSpinner.setAdapter(adapter);
         this.modoJuegoSpinner.setSelection(configSala.getModoJuego().ordinal());
+        this.modoJuegoSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(ConfigSala.ModoJuego.values()[i] == ConfigSala.ModoJuego.Parejas){
+                    radio2.setEnabled(false);
+                    radio3.setEnabled(false);
+                    radio4.setEnabled(false);
+                    radioCualquiera.setEnabled(false);
+                }else{
+                    radio2.setEnabled(true);
+                    radio3.setEnabled(true);
+                    radio4.setEnabled(true);
+                    radioCualquiera.setEnabled(true);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
 
         ReglasEspeciales reglasEspeciales = configSala.getReglas();
         this.rayosXCheckBox.setChecked(reglasEspeciales.isCartaRayosX());
@@ -122,20 +133,24 @@ public class ReglasFilterDialogBuilder {
         this.positiveRunnable = () -> {
             ConfigSala configSala = new ConfigSala();
 
-            // Establecer el número máximo de participantes
-            if(this.radio2.isChecked()){
-                configSala.setMaxParticipantes(2);
-            }else if(this.radio3.isChecked()){
-                configSala.setMaxParticipantes(3);
-            }else if(this.radio4.isChecked()){
-                configSala.setMaxParticipantes(4);
-            }else{
-                configSala.setMaxParticipantes(-1);
-            }
-
             // Establecer el modo de juego
             int idModoJuego = this.modoJuegoSpinner.getSelectedItemPosition();
             configSala.setModoJuego(ConfigSala.ModoJuego.values()[idModoJuego]);
+
+            // Establecer el número máximo de participantes
+            if(configSala.getModoJuego() == ConfigSala.ModoJuego.Parejas){
+                configSala.setMaxParticipantes(4);
+            }else{
+                if(this.radio2.isChecked()){
+                    configSala.setMaxParticipantes(2);
+                }else if(this.radio3.isChecked()){
+                    configSala.setMaxParticipantes(3);
+                }else if(this.radio4.isChecked()){
+                    configSala.setMaxParticipantes(4);
+                }else{
+                    configSala.setMaxParticipantes(-1);
+                }
+            }
 
             // Establecer los filtros adicionales
             ReglasEspeciales reglasEspeciales = new ReglasEspeciales();
