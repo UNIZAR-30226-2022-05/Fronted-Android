@@ -86,6 +86,9 @@ public class PrincipalActivity extends CustomActivity {
             case MODIFICAR_CUENTA_ID:
                 new BackendAPI(this).modificarCuenta();
                 break;
+            case MODIFICAR_ASPECTO_ID:
+
+                break;
             case BORRAR_CUENTA_ID:
                 new BackendAPI(this).borrarCuenta();
                 break;
