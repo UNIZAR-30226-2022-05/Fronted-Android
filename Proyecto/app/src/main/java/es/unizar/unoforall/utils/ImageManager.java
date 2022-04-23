@@ -15,9 +15,20 @@ import es.unizar.unoforall.model.partidas.Carta;
 
 public class ImageManager{
 
-    public static int INVALID_RESOURCE_ID = -1;
-    public static int IA_IMAGE_ID = -1;
-    public static int DEFAULT_IMAGE_ID = -2;
+    public static final int INVALID_RESOURCE_ID = -1;
+    public static final int IA_IMAGE_ID = -1;
+    public static final int DEFAULT_IMAGE_ID = -2;
+    public static final int IMAGEN_PERFIL_0_ID = 0;
+    public static final int IMAGEN_PERFIL_1_ID = 1;
+    public static final int IMAGEN_PERFIL_2_ID = 2;
+    public static final int IMAGEN_PERFIL_3_ID = 3;
+    public static final int IMAGEN_PERFIL_4_ID = 4;
+    public static final int IMAGEN_PERFIL_5_ID = 5;
+    public static final int IMAGEN_PERFIL_6_ID = 6;
+
+    public static final int IMAGEN_FONDO_0_ID = 0;
+    public static final int IMAGEN_FONDO_1_ID = 1;
+    public static final int IMAGEN_FONDO_2_ID = 2;
 
     private static final HashMap<Carta, Integer> defaultCardsMap = new HashMap<>();
     private static final HashMap<Carta, Integer> altCardsMap = new HashMap<>();
@@ -29,41 +40,68 @@ public class ImageManager{
     @SuppressLint("UseCompatLoadingForDrawables")
     public static void setImagenPerfil(ImageView imageView, int imageID){
         if(imageID < -2 || imageID > 6){
-            throw new IllegalArgumentException("ID de imagen inválido: " + imageID + ". Debe estar entre -1 y 6");
+            throw new IllegalArgumentException("ID de imagen inválido: " + imageID + ". Debe estar entre -2 y 6");
         }
 
         int resourceID = INVALID_RESOURCE_ID;
         switch(imageID){
-            case -1:
+            case IA_IMAGE_ID:
                 resourceID = R.drawable.ic_perfil_ia;
                 break;
-            case -2:
+            case DEFAULT_IMAGE_ID:
                 resourceID = R.drawable.ic_iconoperfil;
                 break;
-            case 0:
+            case IMAGEN_PERFIL_0_ID:
                 resourceID = R.drawable.ic_perfil_0;
                 break;
-            case 1:
+            case IMAGEN_PERFIL_1_ID:
                 resourceID = R.drawable.ic_perfil_1;
                 break;
-            case 2:
+            case IMAGEN_PERFIL_2_ID:
                 resourceID = R.drawable.ic_perfil_2;
                 break;
-            case 3:
+            case IMAGEN_PERFIL_3_ID:
                 resourceID = R.drawable.ic_perfil_3;
                 break;
-            case 4:
+            case IMAGEN_PERFIL_4_ID:
                 resourceID = R.drawable.ic_perfil_4;
                 break;
-            case 5:
+            case IMAGEN_PERFIL_5_ID:
                 resourceID = R.drawable.ic_perfil_5;
                 break;
-            case 6:
+            case IMAGEN_PERFIL_6_ID:
                 resourceID = R.drawable.ic_perfil_6;
                 break;
         }
 
         imageView.setImageResource(resourceID);
+    }
+
+    // Pre: 0 <= fondoID <= 2
+    public static void setImagenFondo(View view, int fondoID){
+        if(fondoID < 0 || fondoID > 2){
+            throw new IllegalArgumentException("ID de fondo inválido: " + fondoID + ". Debe estar entre 0 y 2");
+        }
+
+        int resourceID = INVALID_RESOURCE_ID;
+        switch(fondoID){
+            case IMAGEN_FONDO_0_ID:
+                resourceID = R.drawable.fondo_0;
+                break;
+            case IMAGEN_FONDO_1_ID:
+                resourceID = R.drawable.fondo_1;
+                break;
+            case IMAGEN_FONDO_2_ID:
+                resourceID = R.drawable.fondo_2;
+                break;
+        }
+
+        if(view instanceof ImageView){
+            ImageView imageView = (ImageView) view;
+            imageView.setImageResource(resourceID);
+        }else{
+            view.setBackgroundResource(resourceID);
+        }
     }
 
     public static void setImagenColor(ImageView imageView, TextView textView, Carta.Color color, boolean defaultMode){
