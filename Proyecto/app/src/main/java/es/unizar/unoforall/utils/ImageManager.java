@@ -35,6 +35,7 @@ public class ImageManager{
 
     private static final int ENABLED_CARD_COLOR = Color.parseColor("#00000000");
     private static final int DISABLED_CARD_COLOR = Color.parseColor("#5550545c");
+    private static final int SELECTED_CARD_COLOR = Color.parseColor("#5548a84c");
 
     // Pre: -2 <= imageID <= 6
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -105,7 +106,7 @@ public class ImageManager{
     }
 
     public static void setImagenColor(ImageView imageView, TextView textView, Carta.Color color, boolean defaultMode){
-        setImageViewClickable(imageView, true);
+        setImageViewClickableA(imageView, true);
         switch(color){
             case rojo:
                 if(defaultMode){
@@ -172,7 +173,7 @@ public class ImageManager{
             }
 
             setImageViewEnable(imageView, isEnabled);
-            setImageViewClickable(imageView, isClickable);
+            setImageViewClickableA(imageView, isClickable);
         }else{
             imageView.setImageResource(getResourceRevesCarta(defaultMode));
         }
@@ -180,12 +181,12 @@ public class ImageManager{
 
     public static void setImagenMazoCartas(ImageView imageView, boolean defaultMode, boolean isEnabled){
         imageView.setImageResource(getResourceMazoCartas(defaultMode));
-        setImageViewClickable(imageView, isEnabled);
+        setImageViewClickableA(imageView, isEnabled);
         setImageViewEnable(imageView, isEnabled);
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    public static void setImageViewClickable(ImageView imageView, boolean clickable){
+    public static void setImageViewClickableA(ImageView imageView, boolean clickable){
         if(clickable){
             imageView.setOnTouchListener((v, event) -> {
 
@@ -214,9 +215,47 @@ public class ImageManager{
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    public static void setImageViewClickableB(ImageView imageView, boolean clickable){
+        if(clickable){
+            imageView.setOnTouchListener((v, event) -> {
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        ImageView view = (ImageView) v;
+                        //overlay is black with transparency of 0x77 (119)
+                        view.getDrawable().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                        view.invalidate();
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL: {
+                        ImageView view = (ImageView) v;
+                        //clear the overlay
+                        view.getDrawable().setColorFilter(SELECTED_CARD_COLOR, PorterDuff.Mode.SRC_ATOP);
+                        view.invalidate();
+                        break;
+                    }
+                }
+
+                return false;
+            });
+        }else{
+            imageView.setOnTouchListener(null);
+        }
+    }
+
     public static void setImageViewEnable(ImageView imageView, boolean isEnabled){
         if(isEnabled){
             imageView.setColorFilter(ENABLED_CARD_COLOR);
+        }else{
+            imageView.setColorFilter(DISABLED_CARD_COLOR);
+        }
+    }
+
+    public static void setImageViewSelected(ImageView imageView, boolean isSelected){
+        if(isSelected){
+            imageView.setColorFilter(SELECTED_CARD_COLOR);
         }else{
             imageView.setColorFilter(DISABLED_CARD_COLOR);
         }

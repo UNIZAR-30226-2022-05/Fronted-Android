@@ -6,7 +6,7 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
@@ -70,6 +69,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     private View fondoJugadorActual;
 
+    private ImageButton confirmarJugadaButton;
+    private ImageButton cancelarJugadaButton;
+
     private int jugadorActualID = -1;
 
     private boolean defaultMode;
@@ -77,6 +79,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private boolean sePuedePulsarBotonUNO;
     private int turnoAnterior = -1;
     private boolean partidaFinalizada;
+
+    private List<Carta> listaCartasEscalera;
 
     public static String getIAName(int jugadorID){
         return "IA_" + jugadorID;
@@ -167,7 +171,43 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         });
 
         fondoJugadorActual = findViewById(R.id.fondoJugadorActual);
-        fondoJugadorActual.setVisibility(View.INVISIBLE);
+
+        listaCartasEscalera = new ArrayList<>();
+
+        confirmarJugadaButton = findViewById(R.id.confirmarJugadaButton);
+        cancelarJugadaButton = findViewById(R.id.cancelarJugadaButton);
+
+        confirmarJugadaButton.setOnClickListener(view -> {
+            Jugada jugada = new Jugada(listaCartasEscalera);
+            Sala sala = BackendAPI.getSalaActual();
+            if(sala != null){
+                Partida partida = sala.getPartida();
+                if(partida != null){
+                    if(partida.validarJugada(jugada)){
+                        new BackendAPI(this).enviarJugada(jugada);
+                        mostrarMensaje("Has jugado una escalera de " + listaCartasEscalera.size() + " carta(s)");
+                    }else{
+                        mostrarMensaje("Jugada inválida");
+                    }
+                }
+            }
+        });
+        cancelarJugadaButton.setOnClickListener(view -> {
+            // Volver a cargar las cartas del jugador actual
+            Sala sala = BackendAPI.getSalaActual();
+            if(sala != null){
+                Partida partida = sala.getPartida();
+                if(partida != null){
+                    listaCartasEscalera.clear();
+                    confirmarJugadaButton.setVisibility(View.INVISIBLE);
+                    cancelarJugadaButton.setVisibility(View.INVISIBLE);
+
+                    resetCartas(JUGADOR_ABAJO);
+                    partida.getJugadorActual().getMano().forEach(carta ->
+                            addCarta(sala, JUGADOR_ABAJO, jugadorActualID, carta));
+                }
+            }
+        });
 
         // Borrar las cartas que están por defecto
         resetCartas();
@@ -185,6 +225,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
 
         PartidaDialogManager.dismissCurrentDialog();
+        listaCartasEscalera.clear();
+        confirmarJugadaButton.setVisibility(View.INVISIBLE);
+        cancelarJugadaButton.setVisibility(View.INVISIBLE);
 
         Partida partida = sala.getPartida();
         if(jugadorActualID == -1){
@@ -401,53 +444,115 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         boolean isVisible = jugadorID == jugadorActualID || carta.isVisiblePor(jugadorActualID);
 
         ImageView imageView = new ImageView(this);
+        if(isEnabled){
+            imageView.setTag(false);    // Para indicar que no está seleccionada para el modo escalera
+        }
         ImageManager.setImagenCarta(imageView, carta, defaultMode, isEnabled, isVisible, jugadorID == jugadorActualID && isEnabled);
         if(jugadorID != JUGADOR_ABAJO){
             imageView.setLayoutParams(new LinearLayout.LayoutParams(150, -2));
         }
 
-        if(jugadorID == jugadorActualID && isEnabled){
-            imageView.setOnClickListener(view -> {
-                if(esTurnoDelJugadorActual()){
-                    boolean esEspecialFinal = comprobarEspecialFinal(sala, carta);
-                    if(carta.getColor() == Carta.Color.comodin){
-                        SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
-                                this,carta, defaultMode,
-                                jugada -> {
-                                    new BackendAPI(this).enviarJugada(jugada);
-                                    if(esEspecialFinal){
-                                        mostrarMensaje("Has sido penalizado por última carta comodín");
-                                    }else{
-                                        mostrarMensaje("Has jugado una carta comodín");
-                                    }
-                                });
-                        builder.show();
-                    }else if(carta.getTipo() == Carta.Tipo.intercambio){
-                        SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
-                                this, carta, sala,
-                                jugada -> {
-                                    new BackendAPI(this).enviarJugada(jugada);
-                                    if(esEspecialFinal){
-                                        mostrarMensaje("Has sido penalizado por última carta comodín");
-                                    }else{
-                                        mostrarMensaje("Has jugado una carta de intercambio");
-                                    }
-                                });
-                        builder.show();
+        imageView.setOnClickListener(view -> {
+            if(!listaCartasEscalera.isEmpty()){
+                if(imageView.getTag() != null && imageView.getTag().equals(false)){
+                    // Marcar la carta como seleccionada
+                    listaCartasEscalera.add(carta);
+                    ImageManager.setImageViewSelected(imageView, true);
+                    imageView.setTag(true);
+                }
+                return;
+            }
+
+            if(jugadorID != jugadorActualID || !isEnabled){
+                return;
+            }
+
+            if(esTurnoDelJugadorActual()){
+                boolean esEspecialFinal = comprobarEspecialFinal(sala, carta);
+                if(carta.getColor() == Carta.Color.comodin){
+                    SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
+                            this,carta, defaultMode,
+                            jugada -> {
+                                new BackendAPI(this).enviarJugada(jugada);
+                                if(esEspecialFinal){
+                                    mostrarMensaje("Has sido penalizado por última carta comodín");
+                                }else{
+                                    mostrarMensaje("Has jugado una carta comodín");
+                                }
+                            });
+                    builder.show();
+                }else if(carta.getTipo() == Carta.Tipo.intercambio){
+                    SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
+                            this, carta, sala,
+                            jugada -> {
+                                new BackendAPI(this).enviarJugada(jugada);
+                                if(esEspecialFinal){
+                                    mostrarMensaje("Has sido penalizado por última carta comodín");
+                                }else{
+                                    mostrarMensaje("Has jugado una carta de intercambio");
+                                }
+                            });
+                    builder.show();
+                }else{
+                    Jugada jugada = new Jugada(Arrays.asList(carta));
+                    new BackendAPI(this).enviarJugada(jugada);
+                    if(esEspecialFinal){
+                        mostrarMensaje("Has sido penalizado por última carta comodín");
                     }else{
-                        Jugada jugada = new Jugada(Arrays.asList(carta));
-                        new BackendAPI(this).enviarJugada(jugada);
-                        if(esEspecialFinal){
-                            mostrarMensaje("Has sido penalizado por última carta comodín");
-                        }else{
-                            mostrarMensaje("Has jugado una carta");
+                        mostrarMensaje("Has jugado una carta");
+                    }
+                }
+            }else{
+                mostrarMensaje("Espera tu turno");
+            }
+        });
+
+
+
+        imageView.setOnLongClickListener(view -> {
+            if(imageView.getTag() == null){
+                return false;
+            }
+
+            if(!sala.getConfiguracion().getReglas().isJugarVariasCartas()){
+                return false;
+            }
+
+            if(!Carta.esNumero(carta.getTipo())){
+                return false;
+            }
+
+            Boolean estaSeleccionada = (Boolean) imageView.getTag();
+            if(estaSeleccionada){
+                // Ya estaba seleccionada
+                mostrarMensaje("Pulsa el botón de cancelar para resetear tus cartas");
+            }else{
+                if(listaCartasEscalera.isEmpty()){
+                    confirmarJugadaButton.setVisibility(View.VISIBLE);
+                    cancelarJugadaButton.setVisibility(View.VISIBLE);
+
+                    // Activar todas las cartas que sean números y desactivar las
+                    //  que no lo sean
+                    List<Carta> cartas = sala.getPartida().getJugadorActual().getMano();
+                    for(int i=0;i<cartas.size();i++){
+                        ImageView aux = (ImageView) layoutBarajasJugadores[jugadorLayoutID].getChildAt(i);
+                        boolean esNumero = Carta.esNumero(cartas.get(i).getTipo());
+                        ImageManager.setImageViewEnable(aux, esNumero);
+                        ImageManager.setImageViewClickableB(aux, esNumero);
+                        if(esNumero){
+                            aux.setTag(false);  // No se ha seleccionado aún, pero es seleccionable
                         }
                     }
-                }else{
-                    mostrarMensaje("Espera tu turno");
                 }
-            });
-        }
+
+                // Marcar la carta como seleccionada
+                listaCartasEscalera.add(carta);
+                ImageManager.setImageViewSelected(imageView, true);
+                imageView.setTag(true);
+            }
+
+            return true;
+        });
 
         layoutBarajasJugadores[jugadorLayoutID].addView(imageView);
     }

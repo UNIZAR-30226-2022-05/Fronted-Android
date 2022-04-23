@@ -1,6 +1,5 @@
 package es.unizar.unoforall.utils.dialogs;
 
-import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,7 +109,7 @@ public class SelectFourDialogBuilder {
 
             textoElementos[i].setText(nombre);
             ImageManager.setImagenPerfil(imagenElementos[i], imageID);
-            ImageManager.setImageViewClickable(imagenElementos[i], true);
+            ImageManager.setImageViewClickableA(imagenElementos[i], true);
             final int jugadorID = i;
             imagenElementos[i].setOnClickListener(view -> {
                 Jugada jugada = new Jugada(Arrays.asList(carta));
