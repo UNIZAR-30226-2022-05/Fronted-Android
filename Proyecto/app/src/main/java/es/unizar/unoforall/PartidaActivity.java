@@ -74,6 +74,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     private boolean sePuedePulsarBotonUNO;
     private int turnoAnterior = -1;
+    private boolean partidaFinalizada;
 
     public static String getIAName(int jugadorID){
         return "IA_" + jugadorID;
@@ -100,6 +101,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        partidaFinalizada = false;
 
         layoutJugadores = new LinearLayout[] {
                 findViewById(R.id.layoutJugadorAbajo),
@@ -172,6 +175,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void actualizarPantallaPartida(Sala sala){
+        if(partidaFinalizada){
+            return;
+        }
+
         PartidaDialogManager.dismissCurrentDialog();
 
         Partida partida = sala.getPartida();
@@ -299,6 +306,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
 
         if(!sala.isEnPartida()){
+            partidaFinalizada = true;
             Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_INDEFINITE).show();
             // Mostrar dialog con los resultados
         }
