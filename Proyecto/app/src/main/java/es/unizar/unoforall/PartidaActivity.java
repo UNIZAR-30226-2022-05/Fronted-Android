@@ -185,7 +185,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 if(partida != null){
                     if(partida.validarJugada(jugada)){
                         new BackendAPI(this).enviarJugada(jugada);
-                        mostrarMensaje("Has jugado una escalera de " + listaCartasEscalera.size() + " carta(s)");
+                        mostrarMensaje("Has jugado un combo de " + listaCartasEscalera.size() + " carta(s)");
                     }else{
                         mostrarMensaje("Jugada inválida");
                     }
