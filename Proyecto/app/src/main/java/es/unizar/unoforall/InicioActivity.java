@@ -29,6 +29,9 @@ public class InicioActivity extends CustomActivity {
     private static final int DISABLE_OK = -1;
     private static final int DISABLE_FAILED = 0;
 
+    private Button botonRegistro;
+    private Button botonLogin;
+
     @Override
     public ActivityType getType(){
         return ActivityType.INICIO;
@@ -40,8 +43,11 @@ public class InicioActivity extends CustomActivity {
         setContentView(R.layout.activity_inicio);
         setTitle(R.string.app_name);
 
-        Button botonRegistro = findViewById(R.id.botonRegistro);
-        Button botonLogin = findViewById(R.id.botonLogin);
+        botonRegistro = findViewById(R.id.botonRegistro);
+        botonLogin = findViewById(R.id.botonLogin);
+
+        botonRegistro.setEnabled(false);
+        botonLogin.setEnabled(false);
 
         botonRegistro.setOnClickListener(v -> startActivityForResult(new Intent(InicioActivity.this, RegisterActivity.class), 0));
         botonLogin.setOnClickListener(v->startActivityForResult(new Intent(InicioActivity.this, LoginActivity.class), 0));
@@ -55,6 +61,8 @@ public class InicioActivity extends CustomActivity {
         String pkg=getPackageName();
         PowerManager pm=getSystemService(PowerManager.class);
         if (pm.isIgnoringBatteryOptimizations(pkg)) {
+            botonRegistro.setEnabled(true);
+            botonLogin.setEnabled(true);
             return;
         }
 
@@ -85,6 +93,8 @@ public class InicioActivity extends CustomActivity {
             switch(resultCode){
                 case DISABLE_OK:
                     mostrarMensaje("Modo de optimización de batería desactivado");
+                    botonRegistro.setEnabled(true);
+                    botonLogin.setEnabled(true);
                     break;
                 case DISABLE_FAILED:
                     requestDisableBatteryOptimization();
@@ -102,6 +112,12 @@ public class InicioActivity extends CustomActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
+        String pkg=getPackageName();
+        PowerManager pm=getSystemService(PowerManager.class);
+        if (!pm.isIgnoringBatteryOptimizations(pkg)) {
+            return false;
+        }
+
         if(item.getItemId() == CAMBIAR_IP_ID){
             SetIPDialogBuilder builder = new SetIPDialogBuilder(this);
             builder.setPositiveButton(serverIP -> {
