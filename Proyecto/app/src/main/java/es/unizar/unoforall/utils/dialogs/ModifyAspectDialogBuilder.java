@@ -2,6 +2,8 @@ package es.unizar.unoforall.utils.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.LinearLayout;
@@ -23,11 +25,11 @@ public class ModifyAspectDialogBuilder {
     private Runnable positiveRunnable;
     private Runnable negativeRunnable;
 
-    private final LinearLayout layoutGlobal = null;
+    private final View mainView;
 
-    private final RadioGroup grupo1 = null;
-    private final RadioGroup grupo2 = null;
-    private final RadioGroup grupo3 = null;
+    private final RadioGroup grupo1;
+    private final RadioGroup grupo2;
+    private final RadioGroup grupo3;
 
     public ModifyAspectDialogBuilder(Activity activity, UsuarioVO usuarioVO) {
         this.activity = activity;
@@ -35,18 +37,18 @@ public class ModifyAspectDialogBuilder {
 
         this.puntos = this.usuarioVO.getPuntos();
 
-        this.layoutGlobal.findViewById(R.id.globalLayout);
+        this.mainView = LayoutInflater.from(activity).inflate(R.layout.personalizacion_layout, null);
 
-        this.grupo1.findViewById(R.id.rgPer1);
+        this.grupo1 = this.mainView.findViewById(R.id.rgPer1);
         RadioButton child1 = (RadioButton) this.grupo1.getChildAt(this.usuarioVO.getAvatar());
         child1.setChecked(true);
 
-        this.grupo2.findViewById(R.id.rgPer2);
-        RadioButton child2 = (RadioButton) this.grupo1.getChildAt(this.usuarioVO.getAspectoTablero());
+        this.grupo2 = this.mainView.findViewById(R.id.rgPer2);
+        RadioButton child2 = (RadioButton) this.grupo2.getChildAt(this.usuarioVO.getAspectoTablero());
         child2.setChecked(true);
 
-        this.grupo3.findViewById(R.id.rgPer3);
-        RadioButton child3 = (RadioButton) this.grupo1.getChildAt(this.usuarioVO.getAspectoCartas());
+        this.grupo3 = this.mainView.findViewById(R.id.rgPer3);
+        RadioButton child3 = (RadioButton) this.grupo3.getChildAt(this.usuarioVO.getAspectoCartas());
         child3.setChecked(true);
 
         this.positiveRunnable = () -> {};
@@ -119,8 +121,8 @@ public class ModifyAspectDialogBuilder {
                     this.usuarioVO.setAspectoCartas(1);
             }
 
-            consumer.accept(this.usuarioVO.getAvatar(), this.usuarioVO.getAspectoTablero(),
-                    this.usuarioVO.getAspectoCartas());
+            consumer.accept(this.usuarioVO.getAvatar(), this.usuarioVO.getAspectoCartas(),
+                    this.usuarioVO.getAspectoTablero());
         };
     }
 
@@ -129,18 +131,18 @@ public class ModifyAspectDialogBuilder {
     }
 
     public void show(){
-        ViewParent parent = layoutGlobal.getParent();
+        ViewParent parent = mainView.getParent();
         if(parent != null){
-            ((ViewGroup) parent).removeView(layoutGlobal);
+            ((ViewGroup) parent).removeView(mainView);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Personaliza tu cuenta");
         builder.setMessage("Cambia tu avatar, fondo o color de cartas");
-        builder.setView(layoutGlobal);
+        builder.setView(mainView);
         builder.setPositiveButton("Confirmar", (dialog, which) -> positiveRunnable.run());
         builder.setNegativeButton("Cancelar", (dialog, which) -> negativeRunnable.run());
-        builder.setOnCancelListener(dialog -> show());
+        builder.setOnCancelListener(dialog -> negativeRunnable.run());
 
         builder.show();
     }

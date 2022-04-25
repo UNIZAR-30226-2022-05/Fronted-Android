@@ -545,6 +545,11 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             ModifyAspectDialogBuilder builder = new ModifyAspectDialogBuilder(activity, usuarioVO);
+            builder.setPositiveButton((avatar, aspectoCartas, aspectoFondo) -> {
+                cambiarPersonalizacionStepTwo(avatar, aspectoCartas, aspectoFondo);
+            });
+            builder.setNegativeButton(() -> activity.mostrarMensaje("Cambios cancelados"));
+            builder.show();
         });
     }
 
