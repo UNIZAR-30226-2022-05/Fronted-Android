@@ -22,7 +22,9 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
@@ -77,7 +79,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private ImageButton cancelarJugadaButton;
 
     private int jugadorActualID = -1;
-    private int[] numCartasAnteriores = {-1, -1, -1, -1};
+    private final int[] numCartasAnteriores = {-1, -1, -1, -1};
+
+    // Relaciona los IDs de los jugadores con los layout IDs correspondientes
+    private final Map<Integer, Integer> jugadorIDmap = new HashMap<>();
 
     private boolean defaultMode;
 
@@ -243,6 +248,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             defaultMode = usuarioActual.getAspectoCartas() == 0;
             mainView = findViewById(R.id.layoutPantallaPartida);
             ImageManager.setImagenFondo(mainView, usuarioActual.getAspectoTablero());
+
+            jugadorIDmap.clear();
         }
 
         int turnoActual = partida.getTurno();
@@ -285,6 +292,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 mostrarLayoutJugador(i, false);
             }else{
                 Jugador jugador = partida.getJugadores().get(jugadorID);
+                jugadorIDmap.putIfAbsent(jugadorID, i);
 
                 if(sala.isEnPartida() && turnoActual == jugadorID && esNuevoTurno){
                     mostrarTimerVisual(i);
@@ -324,8 +332,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                             cartaRobada.setLayoutParams(new FrameLayout.LayoutParams(150, -2));
                             ImageManager.setImagenCarta(cartaRobada, null, defaultMode, true, false, false);
                             cartaRobada.animate()
-                                    .x(layoutJugadores[jugadorID].getX())
-                                    .y(layoutJugadores[jugadorID].getY())
+                                    .x(layoutJugadores[jugadorIDmap.get(jugadorID)].getX())
+                                    .y(layoutJugadores[jugadorIDmap.get(jugadorID)].getY())
                                     .setDuration(1000)
                                     .withEndAction(() -> {
                                         cartaRobada.setVisibility(View.GONE);
