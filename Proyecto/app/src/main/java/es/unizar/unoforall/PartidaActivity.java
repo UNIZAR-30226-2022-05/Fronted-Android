@@ -448,7 +448,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             imageView.setTag(false);    // Para indicar que no está seleccionada para el modo escalera
         }
         ImageManager.setImagenCarta(imageView, carta, defaultMode, isEnabled, isVisible, jugadorID == jugadorActualID && isEnabled);
-        if(jugadorID != JUGADOR_ABAJO){
+        if(jugadorID != jugadorActualID){
+            // Mostrar las cartas de los demás jugadores de tamaño pequeño
             imageView.setLayoutParams(new LinearLayout.LayoutParams(150, -2));
         }
 
