@@ -6,6 +6,8 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -69,6 +71,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private ImageView botonUNO;
 
     private View fondoJugadorActual;
+    private View mainView;
 
     private ImageButton confirmarJugadaButton;
     private ImageButton cancelarJugadaButton;
@@ -238,7 +241,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             // Si defaultMode = true, se mostrará el aspecto por defecto de las cartas.
             //     Si no, se mostrará el aspecto alternativo.
             defaultMode = usuarioActual.getAspectoCartas() == 0;
-            View mainView = findViewById(R.id.layoutPantallaPartida);
+            mainView = findViewById(R.id.layoutPantallaPartida);
             ImageManager.setImagenFondo(mainView, usuarioActual.getAspectoTablero());
         }
 
@@ -310,6 +313,26 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                             mostrarMensaje("Has robado " + numCartasRobadas + " carta(s)");
                         }else{
                             mostrarMensaje(nombreJugador + " robó " + numCartasRobadas + " carta(s)");
+                        }
+                        // Mostrar animación de las cartas robadas
+                        for(int k=0;k<numCartasRobadas;k++){
+                            ImageView cartaRobada = new ImageView(this);
+                            ViewGroup viewGroup = (ViewGroup) mainView;
+                            viewGroup.addView(cartaRobada);
+                            cartaRobada.setX(mazoRobar.getX());
+                            cartaRobada.setY(mazoRobar.getY());
+                            cartaRobada.setLayoutParams(new FrameLayout.LayoutParams(150, -2));
+                            ImageManager.setImagenCarta(cartaRobada, null, defaultMode, true, false, false);
+                            cartaRobada.animate()
+                                    .x(layoutJugadores[jugadorID].getX())
+                                    .y(layoutJugadores[jugadorID].getY())
+                                    .setDuration(1000)
+                                    .withEndAction(() -> {
+                                        cartaRobada.setVisibility(View.GONE);
+                                        viewGroup.removeView(cartaRobada);
+                                    })
+                                    .setStartDelay(k* 500L)
+                                    .start();
                         }
                     }
                 }
