@@ -28,6 +28,7 @@ import es.unizar.unoforall.model.partidas.Carta;
 import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.partidas.Jugador;
 import es.unizar.unoforall.model.partidas.Partida;
+import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
@@ -439,9 +440,17 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         return false;
     }
 
+
+    private int getJugadorIDPareja(Sala sala, int jugadorID){
+        if(sala.getConfiguracion().getModoJuego() == ConfigSala.ModoJuego.Parejas){
+            return (jugadorID + 2) % 4;
+        }else{
+            return jugadorID;
+        }
+    }
     private void addCarta(Sala sala, int jugadorLayoutID, int jugadorID, Carta carta){
         boolean isEnabled = jugadorID == jugadorActualID && esTurnoDelJugadorActual() && sePuedeUsarCarta(sala.getPartida(), carta);
-        boolean isVisible = jugadorID == jugadorActualID || carta.isVisiblePor(jugadorActualID);
+        boolean isVisible = jugadorID == jugadorActualID || jugadorID == getJugadorIDPareja(sala, jugadorActualID) || carta.isVisiblePor(jugadorActualID);
 
         ImageView imageView = new ImageView(this);
         if(isEnabled){
