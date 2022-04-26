@@ -106,7 +106,7 @@ public class ImageManager{
     }
 
     public static void setImagenColor(ImageView imageView, TextView textView, Carta.Color color, boolean defaultMode){
-        setImageViewClickableA(imageView, true);
+        setImageViewClickable(imageView, true, false);
         switch(color){
             case rojo:
                 if(defaultMode){
@@ -173,7 +173,7 @@ public class ImageManager{
             }
 
             setImageViewEnable(imageView, isEnabled);
-            setImageViewClickableA(imageView, isClickable);
+            setImageViewClickable(imageView, isClickable, false);
         }else{
             imageView.setImageResource(getResourceRevesCarta(defaultMode));
         }
@@ -181,64 +181,36 @@ public class ImageManager{
 
     public static void setImagenMazoCartas(ImageView imageView, boolean defaultMode, boolean isEnabled){
         imageView.setImageResource(getResourceMazoCartas(defaultMode));
-        setImageViewClickableA(imageView, isEnabled);
+        setImageViewClickable(imageView, isEnabled, false);
         setImageViewEnable(imageView, isEnabled);
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    public static void setImageViewClickableA(ImageView imageView, boolean clickable){
+    public static void setImageViewClickable(ImageView imageView, boolean clickable, boolean responsive){
         if(clickable){
             imageView.setOnTouchListener((v, event) -> {
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN: {
-                        ImageView view = (ImageView) v;
                         //overlay is black with transparency of 0x77 (119)
-                        view.getDrawable().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
-                        view.invalidate();
+                        ((ImageView) v).setColorFilter(0x77000000);
+                        //getDrawable().setColorFilter(, PorterDuff.Mode.SRC_ATOP);
+                        ((ImageView) v).invalidate();
                         break;
                     }
                     case MotionEvent.ACTION_UP:
+                        if(responsive){
+                            ((ImageView) v).performClick();
+                        }
                     case MotionEvent.ACTION_CANCEL: {
-                        ImageView view = (ImageView) v;
                         //clear the overlay
-                        view.getDrawable().clearColorFilter();
-                        view.invalidate();
+                        ((ImageView) v).setColorFilter(ENABLED_CARD_COLOR);
+                        ((ImageView) v).invalidate();
                         break;
                     }
                 }
 
-                return false;
-            });
-        }else{
-            imageView.setOnTouchListener(null);
-        }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    public static void setImageViewClickableB(ImageView imageView, boolean clickable){
-        if(clickable){
-            imageView.setOnTouchListener((v, event) -> {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN: {
-                        ImageView view = (ImageView) v;
-                        //overlay is black with transparency of 0x77 (119)
-                        view.getDrawable().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
-                        view.invalidate();
-                        break;
-                    }
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL: {
-                        ImageView view = (ImageView) v;
-                        //clear the overlay
-                        view.getDrawable().setColorFilter(SELECTED_CARD_COLOR, PorterDuff.Mode.SRC_ATOP);
-                        view.invalidate();
-                        break;
-                    }
-                }
-
-                return false;
+                return responsive;
             });
         }else{
             imageView.setOnTouchListener(null);

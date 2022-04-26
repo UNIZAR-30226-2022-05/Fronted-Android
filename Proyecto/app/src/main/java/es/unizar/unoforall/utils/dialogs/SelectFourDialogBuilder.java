@@ -109,7 +109,7 @@ public class SelectFourDialogBuilder {
 
             textoElementos[i].setText(nombre);
             ImageManager.setImagenPerfil(imagenElementos[i], imageID);
-            ImageManager.setImageViewClickableA(imagenElementos[i], true);
+            ImageManager.setImageViewClickable(imagenElementos[i], true, false);
             final int jugadorID = i;
             imagenElementos[i].setOnClickListener(view -> {
                 Jugada jugada = new Jugada(Arrays.asList(carta));

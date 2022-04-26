@@ -239,6 +239,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         cancelarJugadaButton.setVisibility(View.INVISIBLE);
 
         Partida partida = sala.getPartida();
+        int turnoActual = partida.getTurno();
+        int numJugadores = partida.getJugadores().size();
+        boolean esNuevoTurno = turnoActual != turnoAnterior || partida.isRepeticionTurno();
+
         if(jugadorActualID == -1){
             jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
             UsuarioVO usuarioActual = sala.getParticipante(BackendAPI.getUsuarioID());
@@ -250,11 +254,25 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             ImageManager.setImagenFondo(mainView, usuarioActual.getAspectoTablero());
 
             jugadorIDmap.clear();
+            jugadorIDmap.put(jugadorActualID, JUGADOR_ABAJO);
+            switch(numJugadores){
+                case 2:
+                    jugadorIDmap.put((jugadorActualID+1) % numJugadores, JUGADOR_ARRIBA);
+                    mostrarLayoutJugador(JUGADOR_IZQUIERDA, false);
+                    mostrarLayoutJugador(JUGADOR_DERECHA, false);
+                    break;
+                case 3:
+                    jugadorIDmap.put((jugadorActualID+1) % numJugadores, JUGADOR_IZQUIERDA);
+                    jugadorIDmap.put((jugadorActualID+2) % numJugadores, JUGADOR_ARRIBA);
+                    mostrarLayoutJugador(JUGADOR_DERECHA, false);
+                    break;
+                case 4:
+                    jugadorIDmap.put((jugadorActualID+1) % numJugadores, JUGADOR_IZQUIERDA);
+                    jugadorIDmap.put((jugadorActualID+2) % numJugadores, JUGADOR_ARRIBA);
+                    jugadorIDmap.put((jugadorActualID+3) % numJugadores, JUGADOR_DERECHA);
+                    break;
+            }
         }
-
-        int turnoActual = partida.getTurno();
-        int numJugadores = partida.getJugadores().size();
-        boolean esNuevoTurno = turnoActual != turnoAnterior || partida.isRepeticionTurno();
 
         if(esNuevoTurno){
             turnoAnterior = turnoActual;
@@ -271,116 +289,98 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 sePuedePulsarBotonUNO = false;
             });
         }
-        
-        // posicionesJugadores[i] es el ID del jugador al que le corresponde el hueco i
-        //   en los layouts. Será -1 si ese hueco no debe ser rellenado
-        int[] posicionesJugadores;
-        if(numJugadores == 2){
-            posicionesJugadores = new int[] {jugadorActualID, -1, 1-jugadorActualID, -1};
-        }else{
-            posicionesJugadores = new int[] {-1, -1, -1, -1};
-            for(int i=0; i<numJugadores; i++){
-                posicionesJugadores[i] = (jugadorActualID + i) % numJugadores;
-            }
-        }
 
         resetCartas();
-        for(int i=0; i<posicionesJugadores.length; i++){
-            int jugadorID = posicionesJugadores[i];
-            if(jugadorID == -1){
-                // Ocultar los layouts del jugador i
-                mostrarLayoutJugador(i, false);
+        jugadorIDmap.forEach((jugadorID, jugadorLayoutID) -> {
+            Jugador jugador = partida.getJugadores().get(jugadorID);
+
+            if(sala.isEnPartida() && turnoActual == jugadorID && esNuevoTurno){
+                mostrarTimerVisual(jugadorLayoutID);
+            }
+
+            String nombreJugador;
+            int imageID;
+            if(jugador.isEsIA()){
+                imageID = ImageManager.IA_IMAGE_ID;
+                nombreJugador = getIAName(jugadorID);
             }else{
-                Jugador jugador = partida.getJugadores().get(jugadorID);
-                jugadorIDmap.putIfAbsent(jugadorID, i);
+                UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
+                imageID = usuarioVO.getAvatar();
+                nombreJugador = usuarioVO.getNombre();
+            }
+            setImagenJugador(jugadorLayoutID, imageID);
+            setNombreJugador(jugadorLayoutID, nombreJugador, turnoActual == jugadorID);
+            setNumCartas(jugadorLayoutID, jugador.getMano().size());
 
-                if(sala.isEnPartida() && turnoActual == jugadorID && esNuevoTurno){
-                    mostrarTimerVisual(i);
-                }
-
-                String nombreJugador;
-                int imageID;
-                if(jugador.isEsIA()){
-                    imageID = ImageManager.IA_IMAGE_ID;
-                    nombreJugador = getIAName(jugadorID);
-                }else{
-                    UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
-                    imageID = usuarioVO.getAvatar();
-                    nombreJugador = usuarioVO.getNombre();
-                }
-                setImagenJugador(i, imageID);
-                setNombreJugador(i, nombreJugador, turnoActual == jugadorID);
-                setNumCartas(i, jugador.getMano().size());
-
-                int numCartasAntes = numCartasAnteriores[jugadorID];
-                int numCartasAhora = jugador.getMano().size();
-                if(numCartasAntes != -1 && numCartasAhora > numCartasAntes){
-                    if(partida.getUltimaCartaJugada().getTipo() != Carta.Tipo.intercambio){
-                        int numCartasRobadas = numCartasAhora - numCartasAntes;
-                        if(jugadorID == jugadorActualID){
-                            mostrarMensaje("Has robado " + numCartasRobadas + " carta(s)");
-                        }else{
-                            mostrarMensaje(nombreJugador + " robó " + numCartasRobadas + " carta(s)");
-                        }
-                        // Mostrar animación de las cartas robadas
-                        for(int k=0;k<numCartasRobadas;k++){
-                            ImageView cartaRobada = new ImageView(this);
-                            ViewGroup viewGroup = (ViewGroup) mainView;
-                            viewGroup.addView(cartaRobada);
-                            cartaRobada.setX(mazoRobar.getX());
-                            cartaRobada.setY(mazoRobar.getY());
-                            cartaRobada.setLayoutParams(new FrameLayout.LayoutParams(150, -2));
-                            ImageManager.setImagenCarta(cartaRobada, null, defaultMode, true, false, false);
-                            cartaRobada.animate()
-                                    .x(layoutJugadores[jugadorIDmap.get(jugadorID)].getX())
-                                    .y(layoutJugadores[jugadorIDmap.get(jugadorID)].getY())
-                                    .setDuration(1000)
-                                    .withEndAction(() -> {
-                                        cartaRobada.setVisibility(View.GONE);
-                                        viewGroup.removeView(cartaRobada);
-                                    })
-                                    .setStartDelay(k* 500L)
-                                    .start();
-                        }
-                    }
-                }
-                numCartasAnteriores[jugadorID] = numCartasAhora;
-
-                if(jugadorActualID == jugadorID){
-                    if(jugador.isPenalizado_UNO()){
-                        mostrarMensaje("Has sido penalizado por no decir UNO");
+            int numCartasAntes = numCartasAnteriores[jugadorID];
+            int numCartasAhora = jugador.getMano().size();
+            if(numCartasAntes != -1 && numCartasAhora > numCartasAntes){
+                if(partida.getUltimaCartaJugada().getTipo() != Carta.Tipo.intercambio){
+                    int numCartasRobadas = numCartasAhora - numCartasAntes;
+                    if(jugadorID == jugadorActualID){
+                        mostrarMensaje("Has robado " + numCartasRobadas + " carta(s)");
+                    }else{
+                        mostrarMensaje(nombreJugador + " robó " + numCartasRobadas + " carta(s)");
                     }
 
-                    jugador.getMano().sort((carta1, carta2) -> {
-                        boolean sePuedeUsarCarta1 = sePuedeUsarCarta(partida, carta1);
-                        boolean sePuedeUsarCarta2 = sePuedeUsarCarta(partida, carta2);
-                        if(sePuedeUsarCarta1 && !sePuedeUsarCarta2){
-                            return -1;
-                        }else if(!sePuedeUsarCarta1 && sePuedeUsarCarta2){
-                            return 1;
-                        }else{
-                            return carta1.compareTo(carta2);
-                        }
-                    });
-                }else{
-                    jugador.getMano().sort((carta1, carta2) -> {
-                        boolean sePuedeVerCarta1 = carta1.isVisiblePor(jugadorActualID);
-                        boolean sePuedeVerCarta2 = carta2.isVisiblePor(jugadorActualID);
-                        if(sePuedeVerCarta1 && !sePuedeVerCarta2){
-                            return -1;
-                        }else if(!sePuedeVerCarta1 && sePuedeVerCarta2){
-                            return 1;
-                        }else{
-                            return carta1.compareTo(carta2);
-                        }
-                    });
-                }
-
-                for(Carta carta : jugador.getMano()){
-                    addCarta(sala, i, jugadorID, carta);
+                    // Mostrar animación de las cartas robadas
+                    for(int k=0;k<numCartasRobadas;k++){
+                        ImageView cartaRobada = new ImageView(this);
+                        ViewGroup viewGroup = (ViewGroup) mainView;
+                        viewGroup.addView(cartaRobada);
+                        cartaRobada.setX(mazoRobar.getX());
+                        cartaRobada.setY(mazoRobar.getY());
+                        cartaRobada.setLayoutParams(new FrameLayout.LayoutParams(150, -2));
+                        ImageManager.setImagenCarta(cartaRobada, null, defaultMode, true, false, false);
+                        cartaRobada.animate()
+                                .x(layoutJugadores[jugadorIDmap.get(jugadorID)].getX())
+                                .y(layoutJugadores[jugadorIDmap.get(jugadorID)].getY())
+                                .setDuration(1000)
+                                .withEndAction(() -> {
+                                    cartaRobada.setVisibility(View.GONE);
+                                    viewGroup.removeView(cartaRobada);
+                                })
+                                .setStartDelay(k * 500L)
+                                .start();
+                    }
                 }
             }
-        }
+            numCartasAnteriores[jugadorID] = numCartasAhora;
+
+            if(jugadorActualID == jugadorID){
+                if(jugador.isPenalizado_UNO()){
+                    mostrarMensaje("Has sido penalizado por no decir UNO");
+                }
+
+                jugador.getMano().sort((carta1, carta2) -> {
+                    boolean sePuedeUsarCarta1 = sePuedeUsarCarta(partida, carta1);
+                    boolean sePuedeUsarCarta2 = sePuedeUsarCarta(partida, carta2);
+                    if(sePuedeUsarCarta1 && !sePuedeUsarCarta2){
+                        return -1;
+                    }else if(!sePuedeUsarCarta1 && sePuedeUsarCarta2){
+                        return 1;
+                    }else{
+                        return carta1.compareTo(carta2);
+                    }
+                });
+            }else{
+                jugador.getMano().sort((carta1, carta2) -> {
+                    boolean sePuedeVerCarta1 = carta1.isVisiblePor(jugadorActualID);
+                    boolean sePuedeVerCarta2 = carta2.isVisiblePor(jugadorActualID);
+                    if(sePuedeVerCarta1 && !sePuedeVerCarta2){
+                        return -1;
+                    }else if(!sePuedeVerCarta1 && sePuedeVerCarta2){
+                        return 1;
+                    }else{
+                        return carta1.compareTo(carta2);
+                    }
+                });
+            }
+
+            for(Carta carta : jugador.getMano()){
+                addCarta(sala, jugadorLayoutID, jugadorID, carta);
+            }
+        });
         
         setSentido(partida.isSentidoHorario());
         setCartaDelMedio(partida.getUltimaCartaJugada());
@@ -513,12 +513,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
         imageView.setOnClickListener(view -> {
             if(!listaCartasEscalera.isEmpty()){
-                if(imageView.getTag() != null && imageView.getTag().equals(false)){
-                    // Marcar la carta como seleccionada
-                    listaCartasEscalera.add(carta);
-                    ImageManager.setImageViewSelected(imageView, true);
-                    imageView.setTag(true);
-                }
                 return;
             }
 
@@ -597,7 +591,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                         ImageView aux = (ImageView) layoutBarajasJugadores[jugadorLayoutID].getChildAt(i);
                         boolean esNumero = Carta.esNumero(cartas.get(i).getTipo());
                         ImageManager.setImageViewEnable(aux, esNumero);
-                        ImageManager.setImageViewClickableB(aux, esNumero);
+                        ImageManager.setImageViewClickable(aux, esNumero, false);
                         if(esNumero){
                             aux.setTag(false);  // No se ha seleccionado aún, pero es seleccionable
                         }
@@ -607,6 +601,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 // Marcar la carta como seleccionada
                 listaCartasEscalera.add(carta);
                 ImageManager.setImageViewSelected(imageView, true);
+                ImageManager.setImageViewClickable(imageView, false, false);
                 imageView.setTag(true);
             }
 
@@ -636,7 +631,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         final int incremento = 100; // Incrementar el porcentaje cada 100 ms
         timerRunnable = new CancellableRunnable() {
             int i = 0;
-            final int total = Partida.TIMEOUT_TURNO-10*incremento;
+            final int total = Partida.TIMEOUT_TURNO-1000;
             @Override
             public void run() {
                 if(isCancelled()){
