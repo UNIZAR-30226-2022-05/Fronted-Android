@@ -74,6 +74,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private ImageButton cancelarJugadaButton;
 
     private int jugadorActualID = -1;
+    private int[] numCartasAnteriores = {-1, -1, -1, -1};
 
     private boolean defaultMode;
 
@@ -165,7 +166,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         mazoRobar.setOnClickListener(view -> {
             if(esTurnoDelJugadorActual()){
                 new BackendAPI(this).enviarJugada(new Jugada());
-                mostrarMensaje("Has robado una carta");
             }else{
                 mostrarMensaje("Espera tu turno");
             }
@@ -287,15 +287,34 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     mostrarTimerVisual(i);
                 }
 
+                String nombreJugador;
+                int imageID;
                 if(jugador.isEsIA()){
-                    setImagenJugador(i, ImageManager.IA_IMAGE_ID);
-                    setNombreJugador(i, getIAName(jugadorID), turnoActual == jugadorID);
+                    imageID = ImageManager.IA_IMAGE_ID;
+                    nombreJugador = getIAName(jugadorID);
                 }else{
                     UsuarioVO usuarioVO = sala.getParticipante(jugador.getJugadorID());
-                    setImagenJugador(i, usuarioVO.getAvatar());
-                    setNombreJugador(i, usuarioVO.getNombre(), turnoActual == jugadorID);
+                    imageID = usuarioVO.getAvatar();
+                    nombreJugador = usuarioVO.getNombre();
                 }
+                setImagenJugador(i, imageID);
+                setNombreJugador(i, nombreJugador, turnoActual == jugadorID);
                 setNumCartas(i, jugador.getMano().size());
+
+                int numCartasAntes = numCartasAnteriores[jugadorID];
+                int numCartasAhora = jugador.getMano().size();
+                if(numCartasAntes != -1 && numCartasAhora > numCartasAntes){
+                    if(partida.getUltimaCartaJugada().getTipo() != Carta.Tipo.intercambio){
+                        int numCartasRobadas = numCartasAhora - numCartasAntes;
+                        if(jugadorID == jugadorActualID){
+                            mostrarMensaje("Has robado " + numCartasRobadas + " carta(s)");
+                        }else{
+                            mostrarMensaje(nombreJugador + " robó " + numCartasRobadas + " carta(s)");
+                        }
+                    }
+                }
+                numCartasAnteriores[jugadorID] = numCartasAhora;
+
                 if(jugadorActualID == jugadorID){
                     if(jugador.isPenalizado_UNO()){
                         mostrarMensaje("Has sido penalizado por no decir UNO");
@@ -355,7 +374,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 if(!algunaCartaCompatible){
                     // Robar las cartas
                     new BackendAPI(this).enviarJugada(new Jugada());
-                    mostrarMensaje("Has robado " + partida.getRoboAcumulado() + " cartas");
                 }
             }
         }else{
