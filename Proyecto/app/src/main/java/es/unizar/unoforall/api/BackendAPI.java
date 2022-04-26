@@ -112,8 +112,11 @@ public class BackendAPI{
 
                 // Suscribirse a las notificaciones de amigos
                 wsAPI.subscribe(activity, "/topic/notifAmistad/" + usuarioVO.getId(),
-                        UsuarioVO.class, usuarioVO2 ->
-                            Notificaciones.mostrarNotificacionAmigo(usuarioVO2));
+                        UsuarioVO.class, usuarioVO2 -> {
+                            if(usuarioVO2 != null){
+                                Notificaciones.mostrarNotificacionAmigo(usuarioVO2);
+                            }
+                        });
 
                 usuarioID = usuarioVO.getId();
                 activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
