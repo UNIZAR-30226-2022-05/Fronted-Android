@@ -100,7 +100,7 @@ public class UsuarioDbAdapter {
                 null,
                 null,
                 null,
-                KEY_ID + " asc");
+                KEY_CORREO + " asc");
     }
 
     /**
