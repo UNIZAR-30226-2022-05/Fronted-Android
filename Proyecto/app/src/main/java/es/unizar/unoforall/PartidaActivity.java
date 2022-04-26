@@ -248,14 +248,14 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if(esNuevoTurno){
             turnoAnterior = turnoActual;
             sePuedePulsarBotonUNO = true;
+            botonUNO.setEnabled(true);
             ImageManager.setImageViewEnable(botonUNO, true);
             botonUNO.setOnClickListener(view -> {
                 if(sePuedePulsarBotonUNO){
                     new BackendAPI(this).pulsarBotonUNO();
                     mostrarMensaje("Has pulsado el botón UNO");
                     ImageManager.setImageViewEnable(botonUNO, false);
-                }else {
-                    mostrarMensaje("Sólo puedes pulsar el botón de UNO una vez por turno");
+                    botonUNO.setEnabled(false);
                 }
                 sePuedePulsarBotonUNO = false;
             });
