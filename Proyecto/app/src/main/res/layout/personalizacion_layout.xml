@@ -17,75 +17,38 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/eligeUnIconoTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Elige un icono de perfil" />
+                android:text="Elige un icono de perfil. Tienes ? puntos" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:id="@+id/layoutIconosPerfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-                    <RadioGroup
-                        android:id="@+id/rgPer1"
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:gravity="center"
+                        android:orientation="vertical">
 
-                        <RadioButton
-                            android:id="@+id/rbPerfil0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:drawableTop="@drawable/ic_perfil_0"
-                            android:text="Icono 1 - 0 puntos" />
+                        <ImageView
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            app:srcCompat="@drawable/ic_perfil_0" />
 
-                        <RadioButton
-                            android:id="@+id/rbPerfil1"
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableTop="@drawable/ic_perfil_1"
-                            android:text="Icono 2 - 10 puntos" />
-
-                        <RadioButton
-                            android:id="@+id/rbPerfil2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableTop="@drawable/ic_perfil_2"
-                            android:text="Icono 3 - 30 puntos" />
-
-                        <RadioButton
-                            android:id="@+id/rbPerfil3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableTop="@drawable/ic_perfil_3"
-                            android:text="Icono 4 - 50 puntos" />
-
-                        <RadioButton
-                            android:id="@+id/rbPerfil4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableTop="@drawable/ic_perfil_4"
-                            android:text="Icono 5 - 100 puntos" />
-
-                        <RadioButton
-                            android:id="@+id/rbPerfil5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableTop="@drawable/ic_perfil_5"
-                            android:text="Icono 6 - 200 puntos" />
-
-                        <RadioButton
-                            android:id="@+id/rbPerfil6"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableTop="@drawable/ic_perfil_6"
-                            android:text="Icono 7 - 500 puntos" />
-
-                    </RadioGroup>
-
+                            android:text="Icono 0\n0 puntos\nnecesarios"
+                            android:textAlignment="center" />
+                    </LinearLayout>
                 </LinearLayout>
 
             </HorizontalScrollView>
@@ -93,71 +56,132 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Elige un fondo de pantalla" />
+                android:text="Elige un fondo de pantalla para las partidas"
+                android:layout_marginTop="10dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
 
-                <RadioGroup
-                    android:id="@+id/rgPer2"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:id="@+id/layoutFondo0"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
 
-                    <RadioButton
-                        android:id="@+id/rbFondo0"
+                    <ImageView
+                        android:id="@+id/imageViewFondo0"
+                        android:layout_width="85dp"
+                        android:layout_height="135dp"
+                        app:srcCompat="@drawable/fondo_0"/>
+                    <TextView
+                        android:id="@+id/textViewFondo0"
                         android:layout_width="wrap_content"
-                        android:layout_height="100dp"
-                        android:drawableTop="@drawable/fondo_0"
-                        android:text="Fondo 1" />
+                        android:layout_height="wrap_content"
+                        android:text="Fondo 1"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/layoutFondo1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
 
-                    <RadioButton
-                        android:id="@+id/rbFondo1"
+                    <ImageView
+                        android:id="@+id/imageViewFondo1"
+                        android:layout_width="85dp"
+                        android:layout_height="135dp"
+                        app:srcCompat="@drawable/fondo_1"/>
+                    <TextView
+                        android:id="@+id/textViewFondo1"
                         android:layout_width="wrap_content"
-                        android:layout_height="100dp"
-                        android:drawableTop="@drawable/fondo_1"
-                        android:text="Fondo 2" />
+                        android:layout_height="wrap_content"
+                        android:text="Fondo 2"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/layoutFondo2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
 
-                    <RadioButton
-                        android:id="@+id/rbFondo2"
+                    <ImageView
+                        android:id="@+id/imageViewFondo2"
+                        android:layout_width="85dp"
+                        android:layout_height="135dp"
+                        app:srcCompat="@drawable/fondo_2"/>
+                    <TextView
+                        android:id="@+id/textViewFondo2"
                         android:layout_width="wrap_content"
-                        android:layout_height="100dp"
-                        android:drawableTop="@drawable/fondo_2"
-                        android:text="Fondo 3" />
-
-                </RadioGroup>
-
+                        android:layout_height="wrap_content"
+                        android:text="Fondo 3"
+                        android:textAlignment="center"/>
+                </LinearLayout>
             </LinearLayout>
 
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Elige los colores de las cartas" />
+                android:text="Elige los colores de las cartas"
+                android:layout_marginTop="10dp"/>
 
-            <RadioGroup
-                android:id="@+id/rgPer3"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
 
-                <RadioButton
-                    android:id="@+id/rbCartas0"
+                <LinearLayout
+                    android:id="@+id/coloresPorDefectoLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/ic_perfil_5"
-                    android:text="Colores 1" />
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginEnd="20dp"
+                    android:padding="5dp">
 
-                <RadioButton
-                    android:id="@+id/rbCartas1"
+                    <ImageButton
+                        android:id="@+id/coloresPorDefectoImageButton"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_perfil_5"/>
+                    <TextView
+                        android:id="@+id/coloresPorDefectoTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Colores por defecto"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/coloresAlternativosLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/ic_perfil_6"
-                    android:text="Colores 2" />
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
 
-            </RadioGroup>
-
+                    <ImageButton
+                        android:id="@+id/coloresAlternativosImageButton"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_perfil_6"/>
+                    <TextView
+                        android:id="@+id/coloresAlternativosTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Colores alternativos"/>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
     </ScrollView>

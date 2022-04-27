@@ -543,30 +543,26 @@ public class BackendAPI{
     //PERSONALIZACION DE ASPECTO (avatar, cartas y fondo de pantalla)
 
     public void cambiarPersonalizacionStepOne(){
-        RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
-        api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
+        obtenerUsuarioVO(usuarioVO -> {
             ModifyAspectDialogBuilder builder = new ModifyAspectDialogBuilder(activity, usuarioVO);
-            builder.setPositiveButton((avatar, aspectoCartas, aspectoFondo) -> {
-                cambiarPersonalizacionStepTwo(avatar, aspectoCartas, aspectoFondo);
-            });
+            builder.setPositiveButton((avatar, aspectoFondo, aspectoCartas) ->
+                cambiarPersonalizacionStepTwo(avatar, aspectoFondo, aspectoCartas));
             builder.setNegativeButton(() -> activity.mostrarMensaje("Cambios cancelados"));
             builder.show();
         });
     }
 
-    public void cambiarPersonalizacionStepTwo(Integer avatar, Integer aspectoCartas, Integer aspectoFondo){
+    public void cambiarPersonalizacionStepTwo(int avatar, int aspectoFondo, int aspectoCartas){
         RestAPI api = new RestAPI(activity, "/api/cambiarAvatar");
         api.addParameter("sesionID", sesionID);
         api.addParameter("avatar", avatar);
-        api.addParameter("aspectoCartas", aspectoCartas);
         api.addParameter("aspectoFondo", aspectoFondo);
+        api.addParameter("aspectoCartas", aspectoCartas);
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> {
-            if(error.equals("nulo")){
+            if(error == null){
                 activity.mostrarMensaje("Los cambios se han realizado correctamente");
-            } else {
+            }else{
                 activity.mostrarMensaje(error);
             }
         });

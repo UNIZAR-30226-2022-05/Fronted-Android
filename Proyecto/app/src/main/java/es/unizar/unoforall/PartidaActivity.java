@@ -600,7 +600,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
                 // Marcar la carta como seleccionada
                 listaCartasEscalera.add(carta);
-                ImageManager.setImageViewSelected(imageView, true);
+                ImageManager.setImageViewColorFilter(imageView, ImageManager.SELECTED_CARD_COLOR);
                 ImageManager.setImageViewClickable(imageView, false, false);
                 imageView.setTag(true);
             }

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,9 +34,11 @@ public class ImageManager{
     private static final HashMap<Carta, Integer> defaultCardsMap = new HashMap<>();
     private static final HashMap<Carta, Integer> altCardsMap = new HashMap<>();
 
-    private static final int ENABLED_CARD_COLOR = Color.parseColor("#00000000");
-    private static final int DISABLED_CARD_COLOR = Color.parseColor("#5550545c");
-    private static final int SELECTED_CARD_COLOR = Color.parseColor("#5548a84c");
+    public static final int ENABLED_CARD_COLOR = Color.parseColor("#00000000");
+    public static final int DISABLED_CARD_COLOR = Color.parseColor("#5550545c");
+    public static final int SELECTED_CARD_COLOR = Color.parseColor("#5548a84c");
+    public static final int SELECTED_IMAGEN_PERFIL_COLOR = Color.parseColor("#88147ec9");
+    public static final int SELECTED_FONDO_COLOR = Color.parseColor("#99555555");
 
     // Pre: -2 <= imageID <= 6
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -225,12 +228,11 @@ public class ImageManager{
         }
     }
 
-    public static void setImageViewSelected(ImageView imageView, boolean isSelected){
-        if(isSelected){
-            imageView.setColorFilter(SELECTED_CARD_COLOR);
-        }else{
-            imageView.setColorFilter(DISABLED_CARD_COLOR);
-        }
+    public static void setImageViewColorFilter(ImageView imageView, int colorFilter){
+        imageView.setColorFilter(colorFilter);
+    }
+    public static void setImageViewColorFilter(ImageButton imageButton, int colorFilter){
+        imageButton.setColorFilter(colorFilter);
     }
 
     private static int getResourceCarta(Carta carta, boolean defaultMode){
