@@ -47,7 +47,7 @@ public class Notificaciones {
                         case CREAR_SALA:
                         case BUSCAR_SALA:
                             // Unirse a la sala correspondiente
-                            new BackendAPI(activity).iniciarUnirseSala(notificacionSala.getSalaID());
+                            new BackendAPI(activity).unirseSala(notificacionSala.getSalaID());
                             return true;
                         case SALA:
                         case PARTIDA:

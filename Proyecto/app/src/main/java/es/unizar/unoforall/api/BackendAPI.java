@@ -1,9 +1,7 @@
 package es.unizar.unoforall.api;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.widget.Toast;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -15,16 +13,19 @@ import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.model.salas.RespuestaSalas;
 import es.unizar.unoforall.utils.CustomActivity;
+import es.unizar.unoforall.utils.SalaReceiver;
 import es.unizar.unoforall.utils.dialogs.CodeConfirmDialogBuilder;
 import es.unizar.unoforall.utils.HashUtils;
 import es.unizar.unoforall.utils.dialogs.DeleteAccountDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ModifyAccountDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.ModifyAspectDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.PeticionAmistadDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
@@ -37,6 +38,20 @@ public class BackendAPI{
 
     private static String sesionID = null;
     private static WebSocketAPI wsAPI = null;
+
+    private static UUID usuarioID = null;
+    public static UUID getUsuarioID(){
+        return usuarioID;
+    }
+
+    private static Sala salaActual = null;
+    public static Sala getSalaActual(){
+        return salaActual;
+    }
+    private static UUID salaActualID = null;
+    public static UUID getSalaActualID(){
+        return salaActualID;
+    }
 
     private static CustomActivity currentActivity = null;
     public static void setCurrentActivity(CustomActivity currentActivity){
@@ -53,7 +68,10 @@ public class BackendAPI{
         this.activity = activity;
         this.usuarioDbAdapter = new UsuarioDbAdapter(this.activity).open();
     }
-    
+
+    //
+    //  LOGIN, REGISTRO Y RECUPERACIÓN DE CONTRASEÑA
+    //
     public void login(String correo, String contrasennaHash){
         RestAPI api = new RestAPI(activity,"/api/login");
         api.addParameter("correo", correo);
@@ -71,6 +89,7 @@ public class BackendAPI{
 
                 wsAPI = new WebSocketAPI();
                 wsAPI.setOnError((t, i) -> {
+                    activity.mostrarMensaje(t.getMessage());
                     t.printStackTrace();
                     closeWebSocketAPI();
                 });
@@ -93,9 +112,13 @@ public class BackendAPI{
 
                 // Suscribirse a las notificaciones de amigos
                 wsAPI.subscribe(activity, "/topic/notifAmistad/" + usuarioVO.getId(),
-                        UsuarioVO.class, usuarioVO2 ->
-                            Notificaciones.mostrarNotificacionAmigo(usuarioVO2));
+                        UsuarioVO.class, usuarioVO2 -> {
+                            if(usuarioVO2 != null){
+                                Notificaciones.mostrarNotificacionAmigo(usuarioVO2);
+                            }
+                        });
 
+                usuarioID = usuarioVO.getId();
                 activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
 
                 // Iniciar la actividad principal
@@ -201,6 +224,9 @@ public class BackendAPI{
         });
     }
 
+    //
+    //  OBTENCIÓN DE USUARIOS
+    //
     public void obtenerUsuarioVO(Consumer<UsuarioVO> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
         api.addParameter("sesionID", sesionID);
@@ -227,6 +253,9 @@ public class BackendAPI{
         });
     }
 
+    //
+    //  GESTIÓN DE SALAS
+    //
     public void crearSala(ConfigSala configSala){
         RestAPI api = new RestAPI(activity, "/api/crearSala");
         api.addParameter("sesionID", sesionID);
@@ -235,7 +264,7 @@ public class BackendAPI{
         api.setOnObjectReceived(RespuestaSala.class, respuestaSala -> {
             if(respuestaSala.isExito()){
                 // No ha habido errores
-                iniciarUnirseSala(respuestaSala.getSalaID());
+                unirseSala(respuestaSala.getSalaID());
             }else{
                 activity.mostrarMensaje(respuestaSala.getErrorInfo());
             }
@@ -244,17 +273,12 @@ public class BackendAPI{
 
     public void unirseSalaPorID(){
         SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
-        builder.setPositiveButton(salaID -> iniciarUnirseSala(salaID));
+        builder.setPositiveButton(salaID -> unirseSala(salaID));
         builder.setNegativeButton(() -> activity.mostrarMensaje("Búsqueda de sala por ID cancelada"));
         builder.show();
     }
 
-    public void iniciarUnirseSala(UUID salaID){
-        Intent intent = new Intent(activity, SalaActivity.class);
-        intent.putExtra(SalaActivity.KEY_SALA_ID, salaID);
-        activity.startActivityForResult(intent,0);
-    }
-    public void unirseSala(UUID salaID, Consumer<Sala> consumer){
+    public void unirseSala(UUID salaID){
         wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
             if(sala.isNoExiste()){
                 // Se ha producido un error
@@ -262,19 +286,37 @@ public class BackendAPI{
                 wsAPI.unsubscribe("/topic/salas/" + salaID);
                 activity.finish();
             }else{
-                consumer.accept(sala);
+                salaActual = sala;
+                if(salaActualID == null){
+                    salaActualID = salaID;
+                    Intent intent = new Intent(activity, SalaActivity.class);
+                    activity.startActivityForResult(intent,0);
+                    activity.mostrarMensaje("Te has unido a la sala");
+                }
+
+                if(currentActivity instanceof SalaReceiver){
+                    ((SalaReceiver) currentActivity).manageSala(sala);
+                }
             }
         });
         wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
-        activity.mostrarMensaje("Te has unido a la sala");
     }
-    public void listoSala(UUID salaID){
-        wsAPI.sendObject("/app/salas/listo/" + salaID, VACIO);
+    public void listoSala(){
+        wsAPI.sendObject("/app/salas/listo/" + salaActualID, VACIO);
     }
-    public void salirSala(UUID salaID){
-        wsAPI.unsubscribe("/topic/salas/" + salaID);
-        wsAPI.sendObject("/app/salas/salir/" + salaID, VACIO);
-        activity.mostrarMensaje("Has salido de la sala");
+    public void salirSala(){
+        if(salaActual == null){
+            activity.mostrarMensaje("La sala no puede ser null");
+        }else{
+            wsAPI.unsubscribe("/topic/salas/" + salaActualID);
+            wsAPI.sendObject("/app/salas/salir/" + salaActualID, VACIO);
+            activity.mostrarMensaje("Has salido de la sala");
+            salaActual = null;
+            salaActualID = null;
+            Intent intent = new Intent(activity, PrincipalActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            activity.startActivityForResult(intent, 0);
+        }
     }
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
@@ -285,6 +327,9 @@ public class BackendAPI{
         api.setOnObjectReceived(RespuestaSalas.class, consumer);
     }
 
+    //
+    //  MODIFICACIÓN DE CUENTA
+    //
     public void modificarCuenta(){
         RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
         api.addParameter("sesionID", sesionID);
@@ -355,6 +400,9 @@ public class BackendAPI{
         api.setOnObjectReceived(String.class, error -> activity.mostrarMensaje("Operación cancelada"));
     }
 
+    //
+    //  BORRADO DE CUENTA
+    //
     public void borrarCuenta(){
         obtenerUsuarioVO(usuarioVO -> {
             DeleteAccountDialogBuilder builder = new DeleteAccountDialogBuilder(activity);
@@ -381,6 +429,9 @@ public class BackendAPI{
         });
     }
 
+    //
+    //  GESTIÓN DE AMIGOS
+    //
     public void obtenerAmigos(Consumer<ListaUsuarios> consumer){
         RestAPI api = new RestAPI(activity, "/api/sacarAmigos");
         api.addParameter("sesionID", sesionID);
@@ -467,15 +518,54 @@ public class BackendAPI{
         });
     }
 
-    public void invitarAmigoSala(UUID salaID){
+    public void invitarAmigoSala(){
         SeleccionAmigoDialogBuilder builder = new SeleccionAmigoDialogBuilder(activity);
         builder.setPositiveButton(correo -> {
             buscarUsuarioVO(correo, usuarioVO -> {
-                wsAPI.sendObject("/app/notifSala/" + usuarioVO.getId(), salaID);
+                wsAPI.sendObject("/app/notifSala/" + usuarioVO.getId(), salaActualID);
                 activity.mostrarMensaje("Invitación enviada");
             });
         });
         builder.show();
+    }
+
+    //
+    //  GESTIÓN DE PARTIDAS
+    //
+    public void enviarJugada(Jugada jugada){
+        wsAPI.sendObject("/app/partidas/turnos/" + salaActualID, jugada);
+    }
+
+    public void pulsarBotonUNO(){
+        wsAPI.sendObject("/app/partidas/botonUNO/" + salaActualID, VACIO);
+    }
+
+    //PERSONALIZACION DE ASPECTO (avatar, cartas y fondo de pantalla)
+
+    public void cambiarPersonalizacionStepOne(){
+        obtenerUsuarioVO(usuarioVO -> {
+            ModifyAspectDialogBuilder builder = new ModifyAspectDialogBuilder(activity, usuarioVO);
+            builder.setPositiveButton((avatar, aspectoFondo, aspectoCartas) ->
+                cambiarPersonalizacionStepTwo(avatar, aspectoFondo, aspectoCartas));
+            builder.setNegativeButton(() -> activity.mostrarMensaje("Cambios cancelados"));
+            builder.show();
+        });
+    }
+
+    public void cambiarPersonalizacionStepTwo(int avatar, int aspectoFondo, int aspectoCartas){
+        RestAPI api = new RestAPI(activity, "/api/cambiarAvatar");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("avatar", avatar);
+        api.addParameter("aspectoFondo", aspectoFondo);
+        api.addParameter("aspectoCartas", aspectoCartas);
+        api.openConnection();
+        api.setOnObjectReceived(String.class, error -> {
+            if(error == null){
+                activity.mostrarMensaje("Los cambios se han realizado correctamente");
+            }else{
+                activity.mostrarMensaje(error);
+            }
+        });
     }
 
     public static synchronized void closeWebSocketAPI(){

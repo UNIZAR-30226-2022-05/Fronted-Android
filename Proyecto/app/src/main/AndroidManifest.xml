@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UnoForAll"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".PartidaActivity"
+            android:screenOrientation="portrait" />
+
         <service android:name=".utils.notifications.NotificationManager$NotificationActionService" />
+
         <activity
             android:name=".AmigosActivity"
             android:screenOrientation="portrait" />

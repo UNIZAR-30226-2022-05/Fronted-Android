@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
@@ -25,14 +26,13 @@ import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
+import es.unizar.unoforall.utils.SalaReceiver;
+import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 
-public class SalaActivity extends CustomActivity {
+public class SalaActivity extends CustomActivity implements SalaReceiver {
 
-    public static final String KEY_SALA_ID = "id_sala";
     private static final int MAX_PARTICIPANTES_SALA = 4;
-
-    private BackendAPI api;
-    private UUID salaID;
+    private static final int VER_REGLAS_ID = 0;
 
     private TextView numUsuariosTextView;
     private TextView numUsuariosListosTextView;
@@ -51,10 +51,8 @@ public class SalaActivity extends CustomActivity {
         setContentView(R.layout.activity_sala);
         setTitle(R.string.sala);
 
-        salaID = (UUID) getIntent().getSerializableExtra(KEY_SALA_ID);
-
         TextView salaIDTextView = findViewById(R.id.salaIDTextView);
-        salaIDTextView.setText(salaID.toString());
+        salaIDTextView.setText(BackendAPI.getSalaActualID().toString());
 
         salaTipoTextView = findViewById(R.id.salaTipoTextView);
 
@@ -74,16 +72,25 @@ public class SalaActivity extends CustomActivity {
         listoSala.setOnClickListener(view -> {
             listoSala.setEnabled(false);
             listoSala.setBackgroundColor(Color.LTGRAY);
-            api.listoSala(salaID);
+            new BackendAPI(this).listoSala();
         });
 
         Button invitarAmigos = findViewById(R.id.invitarAmigosButton);
         invitarAmigos.setOnClickListener(view -> {
-            new BackendAPI(this).invitarAmigoSala(salaID);
+            new BackendAPI(this).invitarAmigoSala();
         });
 
-        api = new BackendAPI(this);
-        api.unirseSala(salaID, sala -> updateWidgets(sala));
+        manageSala(BackendAPI.getSalaActual());
+    }
+
+    @Override
+    public void manageSala(Sala sala){
+        if(sala.isEnPartida()){
+            Intent intent = new Intent(this, PartidaActivity.class);
+            startActivityForResult(intent, 0);
+        }else{
+            updateWidgets(sala);
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -137,9 +144,9 @@ public class SalaActivity extends CustomActivity {
                 }
             }else if(view instanceof ImageView){
                 if(usuario == null){
-                    ImageManager.setImage((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
+                    ImageManager.setImagenPerfil((ImageView) view, ImageManager.DEFAULT_IMAGE_ID);
                 }else{
-                    ImageManager.setImage((ImageView) view, usuario.getAvatar());
+                    ImageManager.setImagenPerfil((ImageView) view, usuario.getAvatar());
                 }
             }
         }
@@ -149,16 +156,27 @@ public class SalaActivity extends CustomActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Salir de la sala");
         builder.setMessage("¿Quieres salir de la sala?");
-        builder.setPositiveButton("Sí", (dialog, which) -> {
-            api.salirSala(salaID);
-            Intent intent = new Intent(this, PrincipalActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, 0);
-        });
-        builder.setNegativeButton("No", (dialog, which) -> {
-            dialog.dismiss();
-        });
+        builder.setPositiveButton("Sí", (dialog, which) -> new BackendAPI(this).salirSala());
+        builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         builder.create().show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        boolean result = super.onCreateOptionsMenu(menu);
+        menu.add(Menu.NONE, VER_REGLAS_ID, Menu.NONE, "Ver reglas de la sala");
+        return result;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case VER_REGLAS_ID:
+                ReglasViewDialogBuilder builder = new ReglasViewDialogBuilder(this, BackendAPI.getSalaActual().getConfiguracion());
+                builder.show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

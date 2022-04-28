@@ -25,6 +25,22 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    sourceSets {
+        main {
+            res {
+                srcDirs 'src\\main\\res',
+                        'src\\main\\res\\drawable_cartas\\rojo',
+                        'src\\main\\res\\drawable_cartas\\rojo_alt',
+                        'src\\main\\res\\drawable_cartas\\azul',
+                        'src\\main\\res\\drawable_cartas\\azul_alt',
+                        'src\\main\\res\\drawable_cartas\\verde',
+                        'src\\main\\res\\drawable_cartas\\verde_alt',
+                        'src\\main\\res\\drawable_cartas\\amarillo',
+                        'src\\main\\res\\drawable_cartas\\amarillo_alt',
+                        'src\\main\\res\\drawable_cartas\\otros'
+            }
+        }
+    }
 }
 
 dependencies {

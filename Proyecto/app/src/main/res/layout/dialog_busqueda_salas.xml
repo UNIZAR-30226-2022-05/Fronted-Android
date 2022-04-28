@@ -17,6 +17,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/numParticipantesTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/participantesFiltro"/>
@@ -51,6 +52,7 @@
 
 
             <TextView
+                android:id="@+id/modoJuegoTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/modoJuegoFiltro"/>
@@ -78,6 +80,7 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/cartasEspecialesTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/eleccionCartasEspeciales"/>
@@ -104,6 +107,7 @@
 
 
                 <TextView
+                    android:id="@+id/reglasAdicionalesTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/activarReglasEspeciales"/>

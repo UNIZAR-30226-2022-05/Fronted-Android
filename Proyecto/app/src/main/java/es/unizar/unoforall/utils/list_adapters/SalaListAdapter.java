@@ -19,6 +19,7 @@ import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CustomActivity;
+import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 
 public class SalaListAdapter extends ArrayAdapter<Map.Entry<UUID, Sala>> {
 
@@ -45,6 +46,12 @@ public class SalaListAdapter extends ArrayAdapter<Map.Entry<UUID, Sala>> {
 
             UUID uuid = entry.getKey();
             Sala sala = entry.getValue();
+
+            view.setOnClickListener(view2 -> {
+                ReglasViewDialogBuilder builder = new ReglasViewDialogBuilder(activity, sala.getConfiguracion());
+                builder.show();
+            });
+
             int numParticipantes = sala.numParticipantes();
             int maxParticipantes = sala.getConfiguracion().getMaxParticipantes();
             ConfigSala.ModoJuego modoJuego = sala.getConfiguracion().getModoJuego();
@@ -59,7 +66,7 @@ public class SalaListAdapter extends ArrayAdapter<Map.Entry<UUID, Sala>> {
             textView3.setText("Modo de juego: " + nombreModosJuego[modoJuego.ordinal()]);
             button.setOnClickListener(v -> {
                 BackendAPI api = new BackendAPI(activity);
-                api.iniciarUnirseSala(uuid);
+                api.unirseSala(uuid);
             });
         }
 

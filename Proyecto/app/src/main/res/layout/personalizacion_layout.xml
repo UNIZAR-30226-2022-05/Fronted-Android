@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:id="@+id/globalLayout">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/eligeUnIconoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Elige un icono de perfil. Tienes ? puntos" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/layoutIconosPerfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            app:srcCompat="@drawable/ic_perfil_0" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Icono 0\n0 puntos\nnecesarios"
+                            android:textAlignment="center" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Elige un fondo de pantalla para las partidas"
+                android:layout_marginTop="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:id="@+id/layoutFondo0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
+
+                    <ImageView
+                        android:id="@+id/imageViewFondo0"
+                        android:layout_width="85dp"
+                        android:layout_height="135dp"
+                        app:srcCompat="@drawable/fondo_0"/>
+                    <TextView
+                        android:id="@+id/textViewFondo0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fondo 1"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/layoutFondo1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
+
+                    <ImageView
+                        android:id="@+id/imageViewFondo1"
+                        android:layout_width="85dp"
+                        android:layout_height="135dp"
+                        app:srcCompat="@drawable/fondo_1"/>
+                    <TextView
+                        android:id="@+id/textViewFondo1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fondo 2"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/layoutFondo2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
+
+                    <ImageView
+                        android:id="@+id/imageViewFondo2"
+                        android:layout_width="85dp"
+                        android:layout_height="135dp"
+                        app:srcCompat="@drawable/fondo_2"/>
+                    <TextView
+                        android:id="@+id/textViewFondo2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fondo 3"
+                        android:textAlignment="center"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Elige los colores de las cartas"
+                android:layout_marginTop="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:id="@+id/coloresPorDefectoLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginEnd="20dp"
+                    android:padding="5dp">
+
+                    <ImageButton
+                        android:id="@+id/coloresPorDefectoImageButton"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_perfil_5"/>
+                    <TextView
+                        android:id="@+id/coloresPorDefectoTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Colores por defecto"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/coloresAlternativosLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="5dp">
+
+                    <ImageButton
+                        android:id="@+id/coloresAlternativosImageButton"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_perfil_6"/>
+                    <TextView
+                        android:id="@+id/coloresAlternativosTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Colores alternativos"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -6,16 +6,17 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.database.UsuarioDbAdapter;
@@ -30,7 +31,6 @@ public class LoginActivity extends CustomActivity {
     private EditText correoEditText;
     private EditText contrasennaEditText;
     private UsuarioDbAdapter mDbHelper;
-    private Long mRowId;
 
     @Override
     public ActivityType getType(){
@@ -52,14 +52,17 @@ public class LoginActivity extends CustomActivity {
 
 
         TextView linkText = findViewById(R.id.textoMarcableLogin);
-        linkText.setOnClickListener(v -> startActivityForResult(new Intent(this, RestablecerContrasennaActivity.class), 0));
+        linkText.setOnClickListener(view -> startActivityForResult(new Intent(this, RestablecerContrasennaActivity.class), 0));
         linkText.setOnTouchListener((view, event) -> {
-            switch(event.getAction()){
+            switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     view.setBackgroundColor(Color.LTGRAY);
+                    view.invalidate();
                     break;
                 case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
                     view.setBackgroundColor(Color.WHITE);
+                    view.invalidate();
                     break;
             }
             return false;
@@ -123,7 +126,7 @@ public class LoginActivity extends CustomActivity {
             builder.setPositiveButton("Aceptar", (dialog, which) ->  {
                 mDbHelper.deleteUsuario(correo);
                 filldata();
-                Toast.makeText(this, "El usuario " + correo + " ha sido borrado", Toast.LENGTH_SHORT).show();
+                mostrarMensaje("El usuario " + correo + " ha sido borrado");
             });
             builder.setNegativeButton("Cancelar", (dialog, which) -> {
                dialog.dismiss();

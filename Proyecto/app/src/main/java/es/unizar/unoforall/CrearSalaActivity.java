@@ -1,7 +1,6 @@
 package es.unizar.unoforall;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,11 +9,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.UUID;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.ConfigSala;
@@ -42,6 +36,16 @@ public class CrearSalaActivity extends CustomActivity {
         configSala.setModoJuego(ConfigSala.ModoJuego.Original);
         reglasEspeciales = configSala.getReglas();
 
+        RadioButton radio2 = findViewById(R.id.radio_dos);
+        RadioButton radio3 = findViewById(R.id.radio_tres);
+        RadioButton radio4 = findViewById(R.id.radio_cuatro);
+
+        switch(configSala.getMaxParticipantes()){
+            case 2: radio2.setChecked(true); break;
+            case 3: radio3.setChecked(true); break;
+            case 4: radio4.setChecked(true); break;
+        }
+
         Spinner spinner = findViewById(R.id.modo_juego_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.modo_juego_array, android.R.layout.simple_spinner_item);
@@ -54,31 +58,27 @@ public class CrearSalaActivity extends CustomActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 configSala.setModoJuego(ConfigSala.ModoJuego.values()[i]);
+                if(configSala.getModoJuego() == ConfigSala.ModoJuego.Parejas){
+                    radio2.setEnabled(false);
+                    radio3.setEnabled(false);
+                    radio4.setEnabled(false);
+                }else{
+                    radio2.setEnabled(true);
+                    radio3.setEnabled(true);
+                    radio4.setEnabled(true);
+                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
 
-        RadioButton button;
+        RadioButton buttonEsPublica;
         if(configSala.isEsPublica()){
-            button = findViewById(R.id.radio_publica);
+            buttonEsPublica = findViewById(R.id.radio_publica);
         }else{
-            button = findViewById(R.id.radio_privada);
+            buttonEsPublica = findViewById(R.id.radio_privada);
         }
-        button.setChecked(true);
-
-        switch(configSala.getMaxParticipantes()){
-            case 2:
-                button = findViewById(R.id.radio_dos);
-                break;
-            case 3:
-                button = findViewById(R.id.radio_tres);
-                break;
-            default:
-                button = findViewById(R.id.radio_cuatro);
-                break;
-        }
-        button.setChecked(true);
+        buttonEsPublica.setChecked(true);
 
         CheckBox checkBox = findViewById(R.id.checkbox_rayosX);
         checkBox.setChecked(reglasEspeciales.isCartaRayosX());
@@ -118,8 +118,10 @@ public class CrearSalaActivity extends CustomActivity {
 
         Button confirmarSalaButton = findViewById(R.id.confirmarSalaButton);
         confirmarSalaButton.setOnClickListener(view -> {
-            BackendAPI api = new BackendAPI(this);
-            api.crearSala(configSala);
+            if(configSala.getModoJuego() == ConfigSala.ModoJuego.Parejas){
+                configSala.setMaxParticipantes(4);
+            }
+            new BackendAPI(this).crearSala(configSala);
         });
 
     }

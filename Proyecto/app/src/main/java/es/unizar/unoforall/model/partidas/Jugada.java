@@ -1,14 +1,16 @@
 package es.unizar.unoforall.model.partidas;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Jugada {
-	List<Carta> cartas;		//En el orden en el que se quieren tirar
-	boolean robar;
+	private List<Carta> cartas;		//En el orden en el que se quieren tirar
+	private boolean robar;
+	private int jugadorObjetivo;
 	
 	// La jugada es robar
 	public Jugada() {
-		this.cartas = null;
+		this.cartas = new ArrayList<>();
 		this.robar = true;
 	}
 	
@@ -16,8 +18,15 @@ public class Jugada {
 		this.cartas = cartas;
 		this.robar = false;
 	}
-
 	
+	public int getJugadorObjetivo() {
+		return jugadorObjetivo;
+	}
+
+	public void setJugadorObjetivo(int jugadorObjetivo) {
+		this.jugadorObjetivo = jugadorObjetivo;
+	}
+
 	public List<Carta> getCartas() {
 		return cartas;
 	}
@@ -33,4 +42,12 @@ public class Jugada {
 	public void setRobar(boolean robar) {
 		this.robar = robar;
 	}
+
+
+	@Override
+	public String toString() {
+		return "Jugada [cartas=" + cartas + ", robar=" + robar + "]";
+	}
+	
+	
 }
