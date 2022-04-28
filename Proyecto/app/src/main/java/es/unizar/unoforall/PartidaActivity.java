@@ -238,11 +238,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             return;
         }
 
-        PartidaDialogManager.dismissCurrentDialog();
-        listaCartasEscalera.clear();
-        confirmarJugadaButton.setVisibility(View.INVISIBLE);
-        cancelarJugadaButton.setVisibility(View.INVISIBLE);
-
         Partida partida = sala.getPartida();
         int turnoActual = partida.getTurno();
         int numJugadores = partida.getJugadores().size();
@@ -284,6 +279,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 Vibration.vibrate(this, DURACION_VIBRACION_MS);
             }
 
+            PartidaDialogManager.dismissCurrentDialog();
+            listaCartasEscalera.clear();
+            confirmarJugadaButton.setVisibility(View.INVISIBLE);
+            cancelarJugadaButton.setVisibility(View.INVISIBLE);
+
             turnoAnterior = turnoActual;
             sePuedePulsarBotonUNO = true;
             botonUNO.setEnabled(true);
@@ -299,7 +299,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             });
         }
 
-        resetCartas();
         jugadorIDmap.forEach((jugadorID, jugadorLayoutID) -> {
             Jugador jugador = partida.getJugadores().get(jugadorID);
 
@@ -386,8 +385,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 });
             }
 
-            for(Carta carta : jugador.getMano()){
-                addCarta(sala, jugadorLayoutID, jugadorID, carta);
+            if(jugadorID != jugadorActualID || listaCartasEscalera.isEmpty()){
+                resetCartas(jugadorLayoutID);
+                for(Carta carta : jugador.getMano()){
+                    addCarta(sala, jugadorLayoutID, jugadorID, carta);
+                }
             }
         });
         
