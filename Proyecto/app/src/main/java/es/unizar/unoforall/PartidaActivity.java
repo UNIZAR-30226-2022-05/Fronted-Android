@@ -38,6 +38,7 @@ import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.SalaReceiver;
+import es.unizar.unoforall.utils.Vibration;
 import es.unizar.unoforall.utils.dialogs.CartaRobadaDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.PartidaDialogManager;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
@@ -50,6 +51,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private static final int PAUSAR_ID = 0;
     private static final int ABANDONAR_ID = 1;
     private static final int VER_REGLAS_ID = 2;
+    private static final int CONFIGURAR_VIBRACION_ID = 3;
 
     private static final int JUGADOR_ABAJO = 0;
     private static final int JUGADOR_IZQUIERDA = 1;
@@ -91,6 +93,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private boolean partidaFinalizada;
 
     private List<Carta> listaCartasEscalera;
+
+    private static boolean vibracionActivada = true;
+    private static final int DURACION_VIBRACION_MS = 100;
 
     public static String getIAName(int jugadorID){
         return "IA_" + jugadorID;
@@ -275,6 +280,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
 
         if(esNuevoTurno){
+            if(vibracionActivada && esTurnoDelJugadorActual()){
+                Vibration.vibrate(this, DURACION_VIBRACION_MS);
+            }
+
             turnoAnterior = turnoActual;
             sePuedePulsarBotonUNO = true;
             botonUNO.setEnabled(true);
@@ -694,6 +703,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         menu.add(Menu.NONE, PAUSAR_ID, Menu.NONE, "Pausar partida");
         menu.add(Menu.NONE, ABANDONAR_ID, Menu.NONE, "Abandonar partida");
         menu.add(Menu.NONE, VER_REGLAS_ID, Menu.NONE, "Ver reglas de la sala");
+        menu.add(Menu.NONE, CONFIGURAR_VIBRACION_ID, Menu.NONE, "Configurar vibración");
     }
 
     @Override
@@ -713,6 +723,15 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     new ReglasViewDialogBuilder(this, BackendAPI.getSalaActual().getConfiguracion()).show();
                     return true;
                 }
+            case CONFIGURAR_VIBRACION_ID:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Configurar vibración");
+                String estadoVibracion = vibracionActivada ? "activada" : "desactivada";
+                builder.setMessage("La vibración está " + estadoVibracion + ".\n¿Qué quieres hacer?");
+                builder.setPositiveButton("Activarla", (dialog, which) -> vibracionActivada = true);
+                builder.setNegativeButton("Desactivarla", (dialog, which) -> vibracionActivada = false);
+                builder.show();
+                return true;
         }
         return super.onContextItemSelected(item);
     }
