@@ -37,7 +37,7 @@ public class Partida {
 	private boolean repeticionTurno = false;
 	
 	private static final Object LOCK = new Object();
-	private static final int MAX_ROBO_ATTACK = 10;
+	private static final int MAX_ROBO_ATTACK = 5;
 	
 	private UUID salaID = null;	
 	
@@ -445,10 +445,13 @@ public class Partida {
 				}
 				roboAcumulado=0;
 			} else if (configuracion.getModoJuego().equals(ConfigSala.ModoJuego.Attack)) {
-					int random_robo = (int)Math.floor(Math.random()*(MAX_ROBO_ATTACK)+1);
-					for (int i = 0; i < random_robo; i++) {
-						this.jugadores.get(turno).getMano().add(robarCarta());
-					}
+				int random_robo = new Random().nextInt(MAX_ROBO_ATTACK)+1;
+				if (this.jugadores.get(turno).getMano().size() + random_robo > 20) {
+					random_robo = 20 - this.jugadores.get(turno).getMano().size();
+				}
+				for (int i = 0; i < random_robo; i++) {
+					this.jugadores.get(turno).getMano().add(robarCarta());
+				}
 			} else { //FUNCIONA
 				this.cartaRobada = robarCarta(); //No se usaba la variable global, se usaba una local
 				this.jugadores.get(turno).getMano().add(cartaRobada);
@@ -533,6 +536,10 @@ public class Partida {
 							listaCartas.add(c);
 							jugadaIA.setCartas(listaCartas);
 							jugadaIA.setRobar(false);
+							
+							if (c.esDelColor(Carta.Color.comodin)) {
+								cambiarColorAleatorioIA(c);
+							}
 							break;
 						}
 					}
@@ -631,6 +638,7 @@ public class Partida {
 	
 	
 	public void pulsarBotonUNO(UUID jugadorID) { 
+		repeticionTurno = false;
 		for (int indice = 0; indice < jugadores.size(); indice++) {
 			if (jugadores.get(indice).getJugadorID() != null && 
 					jugadores.get(indice).getJugadorID().equals(jugadorID)) {
