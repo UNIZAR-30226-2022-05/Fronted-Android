@@ -41,5 +41,32 @@
             app:rippleColor="#1A2351" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/reanudarSalaButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FF9800"
+            android:text="@string/reanudarSala"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351"
+            android:layout_marginEnd="35dp"/>
+
+        <Button
+            android:id="@+id/abandonarSalaButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#B61D1D"
+            android:text="@string/abandonarSala"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351"/>
+    </LinearLayout>
+
 
 </LinearLayout>

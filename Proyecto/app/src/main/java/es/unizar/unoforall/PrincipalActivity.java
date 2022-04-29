@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 
 import es.unizar.unoforall.api.BackendAPI;
@@ -25,8 +26,12 @@ public class PrincipalActivity extends CustomActivity {
 
     private static boolean sesionIniciada = false;
 
+    private BackendAPI api;
+
     private Button crearSalaButton;
     private Button buscarSalaButton;
+    private Button reanudarSalaButton;
+    private Button abandonarSalaButton;
 
     private void inicializarButtons(){
         crearSalaButton = findViewById(R.id.crearSalaButton);
@@ -34,6 +39,25 @@ public class PrincipalActivity extends CustomActivity {
 
         buscarSalaButton = findViewById(R.id.buscarSalaPublicaButton);
         buscarSalaButton.setOnClickListener(v -> startActivityForResult(new Intent(this, BuscarSalaActivity.class), 0));
+
+        reanudarSalaButton = findViewById(R.id.reanudarSalaButton);
+        reanudarSalaButton.setOnClickListener(view -> api.unirseSala(BackendAPI.getSalaActualID()));
+
+        abandonarSalaButton = findViewById(R.id.abandonarSalaButton);
+        abandonarSalaButton.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Salir de la sala pausada");
+            builder.setMessage("¿Quieres salir de la sala pausada?");
+            builder.setPositiveButton("Sí", (dialog, which) -> {
+                api.salirSalaDefinitivo();
+                crearSalaButton.setVisibility(View.VISIBLE);
+                buscarSalaButton.setVisibility(View.VISIBLE);
+                reanudarSalaButton.setVisibility(View.GONE);
+                abandonarSalaButton.setVisibility(View.GONE);
+            });
+            builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+            builder.create().show();
+        });
     }
     private void setButtonsEnabled(boolean enabled){
         crearSalaButton.setEnabled(enabled);
@@ -58,9 +82,25 @@ public class PrincipalActivity extends CustomActivity {
         setContentView(R.layout.activity_principal);
         setTitle(R.string.pantallaPrincipal);
 
+        api = new BackendAPI(this);
+
         inicializarButtons();
         setButtonsEnabled(true);
         sesionIniciada = true;
+
+        api.comprobarPartidaPausada(haySalaPausada -> {
+            if(haySalaPausada){
+                crearSalaButton.setVisibility(View.GONE);
+                buscarSalaButton.setVisibility(View.GONE);
+                reanudarSalaButton.setVisibility(View.VISIBLE);
+                abandonarSalaButton.setVisibility(View.VISIBLE);
+            }else{
+                crearSalaButton.setVisibility(View.VISIBLE);
+                buscarSalaButton.setVisibility(View.VISIBLE);
+                reanudarSalaButton.setVisibility(View.GONE);
+                abandonarSalaButton.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override

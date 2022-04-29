@@ -15,6 +15,7 @@ import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.EnvioEmoji;
 import es.unizar.unoforall.model.partidas.Jugada;
+import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.NotificacionSala;
 import es.unizar.unoforall.model.salas.RespuestaSala;
@@ -310,6 +311,7 @@ public class BackendAPI{
             activity.mostrarMensaje("La sala no puede ser null");
         }else{
             cancelarSuscripcionCanalEmojis();
+            cancelarSuscripcionCanalVotacionPausa();
             wsAPI.unsubscribe("/topic/salas/" + salaActualID);
             wsAPI.sendObject("/app/salas/salir/" + salaActualID, VACIO);
             activity.mostrarMensaje("Has salido de la sala");
@@ -319,6 +321,37 @@ public class BackendAPI{
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             activity.startActivityForResult(intent, 0);
         }
+    }
+    public void salirSalaDefinitivo(){
+        if(salaActual == null){
+            activity.mostrarMensaje("La sala no puede ser null");
+        }else{
+            cancelarSuscripcionCanalEmojis();
+            cancelarSuscripcionCanalVotacionPausa();
+            wsAPI.unsubscribe("/topic/salas/" + salaActualID);
+            wsAPI.sendObject("/app/salas/salirDefinitivo/" + salaActualID, VACIO);
+            activity.mostrarMensaje("Has salido de la sala");
+            salaActual = null;
+            salaActualID = null;
+            Intent intent = new Intent(activity, PrincipalActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            activity.startActivityForResult(intent, 0);
+        }
+    }
+
+    public void comprobarPartidaPausada(Consumer<Boolean> consumer){
+        RestAPI api = new RestAPI(activity, "/api/comprobarPartidaPausada");
+        api.addParameter("sesionID", sesionID);
+        api.openConnection();
+        api.setOnObjectReceived(Sala.class, sala -> {
+            if(sala.isNoExiste()){
+                consumer.accept(false);
+            }else{
+                salaActual = sala;
+                salaActualID = sala.getSalaID();
+                consumer.accept(true);
+            }
+        });
     }
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
@@ -552,6 +585,21 @@ public class BackendAPI{
     public void enviarEmoji(int jugadorID, int emojiID){
         EnvioEmoji envioEmoji = new EnvioEmoji(emojiID, jugadorID, false);
         wsAPI.sendObject("/app/partidas/emojiPartida/" + salaActualID, envioEmoji);
+    }
+
+    public void suscribirseCanalVotacionPausa(Consumer<RespuestaVotacionPausa> consumer){
+        wsAPI.subscribe(activity, "/topic/salas/" + salaActualID + "/votaciones",
+                RespuestaVotacionPausa.class, respuestaVotacionPausa -> {
+                    if(respuestaVotacionPausa != null){
+                        consumer.accept(respuestaVotacionPausa);
+                    }
+                });
+    }
+    public void enviarVotacion(){
+        wsAPI.sendObject("/app/partidas/votaciones/" + salaActualID, VACIO);
+    }
+    public void cancelarSuscripcionCanalVotacionPausa(){
+        wsAPI.unsubscribe("/topic/salas/" + salaActualID + "/votaciones");
     }
 
     //

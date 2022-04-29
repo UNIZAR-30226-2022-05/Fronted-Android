@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import es.unizar.unoforall.api.BackendAPI;
@@ -242,6 +243,21 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     .start();
         });
 
+        TextView textViewVotacionPausa = findViewById(R.id.textViewVotacionPausa);
+        textViewVotacionPausa.setVisibility(View.INVISIBLE);
+        api.suscribirseCanalVotacionPausa(respuestaVotacionPausa -> {
+            int numVotos = respuestaVotacionPausa.getNumVotos();
+            int numVotantes = respuestaVotacionPausa.getNumVotantes();
+
+            if(numVotos > 0){
+                textViewVotacionPausa.setText(String.format(Locale.ENGLISH,
+                        "Votación pausa\n%d/%d", numVotos, numVotantes));
+                textViewVotacionPausa.setVisibility(View.VISIBLE);
+            }else{
+                textViewVotacionPausa.setVisibility(View.INVISIBLE);
+            }
+        });
+
         cartaDelMedio = findViewById(R.id.cartaDelMedio);
         mazoRobar = findViewById(R.id.mazoRobar);
 
@@ -308,6 +324,14 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
 
         Partida partida = sala.getPartida();
+        if(sala.isEnPausa()){
+            // Partida pausada
+            Intent intent = new Intent(this, SalaActivity.class);
+            this.startActivityForResult(intent,0);
+            this.mostrarMensaje("Has vuelto a la sala");
+            return;
+        }
+
         int turnoActual = partida.getTurno();
         int numJugadores = partida.getJugadores().size();
         boolean esNuevoTurno = turnoActual != turnoAnterior || partida.isRepeticionTurno();
@@ -808,7 +832,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     public boolean onContextItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case PAUSAR_ID:
-                mostrarMensaje("Pausar partida");
+                api.enviarVotacion();
+                mostrarMensaje("Voto enviado");
                 return true;
             case ABANDONAR_ID:
                 abandonarPartida();

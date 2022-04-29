@@ -240,4 +240,23 @@
             android:textColor="@color/white"
             app:rippleColor="#1A2351" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:layout_marginTop="5dp">
+
+        <Button
+            android:id="@+id/volverButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="120dp"
+            android:backgroundTint="#FF9800"
+            android:text="@string/volver"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351" />
+    </LinearLayout>
 </LinearLayout>

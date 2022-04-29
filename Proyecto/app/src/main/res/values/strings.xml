@@ -78,8 +78,11 @@
     <string name="usuariosSala">Usuarios en la sala</string>
     <string name="usuariosListos">Usuarios listos</string>
     <string name="sala">Sala</string>
+    <string name="salaPausada">Sala pausada</string>
     <string name="invitarAmigos">Invitar amigos</string>
+    <string name="volver">Volver</string>
     <string name="abandonarSala">Abandonar sala</string>
+    <string name="reanudarSala">Reanudar</string>
     <string name="listo">Listo</string>
 
     <string name="peticionesRecibidas">Peticiones recibidas</string>

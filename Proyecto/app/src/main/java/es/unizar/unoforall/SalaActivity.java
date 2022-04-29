@@ -22,6 +22,7 @@ import java.util.Map;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.Jugador;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
@@ -39,6 +40,8 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
     private LinearLayout[] layoutUsuarios;
 
     private TextView salaTipoTextView;
+    
+    private BackendAPI api;
 
     @Override
     public ActivityType getType(){
@@ -49,7 +52,15 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sala);
-        setTitle(R.string.sala);
+
+        api = new BackendAPI(this);
+        Sala salaActual = BackendAPI.getSalaActual();
+
+        if(salaActual.isEnPausa()){
+            setTitle(R.string.salaPausada);
+        }else{
+            setTitle(R.string.sala);
+        }
 
         TextView salaIDTextView = findViewById(R.id.salaIDTextView);
         salaIDTextView.setText(BackendAPI.getSalaActualID().toString());
@@ -67,20 +78,31 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
 
         Button abandonarSalaButton = findViewById(R.id.abandonarSalaButton);
         abandonarSalaButton.setOnClickListener(view -> salirSala());
+        
+        Button invitarAmigosButton = findViewById(R.id.invitarAmigosButton);
+        if(salaActual.isEnPausa()){
+            invitarAmigosButton.setEnabled(false);
+            invitarAmigosButton.setBackgroundColor(Color.LTGRAY);
+        }else{
+            invitarAmigosButton.setOnClickListener(view ->
+                    api.invitarAmigoSala());
+        }
+        
+        Button volverButton = findViewById(R.id.volverButton);
+        if(salaActual.isEnPausa()){
+            volverButton.setOnClickListener(view -> api.salirSala());
+        }else{
+            volverButton.setVisibility(View.INVISIBLE);
+        }
 
         Button listoSala = findViewById(R.id.listoSalaButton);
         listoSala.setOnClickListener(view -> {
             listoSala.setEnabled(false);
             listoSala.setBackgroundColor(Color.LTGRAY);
-            new BackendAPI(this).listoSala();
+            api.listoSala();
         });
 
-        Button invitarAmigos = findViewById(R.id.invitarAmigosButton);
-        invitarAmigos.setOnClickListener(view -> {
-            new BackendAPI(this).invitarAmigoSala();
-        });
-
-        manageSala(BackendAPI.getSalaActual());
+        manageSala(salaActual);
     }
 
     @Override
@@ -104,18 +126,36 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
         }
 
         Map<UsuarioVO, Boolean> participantes = sala.getParticipantes();
-        List<UsuarioVO> usuarios = new ArrayList<>(participantes.keySet());
-        usuarios.sort(Comparator.comparing(UsuarioVO::getNombre));
         int i, numParticipantesListos = 0;
-        for(i=0; i<sala.getConfiguracion().getMaxParticipantes(); i++){
-            if(i < usuarios.size()){
-                UsuarioVO usuario = usuarios.get(i);
-                setUserData(i, usuario, participantes.get(usuario));
-                if(participantes.get(usuario)){
+
+        if(sala.isEnPausa()){
+            List<Jugador> listaJugadores = sala.getPartida().getJugadores();
+            for(i=0; i<listaJugadores.size(); i++){
+                Jugador jugador = listaJugadores.get(i);
+                if(jugador.isEsIA()){
                     numParticipantesListos++;
+                    setIAData(i);
+                }else{
+                    UsuarioVO usuario = sala.getParticipante(jugador.getJugadorID());
+                    setUserData(i, usuario, participantes.get(usuario));
+                    if(participantes.get(usuario)){
+                        numParticipantesListos++;
+                    }
                 }
-            }else{
-                setUserData(i, null, false);
+            }
+        }else{
+            List<UsuarioVO> usuarios = new ArrayList<>(participantes.keySet());
+            usuarios.sort(Comparator.comparing(UsuarioVO::getNombre));
+            for(i=0; i<sala.getConfiguracion().getMaxParticipantes(); i++){
+                if(i < usuarios.size()){
+                    UsuarioVO usuario = usuarios.get(i);
+                    setUserData(i, usuario, participantes.get(usuario));
+                    if(participantes.get(usuario)){
+                        numParticipantesListos++;
+                    }
+                }else{
+                    setUserData(i, null, false);
+                }
             }
         }
 
@@ -151,12 +191,32 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
             }
         }
     }
+    @SuppressLint("SetTextI18n")
+    private void setIAData(int layoutID){
+        LinearLayout linearLayout = layoutUsuarios[layoutID];
+        for(int i=0; i<linearLayout.getChildCount(); i++){
+            View view = linearLayout.getChildAt(i);
+            if(view instanceof CheckBox){
+                ((CheckBox) view).setChecked(true);
+            }else if(view instanceof TextView){
+                ((TextView) view).setText(PartidaActivity.getIAName(layoutID));
+            }else if(view instanceof ImageView){
+                ImageManager.setImagenPerfil((ImageView) view, ImageManager.IA_IMAGE_ID);
+            }
+        }
+    }
 
     private void salirSala(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Salir de la sala");
-        builder.setMessage("¿Quieres salir de la sala?");
-        builder.setPositiveButton("Sí", (dialog, which) -> new BackendAPI(this).salirSala());
+        if(BackendAPI.getSalaActual().isEnPausa()){
+            builder.setTitle("Salir de la sala pausada");
+            builder.setMessage("¿Quieres salir de la sala pausada?");
+            builder.setPositiveButton("Sí", (dialog, which) -> api.salirSalaDefinitivo());
+        }else{
+            builder.setTitle("Salir de la sala");
+            builder.setMessage("¿Quieres salir de la sala?");
+            builder.setPositiveButton("Sí", (dialog, which) -> api.salirSala());
+        }        
         builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         builder.create().show();
     }
@@ -181,6 +241,16 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
 
     @Override
     public void onBackPressed(){
-        salirSala();
+        Sala salaActual = BackendAPI.getSalaActual();
+        if(salaActual.isEnPausa()){
+            UsuarioVO usuarioVO = salaActual.getParticipante(BackendAPI.getUsuarioID());
+            if(salaActual.getParticipantes().get(usuarioVO)){
+                salirSala();
+            }else{
+                api.salirSala();
+            }
+        }else{
+            salirSala();
+        }
     }
 }
