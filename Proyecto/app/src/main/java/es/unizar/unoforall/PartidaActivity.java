@@ -1,5 +1,6 @@
 package es.unizar.unoforall;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -40,6 +41,7 @@ import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.SalaReceiver;
 import es.unizar.unoforall.utils.Vibration;
 import es.unizar.unoforall.utils.dialogs.CartaRobadaDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.MostrarResultadosDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.PartidaDialogManager;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SelectEmojiDialogBuilder;
@@ -490,9 +492,27 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }
 
         if(!sala.isEnPartida()){
+            api.cancelarSuscripcionCanalEmojis();
             partidaFinalizada = true;
+            resetPorcentajes();
             Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_INDEFINITE).show();
+
             // Mostrar dialog con los resultados
+            MostrarResultadosDialogBuilder builder = new MostrarResultadosDialogBuilder(this, sala);
+            builder.setPositiveButton(() -> {
+                Intent intent = new Intent(this, SalaActivity.class);
+                this.startActivityForResult(intent,0);
+                this.mostrarMensaje("Has vuelto a la sala");
+            });
+            builder.setNegativeButton(() -> {
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+                builder2.setTitle("Abandonar partida");
+                builder2.setMessage("¿Quieres abandonar la partida?");
+                builder2.setPositiveButton("Sí", (dialog, which) -> api.salirSala());
+                builder2.setNegativeButton("No", (dialog, which) -> builder.show());
+                builder2.create().show();
+            });
+            builder.show();
         }
     }
 
@@ -701,6 +721,13 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private CancellableRunnable timerRunnable = null;
+    private void resetPorcentajes(){
+        if(timerRunnable != null){
+            timerRunnable.cancel();
+        }
+
+        setPorcentaje(-1, 0);
+    }
     private void mostrarTimerVisual(int jugadorLayoutID){
         if(timerRunnable != null){
             timerRunnable.cancel();
