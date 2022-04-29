@@ -64,7 +64,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private static final int TURNO_ACTIVO_COLOR = Color.GREEN;
     private static final int TURNO_INACTIVO_COLOR = Color.WHITE;
 
-    private static final int MAX_LONG_NOMBRE = 16;
+    private static final int MAX_LONG_NOMBRE = 13;
 
     private LinearLayout[] layoutBarajasJugadores;
     private LinearLayout[] layoutJugadores;
