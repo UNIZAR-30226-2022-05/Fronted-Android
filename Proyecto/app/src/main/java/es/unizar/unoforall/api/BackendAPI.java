@@ -13,6 +13,7 @@ import es.unizar.unoforall.database.UsuarioDbAdapter;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
+import es.unizar.unoforall.model.partidas.EnvioEmoji;
 import es.unizar.unoforall.model.partidas.Jugada;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.NotificacionSala;
@@ -308,6 +309,7 @@ public class BackendAPI{
         if(salaActual == null){
             activity.mostrarMensaje("La sala no puede ser null");
         }else{
+            cancelarSuscripcionCanalEmojis();
             wsAPI.unsubscribe("/topic/salas/" + salaActualID);
             wsAPI.sendObject("/app/salas/salir/" + salaActualID, VACIO);
             activity.mostrarMensaje("Has salido de la sala");
@@ -540,7 +542,21 @@ public class BackendAPI{
         wsAPI.sendObject("/app/partidas/botonUNO/" + salaActualID, VACIO);
     }
 
-    //PERSONALIZACION DE ASPECTO (avatar, cartas y fondo de pantalla)
+    public void suscribirseCanalEmojis(Consumer<EnvioEmoji> consumer){
+        wsAPI.subscribe(activity, "/topic/salas/" + salaActualID + "/emojis",
+                EnvioEmoji.class, consumer);
+    }
+    public void cancelarSuscripcionCanalEmojis(){
+        wsAPI.unsubscribe("/topic/salas/" + salaActualID + "/emojis");
+    }
+    public void enviarEmoji(int jugadorID, int emojiID){
+        EnvioEmoji envioEmoji = new EnvioEmoji(emojiID, usuarioID, false);
+        wsAPI.sendObject("/app/partidas/emojiPartida/" + salaActualID, envioEmoji);
+    }
+
+    //
+    // PERSONALIZACION DE ASPECTO (avatar, cartas y fondo de pantalla)
+    //
 
     public void cambiarPersonalizacionStepOne(){
         obtenerUsuarioVO(usuarioVO -> {

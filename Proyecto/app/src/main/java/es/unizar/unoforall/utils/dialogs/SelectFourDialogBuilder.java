@@ -44,23 +44,23 @@ public class SelectFourDialogBuilder {
     private SelectFourDialogBuilder(CustomActivity activity){
         this.activity = activity;
 
-        mainView = LayoutInflater.from(activity).inflate(R.layout.selector_4_opciones, null);
+        this.mainView = LayoutInflater.from(activity).inflate(R.layout.selector_4_opciones, null);
 
-        layoutElementos = new LinearLayout[] {
+        this.layoutElementos = new LinearLayout[] {
                 mainView.findViewById(R.id.layoutElemento0),
                 mainView.findViewById(R.id.layoutElemento1),
                 mainView.findViewById(R.id.layoutElemento2),
                 mainView.findViewById(R.id.layoutElemento3)
         };
 
-        imagenElementos = new ImageView[] {
+        this.imagenElementos = new ImageView[] {
                 mainView.findViewById(R.id.imagenElemento0),
                 mainView.findViewById(R.id.imagenElemento1),
                 mainView.findViewById(R.id.imagenElemento2),
                 mainView.findViewById(R.id.imagenElemento3)
         };
 
-        textoElementos = new TextView[]{
+        this.textoElementos = new TextView[]{
                 mainView.findViewById(R.id.textoElemento0),
                 mainView.findViewById(R.id.textoElemento1),
                 mainView.findViewById(R.id.textoElemento2),

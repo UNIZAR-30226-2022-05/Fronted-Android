@@ -42,6 +42,7 @@ import es.unizar.unoforall.utils.Vibration;
 import es.unizar.unoforall.utils.dialogs.CartaRobadaDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.PartidaDialogManager;
 import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
+import es.unizar.unoforall.utils.dialogs.SelectEmojiDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SelectFourDialogBuilder;
 import es.unizar.unoforall.utils.tasks.CancellableRunnable;
 import es.unizar.unoforall.utils.tasks.Task;
@@ -74,6 +75,10 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     private ImageView mazoRobar;
     private ImageView botonUNO;
 
+    private ImageView[] emojisJugadores;
+    private ImageView chatEmojis;
+    private ImageView alternarEmojis;
+
     private View fondoJugadorActual;
     private View mainView;
 
@@ -94,8 +99,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     private List<Carta> listaCartasEscalera;
 
+    private static boolean emojisActivados = true;
     private static boolean vibracionActivada = true;
     private static final int DURACION_VIBRACION_MS = 100;
+    
+    private BackendAPI api;
 
     public static String getIAName(int jugadorID){
         return "IA_" + jugadorID;
@@ -122,6 +130,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+        
+        api = new BackendAPI(this);
 
         partidaFinalizada = false;
 
@@ -173,12 +183,69 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 findViewById(R.id.contadorCartasJugadorDerecha)
         };
 
+        emojisJugadores = new ImageView[] {
+                findViewById(R.id.emojiJugadorAbajo),
+                findViewById(R.id.emojiJugadorIzquierda),
+                findViewById(R.id.emojiJugadorArriba),
+                findViewById(R.id.emojiJugadorDerecha)
+        };
+        for(ImageView imageView : emojisJugadores){
+            imageView.setAlpha(0.0f);
+        }
+
+        chatEmojis = findViewById(R.id.chatEmojis);
+        alternarEmojis = findViewById(R.id.alternarEmojis);
+        ImageManager.setImagenEmojisActivados(alternarEmojis, emojisActivados);
+        ImageManager.setImageViewClickable(alternarEmojis, true, false);
+        ImageManager.setImageViewClickable(chatEmojis, emojisActivados, false);
+        ImageManager.setImageViewEnable(chatEmojis, emojisActivados);
+        alternarEmojis.setOnClickListener(view -> {
+            emojisActivados = !emojisActivados;
+            ImageManager.setImagenEmojisActivados(alternarEmojis, emojisActivados);
+            ImageManager.setImageViewClickable(chatEmojis, emojisActivados, false);
+            ImageManager.setImageViewEnable(chatEmojis, emojisActivados);
+            if(emojisActivados){
+                mostrarMensaje("Emojis activados");
+            }else{
+                mostrarMensaje("Emojis desactivados");
+            }
+        });
+        chatEmojis.setOnClickListener(view -> {
+            if(emojisActivados){
+                SelectEmojiDialogBuilder builder = new SelectEmojiDialogBuilder(this);
+                builder.setOnEmojiSelected(emojiID ->
+                        api.enviarEmoji(jugadorActualID, emojiID));
+                builder.show();
+            }
+        });
+        api.suscribirseCanalEmojis(envioEmoji -> {
+            if(!emojisActivados){
+                return;
+            }
+
+            int jugadorID = 0;//envioEmoji.?;
+            int emojiID = envioEmoji.getEmoji();
+            if(emojiID == -1){
+                return;
+            }
+
+            ImageView imageView = emojisJugadores[jugadorIDmap.get(jugadorID)];
+            imageView.clearAnimation();
+            imageView.setAlpha(1.0f);
+            ImageManager.setImagenEmoji(imageView, envioEmoji.getEmoji());
+            imageView.animate()
+                    .alpha(0.0f)
+                    .setDuration(3000)
+                    .setStartDelay(2000)
+                    .start();
+        });
+
         cartaDelMedio = findViewById(R.id.cartaDelMedio);
         mazoRobar = findViewById(R.id.mazoRobar);
 
         mazoRobar.setOnClickListener(view -> {
             if(esTurnoDelJugadorActual()){
-                new BackendAPI(this).enviarJugada(new Jugada());
+                api.enviarJugada(new Jugada());
             }else{
                 mostrarMensaje("Espera tu turno");
             }
@@ -198,7 +265,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 Partida partida = sala.getPartida();
                 if(partida != null){
                     if(partida.validarJugada(jugada)){
-                        new BackendAPI(this).enviarJugada(jugada);
+                        api.enviarJugada(jugada);
                         mostrarMensaje("Has jugado un combo de " + listaCartasEscalera.size() + " carta(s)");
                     }else{
                         mostrarMensaje("Jugada inválida");
@@ -213,8 +280,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 Partida partida = sala.getPartida();
                 if(partida != null){
                     listaCartasEscalera.clear();
-                    confirmarJugadaButton.setVisibility(View.INVISIBLE);
-                    cancelarJugadaButton.setVisibility(View.INVISIBLE);
+                    confirmarJugadaButton.setVisibility(View.GONE);
+                    cancelarJugadaButton.setVisibility(View.GONE);
 
                     resetCartas(JUGADOR_ABAJO);
                     partida.getJugadorActual().getMano().forEach(carta ->
@@ -281,8 +348,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
             PartidaDialogManager.dismissCurrentDialog();
             listaCartasEscalera.clear();
-            confirmarJugadaButton.setVisibility(View.INVISIBLE);
-            cancelarJugadaButton.setVisibility(View.INVISIBLE);
+            confirmarJugadaButton.setVisibility(View.GONE);
+            cancelarJugadaButton.setVisibility(View.GONE);
 
             turnoAnterior = turnoActual;
             sePuedePulsarBotonUNO = true;
@@ -290,7 +357,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             ImageManager.setImageViewEnable(botonUNO, true);
             botonUNO.setOnClickListener(view -> {
                 if(sePuedePulsarBotonUNO){
-                    new BackendAPI(this).pulsarBotonUNO();
+                    api.pulsarBotonUNO();
                     mostrarMensaje("Has pulsado el botón UNO");
                     ImageManager.setImageViewEnable(botonUNO, false);
                     botonUNO.setEnabled(false);
@@ -415,7 +482,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
                 if(!algunaCartaCompatible){
                     // Robar las cartas
-                    new BackendAPI(this).enviarJugada(new Jugada());
+                    api.enviarJugada(new Jugada());
                 }
             }
         }else{
@@ -537,7 +604,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
                             this,carta, defaultMode,
                             jugada -> {
-                                new BackendAPI(this).enviarJugada(jugada);
+                                api.enviarJugada(jugada);
                                 if(esEspecialFinal){
                                     mostrarMensaje("Has sido penalizado por última carta comodín");
                                 }else{
@@ -549,7 +616,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     SelectFourDialogBuilder builder = new SelectFourDialogBuilder(
                             this, carta, sala,
                             jugada -> {
-                                new BackendAPI(this).enviarJugada(jugada);
+                                api.enviarJugada(jugada);
                                 if(esEspecialFinal){
                                     mostrarMensaje("Has sido penalizado por última carta comodín");
                                 }else{
@@ -559,7 +626,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     builder.show();
                 }else{
                     Jugada jugada = new Jugada(Arrays.asList(carta));
-                    new BackendAPI(this).enviarJugada(jugada);
+                    api.enviarJugada(jugada);
                     if(esEspecialFinal){
                         mostrarMensaje("Has sido penalizado por última carta comodín");
                     }else{
@@ -687,7 +754,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         builder.setTitle("Abandonar partida");
         builder.setMessage("¿Quieres abandonar la partida?");
         builder.setPositiveButton("Sí", (dialog, which) ->
-                new BackendAPI(this).salirSala());
+                api.salirSala());
         builder.setNegativeButton("No", (dialog, which) ->
                 dialog.dismiss());
         builder.create().show();

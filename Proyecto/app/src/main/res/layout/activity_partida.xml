@@ -33,6 +33,30 @@
         android:layout_height="match_parent"
         android:padding="10dp">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/horizontalScrollView2"
+            app:layout_constraintStart_toEndOf="@+id/botonUNO"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/chatEmojis"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:srcCompat="@drawable/chat_emojis"
+                android:layout_marginEnd="10dp"/>
+
+            <ImageView
+                android:id="@+id/alternarEmojis"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                app:srcCompat="@drawable/desactivar_emojis"/>
+        </LinearLayout>
+
         <HorizontalScrollView
             android:id="@+id/horizontalScrollView2"
             android:layout_width="324dp"
@@ -41,7 +65,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.92"
+            app:layout_constraintVertical_bias="0.90"
             tools:ignore="SpeakableTextPresentCheck">
 
             <LinearLayout
@@ -225,12 +249,14 @@
             android:layout_width="93dp"
             android:layout_height="72dp"
             android:layout_marginTop="116dp"
+            android:layout_marginBottom="10dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            app:layout_constraintBottom_toTopOf="@+id/horizontalScrollView2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.501"
-            app:layout_constraintStart_toStartOf="parent"
 
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView3"
             app:srcCompat="@drawable/ic_boton_uno" />
 
@@ -239,10 +265,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="44dp"
+            android:layout_marginTop="10dp"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/emojiJugadorArriba"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/emoji_0"/>
 
             <LinearLayout
                 android:layout_width="31dp"
@@ -303,12 +335,18 @@
             android:id="@+id/layoutJugadorDerecha"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
+            android:layout_marginTop="10dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.917"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView">
+
+            <ImageView
+                android:id="@+id/emojiJugadorDerecha"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/emoji_0"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -432,6 +470,12 @@
                     android:textColor="@color/white"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/emojiJugadorIzquierda"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/emoji_0"/>
         </LinearLayout>
 
         <LinearLayout
@@ -447,7 +491,7 @@
 
             <ImageButton
                 android:id="@+id/cancelarJugadaButton"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:layout_width="50dp"
                 android:layout_height="40dp"
                 android:backgroundTint="#B61D1D"
@@ -504,13 +548,20 @@
 
             <ImageButton
                 android:id="@+id/confirmarJugadaButton"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:layout_width="50dp"
                 android:layout_height="40dp"
                 android:backgroundTint="#2EC322"
                 android:src="@drawable/ic_aceptar"
                 app:rippleColor="#1A2351"
                 android:layout_marginStart="10dp"/>
+
+            <ImageView
+                android:id="@+id/emojiJugadorAbajo"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/emoji_0"
+                android:layout_marginStart="5dp"/>
         </LinearLayout>
 
         <ImageView
@@ -530,7 +581,7 @@
             android:id="@+id/sentido"
             android:layout_width="54dp"
             android:layout_height="58dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="15dp"
             app:layout_constraintBottom_toTopOf="@+id/botonUNO"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
