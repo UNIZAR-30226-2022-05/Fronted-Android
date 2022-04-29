@@ -2,8 +2,12 @@ package es.unizar.unoforall.utils.dialogs;
 
 import androidx.appcompat.app.AlertDialog;
 
+import java.util.Comparator;
+
 import es.unizar.unoforall.api.BackendAPI;
+import es.unizar.unoforall.api.Serializar;
 import es.unizar.unoforall.model.partidas.Jugada;
+import es.unizar.unoforall.model.partidas.Participante;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CustomActivity;
@@ -23,6 +27,8 @@ public class MostrarResultadosDialogBuilder {
         }
 
         PartidaJugada partidaJugada = sala.getUltimaPartidaJugada();
+        partidaJugada.getParticipantes().sort(Comparator.comparingInt(Participante::getPuesto));
+
         // Generar view con los datos de partidaJugada
     }
 

@@ -491,6 +491,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             fondoJugadorActual.setVisibility(View.INVISIBLE);
         }
 
+        // Finalización de partida
         if(!sala.isEnPartida()){
             api.cancelarSuscripcionCanalEmojis();
             partidaFinalizada = true;
