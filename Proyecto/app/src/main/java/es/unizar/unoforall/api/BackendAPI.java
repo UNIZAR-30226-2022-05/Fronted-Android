@@ -550,7 +550,7 @@ public class BackendAPI{
         wsAPI.unsubscribe("/topic/salas/" + salaActualID + "/emojis");
     }
     public void enviarEmoji(int jugadorID, int emojiID){
-        EnvioEmoji envioEmoji = new EnvioEmoji(emojiID, usuarioID, false);
+        EnvioEmoji envioEmoji = new EnvioEmoji(emojiID, jugadorID, false);
         wsAPI.sendObject("/app/partidas/emojiPartida/" + salaActualID, envioEmoji);
     }
 

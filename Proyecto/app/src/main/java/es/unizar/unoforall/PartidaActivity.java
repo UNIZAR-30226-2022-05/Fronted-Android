@@ -223,7 +223,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 return;
             }
 
-            int jugadorID = 0;//envioEmoji.?;
+            int jugadorID = envioEmoji.getEmisor();
             int emojiID = envioEmoji.getEmoji();
             if(emojiID == -1){
                 return;
