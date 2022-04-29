@@ -41,7 +41,7 @@
             android:layout_marginBottom="15dp"
             android:text="Votación pausa\n?/?"
             android:textAlignment="center"
-            android:textColor="#FF9800"
+            android:textColor="#FFDBA6"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/cartaDelMedio"
             app:layout_constraintEnd_toStartOf="@+id/layoutJugadorDerecha"
