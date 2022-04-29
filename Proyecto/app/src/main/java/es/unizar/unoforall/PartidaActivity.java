@@ -510,6 +510,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 builder2.setMessage("¿Quieres abandonar la partida?");
                 builder2.setPositiveButton("Sí", (dialog, which) -> api.salirSala());
                 builder2.setNegativeButton("No", (dialog, which) -> builder.show());
+                builder2.setOnCancelListener(dialogInterface -> builder2.show());
                 builder2.create().show();
             });
             builder.show();

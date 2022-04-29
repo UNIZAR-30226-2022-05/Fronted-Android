@@ -31,7 +31,7 @@ public class MostrarResultadosDialogBuilder {
     }
 
     public void setNegativeButton(Runnable negativeRunnable){
-        this.positiveRunnable = negativeRunnable;
+        this.negativeRunnable = negativeRunnable;
     }
 
     public void show(){
