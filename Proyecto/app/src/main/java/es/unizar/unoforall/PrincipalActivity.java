@@ -52,6 +52,8 @@ public class PrincipalActivity extends CustomActivity {
             builder.setTitle("Salir de la sala pausada");
             builder.setMessage("¿Quieres salir de la sala pausada?");
             builder.setPositiveButton("Sí", (dialog, which) -> {
+                BackendAPI.setSalaActualID(salaPausada.getSalaID());
+                BackendAPI.setSalaActual(salaPausada);
                 api.salirSalaDefinitivo();
                 crearSalaButton.setVisibility(View.VISIBLE);
                 buscarSalaButton.setVisibility(View.VISIBLE);

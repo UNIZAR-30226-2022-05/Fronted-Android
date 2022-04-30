@@ -50,9 +50,15 @@ public class BackendAPI{
     public static Sala getSalaActual(){
         return salaActual;
     }
+    public static void setSalaActual(Sala sala){
+        BackendAPI.salaActual = sala;
+    }
     private static UUID salaActualID = null;
     public static UUID getSalaActualID(){
         return salaActualID;
+    }
+    public static void setSalaActualID(UUID salaID){
+        BackendAPI.salaActualID = salaID;
     }
 
     private static CustomActivity currentActivity = null;
