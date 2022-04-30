@@ -98,7 +98,7 @@ public class MostrarResultadosDialogBuilder {
 
             ImageManager.setImagenPerfil(imageViewsPuestos[puesto-1], imageID);
             textViewsPuestos[puesto-1].setText(nombre);
-            if(puntos >= 0){
+            if(usuario != null){
                 textViewsPuntos[puesto-1].setText(puntos + " puntos");
             }else{
                 textViewsPuntos[puesto-1].setVisibility(View.GONE);
