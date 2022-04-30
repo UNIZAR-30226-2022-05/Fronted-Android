@@ -95,10 +95,14 @@ public class MostrarResultadosDialogBuilder {
                 nombre = usuario.getNombre();
                 imageID = usuario.getAvatar();
             }
-            
+
             ImageManager.setImagenPerfil(imageViewsPuestos[puesto-1], imageID);
             textViewsPuestos[puesto-1].setText(nombre);
-            textViewsPuntos[puesto-1].setText(puntos + " puntos");
+            if(puntos >= 0){
+                textViewsPuntos[puesto-1].setText(puntos + " puntos");
+            }else{
+                textViewsPuntos[puesto-1].setVisibility(View.GONE);
+            }
         }
     }
 
