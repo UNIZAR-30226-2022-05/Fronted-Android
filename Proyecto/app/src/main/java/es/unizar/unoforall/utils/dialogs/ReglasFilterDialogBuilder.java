@@ -87,6 +87,8 @@ public class ReglasFilterDialogBuilder {
             default: radioCualquiera.setChecked(true); break;
         }
 
+        RadioGroup participantesRadioGroup = this.mainView.findViewById(R.id.participantesRadioGroup);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
                 R.array.modo_juego_filtro_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -100,6 +102,8 @@ public class ReglasFilterDialogBuilder {
                     radio3.setEnabled(false);
                     radio4.setEnabled(false);
                     radioCualquiera.setEnabled(false);
+                    configSala.setMaxParticipantes(4);
+                    participantesRadioGroup.check(R.id.buscarSala_radio_cuatro);
                 }else{
                     radio2.setEnabled(true);
                     radio3.setEnabled(true);
