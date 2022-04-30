@@ -287,27 +287,33 @@ public class BackendAPI{
     }
 
     public void unirseSala(UUID salaID){
-        wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
-            if(sala.isNoExiste()){
-                // Se ha producido un error
-                activity.mostrarMensaje(sala.getError());
-                wsAPI.unsubscribe("/topic/salas/" + salaID);
-                activity.finish();
-            }else{
-                salaActual = sala;
-                if(salaActualID == null){
-                    salaActualID = salaID;
-                    Intent intent = new Intent(activity, SalaActivity.class);
-                    activity.startActivityForResult(intent,0);
-                    activity.mostrarMensaje("Te has unido a la sala");
-                }
+        comprobarUnirseSala(salaID, sePuedeUnir -> {
+            if(sePuedeUnir){
+                wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
+                    if(sala.isNoExiste()){
+                        // Se ha producido un error
+                        activity.mostrarMensaje(sala.getError());
+                        wsAPI.unsubscribe("/topic/salas/" + salaID);
+                        activity.finish();
+                    }else{
+                        salaActual = sala;
+                        if(salaActualID == null){
+                            salaActualID = salaID;
+                            Intent intent = new Intent(activity, SalaActivity.class);
+                            activity.startActivityForResult(intent,0);
+                            activity.mostrarMensaje("Te has unido a la sala");
+                        }
 
-                if(currentActivity instanceof SalaReceiver){
-                    ((SalaReceiver) currentActivity).manageSala(sala);
-                }
+                        if(currentActivity instanceof SalaReceiver){
+                            ((SalaReceiver) currentActivity).manageSala(sala);
+                        }
+                    }
+                });
+                wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
+            }else{
+                activity.mostrarMensaje("No puedes unirte a esa sala ahora mismo");
             }
         });
-        wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
     }
     public void listoSala(){
         wsAPI.sendObject("/app/salas/listo/" + salaActualID, VACIO);
@@ -356,6 +362,14 @@ public class BackendAPI{
                 consumer.accept(sala);
             }
         });
+    }
+
+    public void comprobarUnirseSala(UUID salaID, Consumer<Boolean> consumer){
+        RestAPI api = new RestAPI(activity, "/api/comprobarUnirseSala");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("salaID", salaID);
+        api.openConnection();
+        api.setOnObjectReceived(Boolean.class, consumer);
     }
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
