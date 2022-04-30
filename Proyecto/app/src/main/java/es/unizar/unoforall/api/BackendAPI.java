@@ -339,17 +339,15 @@ public class BackendAPI{
         }
     }
 
-    public void comprobarPartidaPausada(Consumer<Boolean> consumer){
+    public void comprobarPartidaPausada(Consumer<Sala> consumer){
         RestAPI api = new RestAPI(activity, "/api/comprobarPartidaPausada");
         api.addParameter("sesionID", sesionID);
         api.openConnection();
         api.setOnObjectReceived(Sala.class, sala -> {
             if(sala.isNoExiste()){
-                consumer.accept(false);
+                consumer.accept(null);
             }else{
-                salaActual = sala;
-                salaActualID = sala.getSalaID();
-                consumer.accept(true);
+                consumer.accept(sala);
             }
         });
     }

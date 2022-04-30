@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 
 import es.unizar.unoforall.api.BackendAPI;
+import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ActivityType;
 
@@ -33,6 +34,8 @@ public class PrincipalActivity extends CustomActivity {
     private Button reanudarSalaButton;
     private Button abandonarSalaButton;
 
+    private Sala salaPausada;
+
     private void inicializarButtons(){
         crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivityForResult(new Intent(this, CrearSalaActivity.class), 0));
@@ -41,7 +44,7 @@ public class PrincipalActivity extends CustomActivity {
         buscarSalaButton.setOnClickListener(v -> startActivityForResult(new Intent(this, BuscarSalaActivity.class), 0));
 
         reanudarSalaButton = findViewById(R.id.reanudarSalaButton);
-        reanudarSalaButton.setOnClickListener(view -> api.unirseSala(BackendAPI.getSalaActualID()));
+        reanudarSalaButton.setOnClickListener(view -> api.unirseSala(salaPausada.getSalaID()));
 
         abandonarSalaButton = findViewById(R.id.abandonarSalaButton);
         abandonarSalaButton.setOnClickListener(view -> {
@@ -88,13 +91,16 @@ public class PrincipalActivity extends CustomActivity {
         setButtonsEnabled(true);
         sesionIniciada = true;
 
-        api.comprobarPartidaPausada(haySalaPausada -> {
-            if(haySalaPausada){
+        api.comprobarPartidaPausada(sala -> {
+            salaPausada = sala;
+            if(salaPausada != null){
+                // Si hay una sala pausada
                 crearSalaButton.setVisibility(View.GONE);
                 buscarSalaButton.setVisibility(View.GONE);
                 reanudarSalaButton.setVisibility(View.VISIBLE);
                 abandonarSalaButton.setVisibility(View.VISIBLE);
             }else{
+                // Si no hay una sala pausada
                 crearSalaButton.setVisibility(View.VISIBLE);
                 buscarSalaButton.setVisibility(View.VISIBLE);
                 reanudarSalaButton.setVisibility(View.GONE);
