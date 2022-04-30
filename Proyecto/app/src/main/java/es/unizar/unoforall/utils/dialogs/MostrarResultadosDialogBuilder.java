@@ -96,9 +96,9 @@ public class MostrarResultadosDialogBuilder {
                 imageID = usuario.getAvatar();
             }
             System.err.println("Usuario: " + usuario + "; puesto: " + puesto + "; puntos: " + puntos + "; nombre: " + nombre);
-            ImageManager.setImagenPerfil(imageViewsPuestos[puesto], imageID);
-            textViewsPuestos[puesto].setText(nombre);
-            textViewsPuntos[puesto].setText(puntos + " puntos");
+            ImageManager.setImagenPerfil(imageViewsPuestos[puesto-1], imageID);
+            textViewsPuestos[puesto-1].setText(nombre);
+            textViewsPuntos[puesto-1].setText(puntos + " puntos");
         }
     }
 
