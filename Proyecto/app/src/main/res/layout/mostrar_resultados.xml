@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <LinearLayout
         android:id="@+id/layoutPuesto0"
@@ -22,23 +23,30 @@
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto0"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_marginEnd="15dp"/>
-        <TextView
-            android:id="@+id/textViewPuesto0"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="JugadorPuesto0"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginEnd="15dp"/>
-        <TextView
-            android:id="@+id/textViewPuntos0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="\??? puntos"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewPuesto0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="JugadorPuesto0"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginEnd="15dp"/>
+            <TextView
+                android:id="@+id/textViewPuntos0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="\??? puntos"/>
+        </LinearLayout>
+
     </LinearLayout>
     <LinearLayout
         android:id="@+id/layoutPuesto1"
@@ -58,23 +66,30 @@
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto1"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_marginEnd="20dp"/>
-        <TextView
-            android:id="@+id/textViewPuesto1"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="JugadorPuesto1"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginEnd="15dp"/>
-        <TextView
-            android:id="@+id/textViewPuntos1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="\??? puntos"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewPuesto1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="JugadorPuesto1"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginEnd="15dp"/>
+            <TextView
+                android:id="@+id/textViewPuntos1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="\??? puntos"/>
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/layoutPuesto2"
@@ -94,23 +109,30 @@
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto2"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_marginEnd="20dp"/>
-        <TextView
-            android:id="@+id/textViewPuesto2"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="JugadorPuesto2"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginEnd="15dp"/>
-        <TextView
-            android:id="@+id/textViewPuntos2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="\??? puntos"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewPuesto2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="JugadorPuesto2"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginEnd="15dp"/>
+            <TextView
+                android:id="@+id/textViewPuntos2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="\??? puntos"/>
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/layoutPuesto3"
@@ -130,22 +152,28 @@
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto3"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_marginEnd="20dp"/>
-        <TextView
-            android:id="@+id/textViewPuesto3"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="JugadorPuesto3"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginEnd="15dp"/>
-        <TextView
-            android:id="@+id/textViewPuntos3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="\??? puntos"/>
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/textViewPuesto3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="JugadorPuesto3"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginEnd="15dp"/>
+            <TextView
+                android:id="@+id/textViewPuntos3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="\??? puntos"/>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
