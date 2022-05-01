@@ -159,8 +159,13 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
             }
         }
 
-        numUsuariosTextView.setText(sala.numParticipantes() + " / " + sala.getConfiguracion().getMaxParticipantes());
-        numUsuariosListosTextView.setText(numParticipantesListos + " / " + sala.numParticipantes());
+        if(sala.isEnPausa()){
+            numUsuariosTextView.setText(sala.getConfiguracion().getMaxParticipantes() + " / " + sala.getConfiguracion().getMaxParticipantes());
+            numUsuariosListosTextView.setText(numParticipantesListos + " / " + sala.getConfiguracion().getMaxParticipantes());
+        }else{
+            numUsuariosTextView.setText(sala.numParticipantes() + " / " + sala.getConfiguracion().getMaxParticipantes());
+            numUsuariosListosTextView.setText(numParticipantesListos + " / " + sala.numParticipantes());
+        }
 
         if(sala.getConfiguracion().isEsPublica()){
             salaTipoTextView.setText("pública");
