@@ -108,6 +108,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     
     private BackendAPI api;
 
+    public static String getIAName(){
+        return "IA";
+    }
     public static String getIAName(int jugadorID){
         return "IA_" + jugadorID;
     }

@@ -89,7 +89,7 @@ public class MostrarResultadosDialogBuilder {
             int imageID;
             if(usuario == null){
                 // Es una IA
-                nombre = PartidaActivity.getIAName(i);
+                nombre = PartidaActivity.getIAName();
                 imageID = ImageManager.IA_IMAGE_ID;
             }else{
                 nombre = usuario.getNombre();
