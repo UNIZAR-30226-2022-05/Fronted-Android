@@ -12,4 +12,9 @@
     <color name="azul_oscuro">#FF004A71</color>
 
     <color name="color_barra_progreso">#FFC3C3C3</color>
+
+    <color name="color_primer_puesto">#D4AF37</color>
+    <color name="color_segundo_puesto">#C2C2C3</color>
+    <color name="color_tercer_puesto">#CD7F32</color>
+    <color name="color_cuarto_puesto">#6C78BD</color>
 </resources>

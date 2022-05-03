@@ -14,12 +14,13 @@
         android:layout_marginTop="5dp">
 
         <TextView
+            android:id="@+id/numeroPuesto0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1º"
             android:textStyle="bold|italic"
             android:textSize="30sp"
-            android:textColor="#D4AF37"
+            android:textColor="@color/color_primer_puesto"
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto0"
@@ -57,12 +58,13 @@
         android:layout_marginTop="5dp">
 
         <TextView
+            android:id="@+id/numeroPuesto1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2º"
             android:textStyle="bold|italic"
             android:textSize="30sp"
-            android:textColor="#C2C2C3"
+            android:textColor="@color/color_segundo_puesto"
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto1"
@@ -100,12 +102,13 @@
         android:layout_marginTop="5dp">
 
         <TextView
+            android:id="@+id/numeroPuesto2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="3º"
             android:textStyle="bold|italic"
             android:textSize="30sp"
-            android:textColor="#CD7F32"
+            android:textColor="@color/color_tercer_puesto"
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto2"
@@ -143,12 +146,13 @@
         android:layout_marginTop="5dp">
 
         <TextView
+            android:id="@+id/numeroPuesto3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="4º"
             android:textStyle="bold|italic"
             android:textSize="30sp"
-            android:textColor="#6C78BD"
+            android:textColor="@color/color_cuarto_puesto"
             android:layout_marginEnd="10dp"/>
         <ImageView
             android:id="@+id/imageViewPuesto3"
