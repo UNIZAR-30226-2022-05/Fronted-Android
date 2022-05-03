@@ -537,7 +537,7 @@ public class BackendAPI{
                 }
             });
         });
-        builder.setNegativeButton(() -> activity.mostrarMensaje("Envío cancelado"));
+        builder.setNegativeButton(() -> activity.mostrarMensaje("Envío de solicitud cancelado"));
         builder.show();
     }
     private void enviarPeticion2(String correo, Runnable runnable){

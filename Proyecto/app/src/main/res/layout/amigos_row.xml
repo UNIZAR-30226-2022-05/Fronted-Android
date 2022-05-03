@@ -28,6 +28,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="correo"/>
+
+            <TextView
+                android:id="@+id/solicitudPendiente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(Solicitud pendiente)"
+                android:textColor="#CA7800"/>
         </LinearLayout>
 
         <ImageView

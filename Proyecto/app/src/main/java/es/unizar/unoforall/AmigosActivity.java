@@ -1,10 +1,9 @@
 package es.unizar.unoforall;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.os.Bundle;
 import android.widget.ListView;
+
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -12,17 +11,14 @@ import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.utils.ActivityType;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.list_adapters.AmigosAdapter;
-import es.unizar.unoforall.utils.list_adapters.PeticionesEnviadasAdapter;
-import es.unizar.unoforall.utils.list_adapters.PeticionesRecibidasAdapter;
-import es.unizar.unoforall.utils.tasks.Task;
 
 public class AmigosActivity extends CustomActivity {
 
     private ListView amigosListView;
-    private ListView peticionesRecibidasListView;
-    private ListView peticionesEnviadasListView;
 
     private SwipeRefreshLayout pullToRefresh;
+
+    private BackendAPI api;
 
     @Override
     public ActivityType getType(){
@@ -36,14 +32,13 @@ public class AmigosActivity extends CustomActivity {
         setTitle(getString(R.string.gestionarAmigos));
 
         amigosListView = findViewById(R.id.amigosListView);
-        peticionesEnviadasListView = findViewById(R.id.peticionesEnviadasListView);
-        peticionesRecibidasListView = findViewById(R.id.peticionesRecibidasListView);
 
         pullToRefresh = findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(() -> refreshData());
 
+        api = new BackendAPI(this);
         FloatingActionButton fab = findViewById(R.id.agregarAmigoButton);
-        fab.setOnClickListener(view -> new BackendAPI(this).enviarPeticion(() -> refreshData()));
+        fab.setOnClickListener(view -> api.enviarPeticion(() -> refreshData()));
 
         refreshData();
     }
@@ -51,19 +46,17 @@ public class AmigosActivity extends CustomActivity {
     private void refreshData(){
         pullToRefresh.setRefreshing(true);
 
-        BackendAPI api = new BackendAPI(this);
-        api.obtenerAmigos(listaUsuarios -> {
-            AmigosAdapter adapter = new AmigosAdapter(this, listaUsuarios);
-            amigosListView.setAdapter(adapter);
-        });
-        api.obtenerPeticionesEnviadas(listaUsuarios -> {
-            PeticionesEnviadasAdapter adapter = new PeticionesEnviadasAdapter(this, listaUsuarios);
-            peticionesEnviadasListView.setAdapter(adapter);
-        });
-        api.obtenerPeticionesRecibidas(listaUsuarios -> {
-            PeticionesRecibidasAdapter adapter = new PeticionesRecibidasAdapter(this, listaUsuarios, () -> refreshData());
-            peticionesRecibidasListView.setAdapter(adapter);
-            pullToRefresh.setRefreshing(false);
+        api.obtenerAmigos(listaAmigos -> {
+            api.obtenerPeticionesEnviadas(listaAmigosPendientes -> {
+                listaAmigosPendientes.getUsuarios().forEach(usuarioVO -> {
+                    usuarioVO.setPuntos(-1000);
+                    listaAmigos.getUsuarios().add(usuarioVO);
+                });
+
+                AmigosAdapter adapter = new AmigosAdapter(this, listaAmigos);
+                amigosListView.setAdapter(adapter);
+                pullToRefresh.setRefreshing(false);
+            });
         });
     }
 }
