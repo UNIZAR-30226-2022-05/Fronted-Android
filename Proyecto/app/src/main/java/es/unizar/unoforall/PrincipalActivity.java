@@ -22,18 +22,9 @@ import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 
 public class PrincipalActivity extends CustomActivity {
 
-//    private static final int MODIFICAR_CUENTA_ID = 0;
-//    private static final int MODIFICAR_ASPECTO_ID = 1;
-    private static final int GESTIONAR_AMIGOS_ID = 2;
-    private static final int VER_ESTADISTICAS_ID = 3;
-    private static final int VER_HISTORIAL_ID = 4;
-    private static final int BORRAR_CUENTA_ID = 5;
-//    private static final int CERRAR_SESION_ID = 6;
-
     private static final int MODIFICAR_CUENTA_ID = 0;
     private static final int MODIFICAR_ASPECTO_ID = 1;
     private static final int CERRAR_SESION_ID = 2;
-
 
     private static boolean sesionIniciada = false;
 
@@ -102,8 +93,6 @@ public class PrincipalActivity extends CustomActivity {
 
         api = new BackendAPI(this);
 
-
-
         inicializar();
         setButtonsEnabled(true);
         sesionIniciada = true;
@@ -139,48 +128,6 @@ public class PrincipalActivity extends CustomActivity {
                 layoutCrearBuscarSala.setVisibility(View.VISIBLE);
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        boolean result = super.onCreateOptionsMenu(menu);
-        menu.add(Menu.NONE, MODIFICAR_CUENTA_ID, Menu.NONE, R.string.modificarCuenta);
-        menu.add(Menu.NONE, MODIFICAR_ASPECTO_ID, Menu.NONE, R.string.modificarAspecto);
-        menu.add(Menu.NONE, GESTIONAR_AMIGOS_ID, Menu.NONE, R.string.gestionarAmigos);
-        menu.add(Menu.NONE, VER_ESTADISTICAS_ID, Menu.NONE, R.string.verEstadisticas);
-        menu.add(Menu.NONE, VER_HISTORIAL_ID, Menu.NONE, R.string.verHistorial);
-        menu.add(Menu.NONE, BORRAR_CUENTA_ID, Menu.NONE, R.string.borrarCuenta);
-        menu.add(Menu.NONE, CERRAR_SESION_ID, Menu.NONE, R.string.cerrarSesion);
-        return result;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(!sesionIniciada){
-            return false;
-        }
-
-        switch(item.getItemId()){
-            case MODIFICAR_CUENTA_ID:
-                new BackendAPI(this).modificarCuenta();
-                break;
-            case MODIFICAR_ASPECTO_ID:
-                new BackendAPI(this).cambiarPersonalizacionStepOne();
-                break;
-            case BORRAR_CUENTA_ID:
-                new BackendAPI(this).borrarCuenta();
-                break;
-//            case GESTIONAR_AMIGOS_ID:
-//                Intent intent = new Intent(this, AmigosActivity.class);
-//                startActivityForResult(intent, 0);
-//                break;
-//            case CERRAR_SESION_ID:
-//                cerrarSesion();
-//                break;
-            default:
-                mostrarMensaje("No implementado todavía");
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
