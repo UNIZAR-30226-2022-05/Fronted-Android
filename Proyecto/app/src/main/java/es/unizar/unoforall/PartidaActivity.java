@@ -340,14 +340,13 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         boolean esNuevoTurno = turnoActual != turnoAnterior || partida.isRepeticionTurno();
 
         if(jugadorActualID == -1){
-            jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuarioID());
-            UsuarioVO usuarioActual = sala.getParticipante(BackendAPI.getUsuarioID());
+            this.jugadorActualID = partida.getIndiceJugador(BackendAPI.getUsuario().getId());
 
             // Si defaultMode = true, se mostrará el aspecto por defecto de las cartas.
             //     Si no, se mostrará el aspecto alternativo.
-            defaultMode = usuarioActual.getAspectoCartas() == 0;
-            mainView = findViewById(R.id.layoutPantallaPartida);
-            ImageManager.setImagenFondo(mainView, usuarioActual.getAspectoTablero());
+            this.defaultMode = BackendAPI.getUsuario().getAspectoCartas() == 0;
+            this.mainView = findViewById(R.id.layoutPantallaPartida);
+            ImageManager.setImagenFondo(mainView, BackendAPI.getUsuario().getAspectoTablero());
 
             jugadorIDmap.clear();
             jugadorIDmap.put(jugadorActualID, JUGADOR_ABAJO);

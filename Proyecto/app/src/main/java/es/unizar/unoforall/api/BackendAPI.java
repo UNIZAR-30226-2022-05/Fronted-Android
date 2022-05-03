@@ -41,9 +41,12 @@ public class BackendAPI{
     private static String sesionID = null;
     private static WebSocketAPI wsAPI = null;
 
-    private static UUID usuarioID = null;
-    public static UUID getUsuarioID(){
-        return usuarioID;
+    private static UsuarioVO usuario = null;
+    public static UsuarioVO getUsuario(){
+        return usuario;
+    }
+    public static void setUsuario(UsuarioVO usuario){
+        BackendAPI.usuario = usuario;
     }
 
     private static Sala salaActual = null;
@@ -126,7 +129,7 @@ public class BackendAPI{
                             }
                         });
 
-                usuarioID = usuarioVO.getId();
+                usuario = usuarioVO;
                 activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
 
                 // Iniciar la actividad principal
