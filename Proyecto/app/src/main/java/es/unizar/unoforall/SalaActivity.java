@@ -99,6 +99,10 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
         listoSala.setOnClickListener(view -> {
             listoSala.setEnabled(false);
             listoSala.setBackgroundColor(Color.LTGRAY);
+            if(salaActual.isEnPausa()){
+                volverButton.setEnabled(false);
+                volverButton.setBackgroundColor(Color.LTGRAY);
+            }
             api.listoSala();
         });
 
