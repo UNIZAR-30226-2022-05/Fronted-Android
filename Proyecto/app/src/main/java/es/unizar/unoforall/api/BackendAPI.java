@@ -244,6 +244,7 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
             if(usuarioVO.isExito()){
+                usuario = usuarioVO;
                 consumer.accept(usuarioVO);
             }else{
                 activity.mostrarMensaje("Se ha producido un error al obtener el usuario");
@@ -480,7 +481,6 @@ public class BackendAPI{
                     }
                 });
             });
-            builder.setNegativeButton(() -> activity.mostrarMensaje("Borrado cancelado"));
             builder.show();
         });
     }
