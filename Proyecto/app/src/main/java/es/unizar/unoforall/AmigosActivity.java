@@ -49,7 +49,8 @@ public class AmigosActivity extends CustomActivity {
         api.obtenerAmigos(listaAmigos -> {
             api.obtenerPeticionesEnviadas(listaAmigosPendientes -> {
                 listaAmigosPendientes.getUsuarios().forEach(usuarioVO -> {
-                    usuarioVO.setPuntos(-1000);
+                    // Indicar que la solicitud está pendiente
+                    usuarioVO.setAspectoCartas(-1);
                     listaAmigos.getUsuarios().add(usuarioVO);
                 });
 

@@ -47,7 +47,7 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
         correoTextView.setText(correo);
         ImageManager.setImagenPerfil(imageView, imageID);
 
-        boolean solicitudPendiente = usuarioVO.getPuntos() == -1000;
+        boolean solicitudPendiente = usuarioVO.getAspectoCartas() == -1;
         if(!solicitudPendiente){
             // Si el usuario no está pendiente de aceptar la solicitud,
             //  se oculta el texto de solicitud pendiente
