@@ -8,6 +8,8 @@ public enum ActivityType {
 
     PRINCIPAL,
     AMIGOS,
+    PERFIL,
+    NOTIFICACIONES,
     CREAR_SALA,
     BUSCAR_SALA,
 

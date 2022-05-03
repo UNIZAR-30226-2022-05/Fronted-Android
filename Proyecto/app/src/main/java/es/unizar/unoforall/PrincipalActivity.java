@@ -113,9 +113,16 @@ public class PrincipalActivity extends CustomActivity {
             Intent intent = new Intent(this, AmigosActivity.class);
             startActivityForResult(intent, 0);
         });
-
         registerForContextMenu(imageViewConfiguracion);
         imageViewConfiguracion.setOnClickListener(view -> view.showContextMenu(view.getX(), view.getY()));
+        imageViewNotificaciones.setOnClickListener(view -> {
+            Intent intent = new Intent(this, NotificacionesActivity.class);
+            startActivityForResult(intent, 0);
+        });
+        imageViewPerfil.setOnClickListener(view -> {
+            Intent intent = new Intent(this, PerfilActivity.class);
+            startActivityForResult(intent, 0);
+        });
 
         layoutCrearBuscarSala.setVisibility(View.GONE);
         layoutReanudarAbandonarSala.setVisibility(View.GONE);

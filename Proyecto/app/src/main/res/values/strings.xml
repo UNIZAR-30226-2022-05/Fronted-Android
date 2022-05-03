@@ -89,4 +89,7 @@
     <string name="peticionesEnviadas">Peticiones enviadas</string>
     <string name="listaAmigos">Lista de amigos</string>
     <string name="agregarAmigo">Agregar amigo</string>
+
+    <string name="notificaciones">Notificaciones</string>
+    <string name="perfil">Perfil</string>
 </resources>
