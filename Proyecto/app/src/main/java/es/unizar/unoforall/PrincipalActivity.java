@@ -104,10 +104,10 @@ public class PrincipalActivity extends CustomActivity {
         ImageView imageViewAmigos = findViewById(R.id.imageViewAmigos);
         ImageView imageViewNotificaciones = findViewById(R.id.imageViewNotificaciones);
 
-        ImageManager.setImageViewClickable(imageViewPerfil, true, true);
-        ImageManager.setImageViewClickable(imageViewConfiguracion, true, true);
-        ImageManager.setImageViewClickable(imageViewAmigos, true, true);
-        ImageManager.setImageViewClickable(imageViewNotificaciones, true, true);
+        ImageManager.setImageViewClickable(imageViewPerfil, true, false);
+        ImageManager.setImageViewClickable(imageViewConfiguracion, true, false);
+        ImageManager.setImageViewClickable(imageViewAmigos, true, false);
+        ImageManager.setImageViewClickable(imageViewNotificaciones, true, false);
 
         imageViewAmigos.setOnClickListener(view -> {
             Intent intent = new Intent(this, AmigosActivity.class);
