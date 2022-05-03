@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.Sala;
@@ -29,6 +30,9 @@ public class PrincipalActivity extends CustomActivity {
 
     private BackendAPI api;
 
+    private LinearLayout layoutCrearBuscarSala;
+    private LinearLayout layoutReanudarAbandonarSala;
+
     private Button crearSalaButton;
     private Button buscarSalaButton;
     private Button reanudarSalaButton;
@@ -37,6 +41,9 @@ public class PrincipalActivity extends CustomActivity {
     private Sala salaPausada;
 
     private void inicializarButtons(){
+        layoutCrearBuscarSala = findViewById(R.id.layoutCrearBuscarSala);
+        layoutReanudarAbandonarSala = findViewById(R.id.layoutReanudarAbandonarSala);
+
         crearSalaButton = findViewById(R.id.crearSalaButton);
         crearSalaButton.setOnClickListener(v -> startActivityForResult(new Intent(this, CrearSalaActivity.class), 0));
 
@@ -55,10 +62,7 @@ public class PrincipalActivity extends CustomActivity {
                 BackendAPI.setSalaActualID(salaPausada.getSalaID());
                 BackendAPI.setSalaActual(salaPausada);
                 api.salirSalaDefinitivo();
-                crearSalaButton.setVisibility(View.VISIBLE);
-                buscarSalaButton.setVisibility(View.VISIBLE);
-                reanudarSalaButton.setVisibility(View.GONE);
-                abandonarSalaButton.setVisibility(View.GONE);
+                layoutReanudarAbandonarSala.setVisibility(View.GONE);
             });
             builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
             builder.create().show();
@@ -93,20 +97,17 @@ public class PrincipalActivity extends CustomActivity {
         setButtonsEnabled(true);
         sesionIniciada = true;
 
+        layoutCrearBuscarSala.setVisibility(View.GONE);
+        layoutReanudarAbandonarSala.setVisibility(View.GONE);
+
         api.comprobarPartidaPausada(sala -> {
             salaPausada = sala;
             if(salaPausada != null){
                 // Si hay una sala pausada
-                crearSalaButton.setVisibility(View.GONE);
-                buscarSalaButton.setVisibility(View.GONE);
-                reanudarSalaButton.setVisibility(View.VISIBLE);
-                abandonarSalaButton.setVisibility(View.VISIBLE);
+                layoutReanudarAbandonarSala.setVisibility(View.VISIBLE);
             }else{
                 // Si no hay una sala pausada
-                crearSalaButton.setVisibility(View.VISIBLE);
-                buscarSalaButton.setVisibility(View.VISIBLE);
-                reanudarSalaButton.setVisibility(View.GONE);
-                abandonarSalaButton.setVisibility(View.GONE);
+                layoutCrearBuscarSala.setVisibility(View.VISIBLE);
             }
         });
     }

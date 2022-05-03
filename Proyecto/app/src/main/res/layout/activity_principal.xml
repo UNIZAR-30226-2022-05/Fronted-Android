@@ -15,6 +15,7 @@
         android:layout_marginTop="100dp"/>
 
     <LinearLayout
+        android:id="@+id/layoutCrearBuscarSala"
         android:layout_marginTop="50dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,6 +43,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layoutReanudarAbandonarSala"
         android:layout_marginTop="50dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
