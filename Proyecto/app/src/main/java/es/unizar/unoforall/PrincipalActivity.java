@@ -5,26 +5,35 @@ import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.ImageManager;
+import es.unizar.unoforall.utils.dialogs.ReglasViewDialogBuilder;
 
 public class PrincipalActivity extends CustomActivity {
 
-    private static final int MODIFICAR_CUENTA_ID = 0;
-    private static final int MODIFICAR_ASPECTO_ID = 1;
+//    private static final int MODIFICAR_CUENTA_ID = 0;
+//    private static final int MODIFICAR_ASPECTO_ID = 1;
     private static final int GESTIONAR_AMIGOS_ID = 2;
     private static final int VER_ESTADISTICAS_ID = 3;
     private static final int VER_HISTORIAL_ID = 4;
     private static final int BORRAR_CUENTA_ID = 5;
-    private static final int CERRAR_SESION_ID = 6;
+//    private static final int CERRAR_SESION_ID = 6;
+
+    private static final int MODIFICAR_CUENTA_ID = 0;
+    private static final int MODIFICAR_ASPECTO_ID = 1;
+    private static final int CERRAR_SESION_ID = 2;
+
 
     private static boolean sesionIniciada = false;
 
@@ -40,7 +49,7 @@ public class PrincipalActivity extends CustomActivity {
 
     private Sala salaPausada;
 
-    private void inicializarButtons(){
+    private void inicializar(){
         layoutCrearBuscarSala = findViewById(R.id.layoutCrearBuscarSala);
         layoutReanudarAbandonarSala = findViewById(R.id.layoutReanudarAbandonarSala);
 
@@ -93,9 +102,29 @@ public class PrincipalActivity extends CustomActivity {
 
         api = new BackendAPI(this);
 
-        inicializarButtons();
+
+
+        inicializar();
         setButtonsEnabled(true);
         sesionIniciada = true;
+
+        ImageView imageViewPerfil = findViewById(R.id.imageViewPerfil);
+        ImageView imageViewConfiguracion = findViewById(R.id.imageViewConfiguracion);
+        ImageView imageViewAmigos = findViewById(R.id.imageViewAmigos);
+        ImageView imageViewNotificaciones = findViewById(R.id.imageViewNotificaciones);
+
+        ImageManager.setImageViewClickable(imageViewPerfil, true, true);
+        ImageManager.setImageViewClickable(imageViewConfiguracion, true, true);
+        ImageManager.setImageViewClickable(imageViewAmigos, true, true);
+        ImageManager.setImageViewClickable(imageViewNotificaciones, true, true);
+
+        imageViewAmigos.setOnClickListener(view -> {
+            Intent intent = new Intent(this, AmigosActivity.class);
+            startActivityForResult(intent, 0);
+        });
+
+        registerForContextMenu(imageViewConfiguracion);
+        imageViewConfiguracion.setOnClickListener(view -> view.showContextMenu(view.getX(), view.getY()));
 
         layoutCrearBuscarSala.setVisibility(View.GONE);
         layoutReanudarAbandonarSala.setVisibility(View.GONE);
@@ -141,13 +170,13 @@ public class PrincipalActivity extends CustomActivity {
             case BORRAR_CUENTA_ID:
                 new BackendAPI(this).borrarCuenta();
                 break;
-            case GESTIONAR_AMIGOS_ID:
-                Intent intent = new Intent(this, AmigosActivity.class);
-                startActivityForResult(intent, 0);
-                break;
-            case CERRAR_SESION_ID:
-                cerrarSesion();
-                break;
+//            case GESTIONAR_AMIGOS_ID:
+//                Intent intent = new Intent(this, AmigosActivity.class);
+//                startActivityForResult(intent, 0);
+//                break;
+//            case CERRAR_SESION_ID:
+//                cerrarSesion();
+//                break;
             default:
                 mostrarMensaje("No implementado todavía");
         }
@@ -157,6 +186,31 @@ public class PrincipalActivity extends CustomActivity {
     @Override
     public void onBackPressed(){
         cerrarSesion();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateOptionsMenu(menu);
+        menu.add(Menu.NONE, MODIFICAR_CUENTA_ID, Menu.NONE, R.string.modificarCuenta);
+        menu.add(Menu.NONE, MODIFICAR_ASPECTO_ID, Menu.NONE, R.string.modificarAspecto);
+        menu.add(Menu.NONE, CERRAR_SESION_ID, Menu.NONE, R.string.cerrarSesion);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case MODIFICAR_CUENTA_ID:
+                api.modificarCuenta();
+                break;
+            case MODIFICAR_ASPECTO_ID:
+                api.cambiarPersonalizacionStepOne();
+                break;
+            case CERRAR_SESION_ID:
+                cerrarSesion();
+                break;
+        }
+        return super.onContextItemSelected(item);
     }
 
     private void cerrarSesion(){
