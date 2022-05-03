@@ -71,7 +71,6 @@ public class ModifyAspectDialogBuilder {
                 }
 
                 ImageManager.setImageViewColorFilter(imageView, ImageManager.SELECTED_IMAGEN_PERFIL_COLOR);
-                activity.mostrarMensaje("Has seleccionado el icono " + (imageIDfinal+1));
                 iconoSeleccionado = imageIDfinal;
                 for(int j=ImageManager.IMAGEN_PERFIL_0_ID; j<=ImageManager.IMAGEN_PERFIL_6_ID; j++){
                     if(j != imageIDfinal){
@@ -139,7 +138,6 @@ public class ModifyAspectDialogBuilder {
             ImageManager.setImageViewClickable(imageViewsFondo[i], true, false);
             final int finalI = i;
             imageViewsFondo[i].setOnClickListener(view -> {
-                activity.mostrarMensaje("Has seleccionado el fondo " + (finalI+1));
                 fondoSeleccionado = finalI;
                 layoutFondos[fondoSeleccionado].setBackgroundColor(ImageManager.SELECTED_FONDO_COLOR);
                 textoFondos[fondoSeleccionado].setTextColor(Color.WHITE);
@@ -174,7 +172,6 @@ public class ModifyAspectDialogBuilder {
         }
 
         coloresPorDefectoImageButton.setOnClickListener(view -> {
-            activity.mostrarMensaje("Has seleccionado los colores por defecto");
             cartasPorDefecto = 0;
             coloresPorDefectoLayout.setBackgroundColor(ImageManager.SELECTED_FONDO_COLOR);
             coloresPorDefectoTextView.setTextColor(Color.WHITE);
@@ -183,7 +180,6 @@ public class ModifyAspectDialogBuilder {
         });
 
         coloresAlternativosImageButton.setOnClickListener(view -> {
-            activity.mostrarMensaje("Has seleccionado los colores alternativos");
             cartasPorDefecto = 1;
             coloresAlternativosLayout.setBackgroundColor(ImageManager.SELECTED_FONDO_COLOR);
             coloresAlternativosTextView.setTextColor(Color.WHITE);

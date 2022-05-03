@@ -646,7 +646,9 @@ public class BackendAPI{
         api.openConnection();
         api.setOnObjectReceived(String.class, error -> {
             if(error == null){
-                activity.mostrarMensaje("Los cambios se han realizado correctamente");
+                // Cerrar sesión y volverla a iniciar
+                closeWebSocketAPI();
+                login(usuario.getCorreo(), usuario.getContrasenna());
             }else{
                 activity.mostrarMensaje(error);
             }

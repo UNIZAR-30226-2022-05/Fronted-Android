@@ -97,6 +97,8 @@ public class PrincipalActivity extends CustomActivity {
         setButtonsEnabled(true);
         sesionIniciada = true;
 
+        ImageManager.setImagenFondo(findViewById(R.id.mainView), BackendAPI.getUsuario().getAspectoTablero());
+
         ImageView imageViewPerfil = findViewById(R.id.imageViewPerfil);
         ImageView imageViewConfiguracion = findViewById(R.id.imageViewConfiguracion);
         ImageView imageViewAmigos = findViewById(R.id.imageViewAmigos);

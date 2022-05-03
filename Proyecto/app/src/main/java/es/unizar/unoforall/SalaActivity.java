@@ -54,6 +54,7 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
         setContentView(R.layout.activity_sala);
 
         api = new BackendAPI(this);
+        ImageManager.setImagenFondo(findViewById(R.id.mainView), BackendAPI.getUsuario().getAspectoTablero());
         Sala salaActual = BackendAPI.getSalaActual();
 
         if(salaActual.isEnPausa()){
