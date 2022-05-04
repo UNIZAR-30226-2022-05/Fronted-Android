@@ -38,8 +38,27 @@ public class PrincipalActivity extends CustomActivity {
     private Button reanudarSalaButton;
     private Button abandonarSalaButton;
 
+    ImageView imageViewPerfil;
+    ImageView imageViewConfiguracion;
+    ImageView imageViewAmigos;
+    ImageView imageViewNotificaciones;
+
     private Sala salaPausada;
 
+    private void setOpcionesEnabled(boolean enabled){
+        ImageManager.setImageViewEnable(imageViewPerfil, enabled);
+        ImageManager.setImageViewEnable(imageViewConfiguracion, true);
+        ImageManager.setImageViewEnable(imageViewAmigos, enabled);
+        ImageManager.setImageViewEnable(imageViewNotificaciones, enabled);
+        ImageManager.setImageViewClickable(imageViewPerfil, enabled, false);
+        ImageManager.setImageViewClickable(imageViewConfiguracion, true, false);
+        ImageManager.setImageViewClickable(imageViewAmigos, enabled, false);
+        ImageManager.setImageViewClickable(imageViewNotificaciones, enabled, false);
+        imageViewPerfil.setEnabled(enabled);
+        imageViewConfiguracion.setEnabled(true);
+        imageViewAmigos.setEnabled(enabled);
+        imageViewNotificaciones.setEnabled(enabled);
+    }
     private void inicializar(){
         layoutCrearBuscarSala = findViewById(R.id.layoutCrearBuscarSala);
         layoutReanudarAbandonarSala = findViewById(R.id.layoutReanudarAbandonarSala);
@@ -66,6 +85,26 @@ public class PrincipalActivity extends CustomActivity {
             });
             builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
             builder.create().show();
+        });
+
+        imageViewPerfil = findViewById(R.id.imageViewPerfil);
+        imageViewConfiguracion = findViewById(R.id.imageViewConfiguracion);
+        imageViewAmigos = findViewById(R.id.imageViewAmigos);
+        imageViewNotificaciones = findViewById(R.id.imageViewNotificaciones);
+
+        imageViewAmigos.setOnClickListener(view -> {
+            Intent intent = new Intent(this, AmigosActivity.class);
+            startActivityForResult(intent, 0);
+        });
+        registerForContextMenu(imageViewConfiguracion);
+        imageViewConfiguracion.setOnClickListener(view -> view.showContextMenu(view.getX(), view.getY()));
+        imageViewNotificaciones.setOnClickListener(view -> {
+            Intent intent = new Intent(this, NotificacionesActivity.class);
+            startActivityForResult(intent, 0);
+        });
+        imageViewPerfil.setOnClickListener(view -> {
+            Intent intent = new Intent(this, PerfilActivity.class);
+            startActivityForResult(intent, 0);
         });
     }
     private void setButtonsEnabled(boolean enabled){
@@ -99,31 +138,6 @@ public class PrincipalActivity extends CustomActivity {
 
         ImageManager.setImagenFondo(findViewById(R.id.mainView), BackendAPI.getUsuario().getAspectoTablero());
 
-        ImageView imageViewPerfil = findViewById(R.id.imageViewPerfil);
-        ImageView imageViewConfiguracion = findViewById(R.id.imageViewConfiguracion);
-        ImageView imageViewAmigos = findViewById(R.id.imageViewAmigos);
-        ImageView imageViewNotificaciones = findViewById(R.id.imageViewNotificaciones);
-
-        ImageManager.setImageViewClickable(imageViewPerfil, true, false);
-        ImageManager.setImageViewClickable(imageViewConfiguracion, true, false);
-        ImageManager.setImageViewClickable(imageViewAmigos, true, false);
-        ImageManager.setImageViewClickable(imageViewNotificaciones, true, false);
-
-        imageViewAmigos.setOnClickListener(view -> {
-            Intent intent = new Intent(this, AmigosActivity.class);
-            startActivityForResult(intent, 0);
-        });
-        registerForContextMenu(imageViewConfiguracion);
-        imageViewConfiguracion.setOnClickListener(view -> view.showContextMenu(view.getX(), view.getY()));
-        imageViewNotificaciones.setOnClickListener(view -> {
-            Intent intent = new Intent(this, NotificacionesActivity.class);
-            startActivityForResult(intent, 0);
-        });
-        imageViewPerfil.setOnClickListener(view -> {
-            Intent intent = new Intent(this, PerfilActivity.class);
-            startActivityForResult(intent, 0);
-        });
-
         layoutCrearBuscarSala.setVisibility(View.GONE);
         layoutReanudarAbandonarSala.setVisibility(View.GONE);
 
@@ -132,9 +146,11 @@ public class PrincipalActivity extends CustomActivity {
             if(salaPausada != null){
                 // Si hay una sala pausada
                 layoutReanudarAbandonarSala.setVisibility(View.VISIBLE);
+                setOpcionesEnabled(false);
             }else{
                 // Si no hay una sala pausada
                 layoutCrearBuscarSala.setVisibility(View.VISIBLE);
+                setOpcionesEnabled(true);
             }
         });
     }
@@ -157,15 +173,26 @@ public class PrincipalActivity extends CustomActivity {
     public boolean onContextItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case MODIFICAR_CUENTA_ID:
-                api.modificarCuenta();
-                break;
+                if(salaPausada == null){
+                    api.modificarCuenta();
+                    return true;
+                }else{
+                    mostrarMensaje("No puedes modificar tu cuenta ahora mismo");
+                    return false;
+                }
             case MODIFICAR_ASPECTO_ID:
-                api.cambiarPersonalizacionStepOne();
-                break;
+                if(salaPausada == null){
+                    api.cambiarPersonalizacionStepOne();
+                    return true;
+                }else{
+                    mostrarMensaje("No puedes personalizar tu aspecto ahora mismo");
+                    return false;
+                }
             case CERRAR_SESION_ID:
                 cerrarSesion();
-                break;
+                return true;
         }
+
         return super.onContextItemSelected(item);
     }
 
