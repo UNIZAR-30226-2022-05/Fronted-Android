@@ -387,6 +387,58 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                 }
                 sePuedePulsarBotonUNO = false;
             });
+
+            Jugada jugada = partida.getUltimaJugada();
+            if(jugada != null && !jugada.isRobar()){
+                List<Carta> cartasJugada = jugada.getCartas();
+                // Es una jugada del jugador del turno anterior que no es robar
+                int jugadorIDTurnoAnterior = partida.getTurnoUltimaJugada();
+
+                AnimationManager.Builder builder = new AnimationManager.Builder((ViewGroup) mainView);
+                builder
+                        .withStartView(layoutJugadores[jugadorIDmap.get(jugadorIDTurnoAnterior)])
+                        .withEndView(cartaDelMedio)
+                        .withDefaultMode(defaultMode)
+                        .withCartas(cartasJugada, true)
+                        .withEndAction(() -> {
+                            // Se vuelve a obtener la sala, porque podría estar desactualizada
+                            Sala salaActual = BackendAPI.getSalaActual();
+                            if(salaActual != null){
+                                Partida partidaActual = salaActual.getPartida();
+                                if(partidaActual != null){
+                                    setCartaDelMedio(partidaActual.getUltimaCartaJugada());
+                                }
+                            }
+                        })
+                        .start();
+
+                if(cartasJugada.get(0).getTipo() == Carta.Tipo.intercambio){
+                    // Es un intercambio de cartas entre el jugador del turno anterior
+                    //  y el jugador objetivo de la jugada
+
+                    int jugadorIDObjetivo = jugada.getJugadorObjetivo();
+
+                    // Mover las cartas del jugador anterior al jugador objetivo
+                    AnimationManager.Builder builder1 = new AnimationManager.Builder((ViewGroup) mainView);
+                    builder1
+                            .withStartView(layoutJugadores[jugadorIDmap.get(jugadorIDTurnoAnterior)])
+                            .withEndView(layoutJugadores[jugadorIDmap.get(jugadorIDObjetivo)])
+                            .withDefaultMode(defaultMode)
+                            .withCartas(partida.getJugadores().get(jugadorIDObjetivo).getMano(), false)
+                            .start();
+
+                    // Mover las cartas del jugador objetivo al jugador anterior
+                    AnimationManager.Builder builder2 = new AnimationManager.Builder((ViewGroup) mainView);
+                    builder2
+                            .withStartView(layoutJugadores[jugadorIDmap.get(jugadorIDObjetivo)])
+                            .withEndView(layoutJugadores[jugadorIDmap.get(jugadorIDTurnoAnterior)])
+                            .withDefaultMode(defaultMode)
+                            .withCartas(partida.getJugadores().get(jugadorIDTurnoAnterior).getMano(), false)
+                            .start();
+                }
+            }else{
+                setCartaDelMedio(partida.getUltimaCartaJugada());
+            }
         }
 
         jugadorIDmap.forEach((jugadorID, jugadorLayoutID) -> {
@@ -472,7 +524,6 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         });
         
         setSentido(partida.isSentidoHorario());
-        setCartaDelMedio(partida.getUltimaCartaJugada());
         setMazoRobar(esTurnoDelJugadorActual());
 
         if(esTurnoDelJugadorActual()){
