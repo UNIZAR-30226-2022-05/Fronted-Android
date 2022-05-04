@@ -41,10 +41,21 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
         TextView nombreTextView = view.findViewById(R.id.nombre);
         TextView correoTextView = view.findViewById(R.id.correo);
         ImageView imageView = view.findViewById(R.id.imagen);
+        TextView solicitudPendienteTextView = view.findViewById(R.id.solicitudPendiente);
 
         nombreTextView.setText(nombre);
         correoTextView.setText(correo);
         ImageManager.setImagenPerfil(imageView, imageID);
+
+        boolean solicitudPendiente = usuarioVO.getAspectoCartas() == -1;
+        if(!solicitudPendiente){
+            // Si el usuario no está pendiente de aceptar la solicitud,
+            //  se oculta el texto de solicitud pendiente
+            solicitudPendienteTextView.setVisibility(View.GONE);
+
+            // TO DO: Mostrar la pantalla de perfil del usuario al hacer click en él
+            //view.setOnClickListener(view -> mostrarPantallaPerfil(usuarioVO));
+        }
 
         return view;
     }

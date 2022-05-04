@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import es.unizar.unoforall.api.BackendAPI;
@@ -36,6 +37,8 @@ public class CrearSalaActivity extends CustomActivity {
         configSala.setModoJuego(ConfigSala.ModoJuego.Original);
         reglasEspeciales = configSala.getReglas();
 
+        RadioGroup participantesRadioGroup = findViewById(R.id.participantesRadioGroup);
+
         RadioButton radio2 = findViewById(R.id.radio_dos);
         RadioButton radio3 = findViewById(R.id.radio_tres);
         RadioButton radio4 = findViewById(R.id.radio_cuatro);
@@ -62,6 +65,8 @@ public class CrearSalaActivity extends CustomActivity {
                     radio2.setEnabled(false);
                     radio3.setEnabled(false);
                     radio4.setEnabled(false);
+                    configSala.setMaxParticipantes(4);
+                    participantesRadioGroup.check(R.id.radio_cuatro);
                 }else{
                     radio2.setEnabled(true);
                     radio3.setEnabled(true);

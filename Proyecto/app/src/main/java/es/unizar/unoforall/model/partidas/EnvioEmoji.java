@@ -1,13 +1,12 @@
 package es.unizar.unoforall.model.partidas;
 
-import java.util.UUID;
 
 public class EnvioEmoji {
 	int emoji;
-	UUID emisor;
+	int emisor;
 	boolean esIA;
 	
-	public EnvioEmoji(int emoji, UUID emisor, boolean esIA) {
+	public EnvioEmoji(int emoji, int emisor, boolean esIA) {
 		super();
 		this.emoji = emoji;
 		this.emisor = emisor;
@@ -20,10 +19,10 @@ public class EnvioEmoji {
 	public void setEmoji(int emoji) {
 		this.emoji = emoji;
 	}
-	public UUID getEmisor() {
+	public int getEmisor() {
 		return emisor;
 	}
-	public void setEmisor(UUID emisor) {
+	public void setEmisor(int emisor) {
 		this.emisor = emisor;
 	}
 

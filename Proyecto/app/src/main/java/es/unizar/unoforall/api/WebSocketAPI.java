@@ -19,8 +19,8 @@ import ua.naiksoftware.stomp.StompClient;
 
 public class WebSocketAPI {
     private static String SERVER_URL = "ws://192.168.1.100/unoforall";
-    private static final int CLIENT_HEARTBEAT_MS = 1000;
-    private static final int SERVER_HEARTBEAT_MS = 1000;
+    private static final int CLIENT_HEARTBEAT_MS = 10000;
+    private static final int SERVER_HEARTBEAT_MS = 10000;
     private static final int CONNECTION_TIMEOUT = 3000;
     private static final int CONNECTION_CHECK_TIME = 100;
 
@@ -55,6 +55,8 @@ public class WebSocketAPI {
     private CancellableRunnable runnable1, runnable2;
     public void openConnection(Activity activity, Runnable onConnectionRunnable){
         client = Stomp.over(Stomp.ConnectionProvider.JWS, SERVER_URL);
+        client.withClientHeartbeat(CLIENT_HEARTBEAT_MS);
+        client.withServerHeartbeat(SERVER_HEARTBEAT_MS);
         client.connect();
 
         // Comprobar si se ha conectado

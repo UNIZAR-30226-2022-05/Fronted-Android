@@ -3,6 +3,7 @@ package es.unizar.unoforall.utils;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.Image;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -30,6 +31,12 @@ public class ImageManager{
     public static final int IMAGEN_FONDO_0_ID = 0;
     public static final int IMAGEN_FONDO_1_ID = 1;
     public static final int IMAGEN_FONDO_2_ID = 2;
+
+    public static final int IMAGEN_EMOJI_O_ID = 0;
+    public static final int IMAGEN_EMOJI_1_ID = 1;
+    public static final int IMAGEN_EMOJI_2_ID = 2;
+    public static final int IMAGEN_EMOJI_3_ID = 3;
+    public static final int IMAGEN_EMOJI_4_ID = 4;
 
     private static final HashMap<Carta, Integer> defaultCardsMap = new HashMap<>();
     private static final HashMap<Carta, Integer> altCardsMap = new HashMap<>();
@@ -149,6 +156,43 @@ public class ImageManager{
                 break;
 
         }
+    }
+
+    // Pre: 0 <= emojiID <= 4
+    public static void setImagenEmoji(ImageView imageView, int emojiID){
+        if(emojiID < 0 || emojiID > 4){
+            throw new IllegalArgumentException("ID de emoji inválido: " + emojiID + ". Debe estar entre 0 y 4");
+        }
+
+        int resourceID = INVALID_RESOURCE_ID;
+        switch(emojiID){
+            case IMAGEN_EMOJI_O_ID:
+                resourceID = R.drawable.emoji_0;
+                break;
+            case IMAGEN_EMOJI_1_ID:
+                resourceID = R.drawable.emoji_1;
+                break;
+            case IMAGEN_EMOJI_2_ID:
+                resourceID = R.drawable.emoji_2;
+                break;
+            case IMAGEN_EMOJI_3_ID:
+                resourceID = R.drawable.emoji_3;
+                break;
+            case IMAGEN_EMOJI_4_ID:
+                resourceID = R.drawable.emoji_4;
+        }
+
+        imageView.setImageResource(resourceID);
+    }
+    public static void setImagenEmojisActivados(ImageView imageView, boolean emojisActivados){
+        int resourceID;
+        if(emojisActivados){
+            resourceID = R.drawable.activar_emojis;
+        }else{
+            resourceID = R.drawable.desactivar_emojis;
+        }
+
+        imageView.setImageResource(resourceID);
     }
 
     public static void setImagenCarta(ImageView imageView, Carta carta, boolean defaultMode, boolean isEnabled, boolean isVisible, boolean isClickable){

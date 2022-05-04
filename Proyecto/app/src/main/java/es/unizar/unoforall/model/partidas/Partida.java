@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -19,6 +20,10 @@ public class Partida {
 	private List<Carta> mazo = null;
 	private List<Carta> cartasJugadas = null;
 	
+	private Jugada ultimaJugada = null;
+	private int turnoUltimaJugada;
+
+
 	private List<Jugador> jugadores = null;
 	private int turno = 0;
 	private boolean sentidoHorario = true;
@@ -73,6 +78,8 @@ public class Partida {
 		this.configuracion = configuracion;
 		this.terminada = false;
 		this.salaID = salaID;
+		ultimaJugada = null;
+		turnoUltimaJugada = 0;
 				
 				
 		//Marcamos fecha de inicio
@@ -106,14 +113,14 @@ public class Partida {
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.n2, Carta.Color.rojo));
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.n3, Carta.Color.rojo));
 //		listaCartasBaraja.add(new Carta(Carta.Tipo.mas2, Carta.Color.rojo));
-//		listaCartasBaraja.add(new Carta(Carta.Tipo.reversa, Carta.Color.rojo));
+//		listaCartasBaraja.add(new Carta(Carta.Tipo.n4, Carta.Color.rojo));
 //		
 //		for (Carta c : listaCartasBaraja) {
 //			for(int i = 0; i < 20; i++) {
 //				this.mazo.add(c.clone());
 //			}
 //		}
-//		
+		
 		
 		Collections.shuffle(this.mazo); 
 		
@@ -425,6 +432,8 @@ public class Partida {
 	/**************************************************************************/
 	
 	public void ejecutarJugada(Jugada jugada) {
+		ultimaJugada = jugada;
+		turnoUltimaJugada = turno;
 		repeticionTurno = false;
 		if(modoJugarCartaRobada) { //FUNCIONA
 			if(jugada.getCartas()!=null && jugada.getCartas().size()==1) {
@@ -491,11 +500,14 @@ public class Partida {
 		
 	}
 	
-	public void ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
+	public boolean ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
 		if (validarJugada(jugada) && 
 				this.jugadores.get(turno).getJugadorID() != null &&
 				this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
 			ejecutarJugada(jugada);
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -639,6 +651,7 @@ public class Partida {
 	
 	public void pulsarBotonUNO(UUID jugadorID) { 
 		repeticionTurno = false;
+		ultimaJugada = null;
 		for (int indice = 0; indice < jugadores.size(); indice++) {
 			if (jugadores.get(indice).getJugadorID() != null && 
 					jugadores.get(indice).getJugadorID().equals(jugadorID)) {
@@ -695,7 +708,7 @@ public class Partida {
 	// Devuelve -1 si no se ha encontrado
 	public int getIndiceJugador(UUID jugadorID) {
 		for (int i = 0; i < this.jugadores.size() ; i++) {
-			if (jugadores.get(i).getJugadorID().equals(jugadorID)) {
+			if (Objects.equals(jugadores.get(i).getJugadorID(), jugadorID)) {
 				return i;
 			}
 		}
@@ -779,16 +792,12 @@ public class Partida {
 			} else { //Cartas con efecto o en general sin poder jugar varias cartas
 				if (jugada.getCartas().size()>1) {
 					valida = false; //Solo se puede jugar una si no son números. (o si no se permite jugar más de una).
-				}else { //Decía true aun con más de una carta sin este else
-					return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
+				}else {
+					valida = Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
 							|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
 							|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)
 							|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.cambioColor);
 				}
-				return Carta.compartenTipo(jugada.getCartas().get(0),anterior) 
-						|| Carta.compartenColor(anterior,jugada.getCartas().get(0))
-						|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.mas4)
-						|| jugada.getCartas().get(0).esDelTipo(Carta.Tipo.cambioColor);
 			}
 			
 			return valida;
@@ -889,6 +898,9 @@ public class Partida {
 			partidaResumida.cartasJugadas = this.cartasJugadas;
 		}
 		
+		partidaResumida.ultimaJugada = this.ultimaJugada;
+		partidaResumida.turnoUltimaJugada = this.turnoUltimaJugada;
+		
 		
 		partidaResumida.jugadores = jugadores;
 		partidaResumida.turno = turno;
@@ -932,5 +944,13 @@ public class Partida {
 
 	public int getRoboAcumulado() {
 		return roboAcumulado;
+	}
+	
+	public Jugada getUltimaJugada(){
+		return this.ultimaJugada;
+	}
+	
+	public int getTurnoUltimaJugada() {
+		return turnoUltimaJugada;
 	}
 }

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    android:id="@+id/mainView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:padding="10dp"
+    android:background="@color/black">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/salaID"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:textColor="@color/white"/>
 
         <TextView
             android:id="@+id/salaIDTextView"
@@ -23,7 +27,8 @@
             android:layout_height="wrap_content"
             android:text="null"
             android:textIsSelectable="true"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/white"/>
     </LinearLayout>
 
     <LinearLayout
@@ -37,7 +42,8 @@
             android:layout_height="wrap_content"
             android:text="@string/tipoSala"
             android:textSize="20sp"
-            android:layout_marginEnd="10dp"/>
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/white"/>
 
         <TextView
             android:id="@+id/salaTipoTextView"
@@ -45,7 +51,8 @@
             android:layout_height="wrap_content"
             android:text="null"
             android:layout_weight="1"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/white"/>
     </LinearLayout>
 
     <LinearLayout
@@ -63,7 +70,8 @@
                 android:layout_width="180sp"
                 android:layout_height="match_parent"
                 android:text="@string/usuariosSala"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textColor="@color/white"/>
 
             <TextView
                 android:id="@+id/numUsuariosTextView"
@@ -72,19 +80,22 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:text="numUsuarios"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textColor="@color/white"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="15dp">
 
             <TextView
                 android:layout_width="180sp"
                 android:layout_height="match_parent"
                 android:text="@string/usuariosListos"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textColor="@color/white"/>
 
             <TextView
                 android:id="@+id/numUsuariosListosTextView"
@@ -93,7 +104,8 @@
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:text="numUsuariosListos"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textColor="@color/white"/>
         </LinearLayout>
 
         <LinearLayout
@@ -106,7 +118,8 @@
             <CheckBox
                 android:enabled="false"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/white"/>
 
             <ImageView
                 android:layout_width="50dp"
@@ -118,7 +131,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:text="nombreUsuario"/>
+                android:text="nombreUsuario"
+                android:textColor="@color/white"/>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/layoutUsuario2"
@@ -130,7 +144,8 @@
             <CheckBox
                 android:enabled="false"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/white"/>
 
             <ImageView
                 android:layout_width="50dp"
@@ -142,7 +157,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:text="nombreUsuario"/>
+                android:text="nombreUsuario"
+                android:textColor="@color/white"/>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/layoutUsuario3"
@@ -154,7 +170,8 @@
             <CheckBox
                 android:enabled="false"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/white"/>
 
             <ImageView
                 android:layout_width="50dp"
@@ -166,7 +183,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:text="nombreUsuario"/>
+                android:text="nombreUsuario"
+                android:textColor="@color/white"/>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/layoutUsuario4"
@@ -178,7 +196,8 @@
             <CheckBox
                 android:enabled="false"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/white"/>
 
             <ImageView
                 android:layout_width="50dp"
@@ -190,7 +209,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:text="nombreUsuario"/>
+                android:text="nombreUsuario"
+                android:textColor="@color/white"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -237,6 +257,25 @@
             android:layout_height="wrap_content"
             android:backgroundTint="#2EC322"
             android:text="@string/listo"
+            android:textColor="@color/white"
+            app:rippleColor="#1A2351" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:layout_marginTop="5dp">
+
+        <Button
+            android:id="@+id/volverButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="120dp"
+            android:backgroundTint="#FF9800"
+            android:text="@string/volver"
             android:textColor="@color/white"
             app:rippleColor="#1A2351" />
     </LinearLayout>
