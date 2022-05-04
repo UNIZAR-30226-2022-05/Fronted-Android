@@ -3,6 +3,10 @@ package es.unizar.unoforall.api;
 import android.content.Intent;
 import android.database.Cursor;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -32,6 +36,7 @@ import es.unizar.unoforall.utils.dialogs.PeticionAmistadDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.ResetPasswordDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SalaIDSearchDialogBuilder;
 import es.unizar.unoforall.utils.dialogs.SeleccionAmigoDialogBuilder;
+import es.unizar.unoforall.utils.notifications.Notificacion;
 import es.unizar.unoforall.utils.notifications.Notificaciones;
 import es.unizar.unoforall.utils.tasks.Task;
 
@@ -62,6 +67,17 @@ public class BackendAPI{
     }
     public static void setSalaActualID(UUID salaID){
         BackendAPI.salaActualID = salaID;
+    }
+
+    private static Set<Notificacion> notificacionesSala = new LinkedHashSet<>();
+    public static void addNotificacionSala(Notificacion notificacion){
+        notificacionesSala.add(notificacion);
+    }
+    public static void removeNotificacionSala(Notificacion notificacion){
+        notificacionesSala.remove(notificacion);
+    }
+    public static Set<Notificacion> getNotificacionesSala(){
+        return notificacionesSala;
     }
 
     private static CustomActivity currentActivity = null;
@@ -114,6 +130,8 @@ public class BackendAPI{
         wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, String.class, sesionID -> {
             wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
             BackendAPI.sesionID = sesionID;
+
+            notificacionesSala.clear();
 
             obtenerUsuarioVO(usuarioVO -> {
                 // Suscribirse a las notificaciones de sala
@@ -291,6 +309,9 @@ public class BackendAPI{
     }
 
     public void unirseSala(UUID salaID){
+        unirseSala(salaID, exito -> {});
+    }
+    public void unirseSala(UUID salaID, Consumer<Boolean> consumer){
         comprobarUnirseSala(salaID, sePuedeUnir -> {
             if(sePuedeUnir){
                 wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
@@ -314,8 +335,10 @@ public class BackendAPI{
                     }
                 });
                 wsAPI.sendObject("/app/salas/unirse/" + salaID, VACIO);
+                consumer.accept(true);
             }else{
                 activity.mostrarMensaje("No puedes unirte a esa sala ahora mismo");
+                consumer.accept(false);
             }
         });
     }

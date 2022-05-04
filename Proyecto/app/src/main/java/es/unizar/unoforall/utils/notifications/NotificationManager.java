@@ -20,13 +20,13 @@ import es.unizar.unoforall.api.BackendAPI;
 import es.unizar.unoforall.utils.CustomActivity;
 
 public class NotificationManager {
-    private static final String CHANNEL_ID = "unoforall";
-    private static final String ACTION_1_KEY_ID = "ACTION_1";
-    private static final String ACTION_2_KEY_ID = "ACTION_2";
-    private static final String ACTION_3_KEY_ID = "ACTION_3";
-    private static final int NOTIFICATION_ID = 1;
+    protected static final String CHANNEL_ID = "unoforall";
+    protected static final String ACTION_1_KEY_ID = "ACTION_1";
+    protected static final String ACTION_2_KEY_ID = "ACTION_2";
+    protected static final String ACTION_3_KEY_ID = "ACTION_3";
+    protected static final int NOTIFICATION_ID = 1;
 
-    private static HashMap<UUID, Function<CustomActivity, Boolean>> actionsMap;
+    static HashMap<UUID, Function<CustomActivity, Boolean>> actionsMap;
 
     public static void initialize(Context context){
         createNotificationChannel(context);
@@ -96,112 +96,39 @@ public class NotificationManager {
     }
 
     public static class Builder{
-        private final Context context;
-
-        private String title;
-        private String message;
-
-        private String action1title;
-        private String action2title;
-        private String action3title;
-
-        private Function<CustomActivity, Boolean> action1;
-        private Function<CustomActivity, Boolean> action2;
-        private Function<CustomActivity, Boolean> action3;
+        private final Notificacion notificacion;
 
         public Builder(Context context){
-            this.context = context;
-
-            this.title = "";
-            this.message = "";
-
-            this.action1title = "";
-            this.action2title = "";
-            this.action3title = "";
-
-            this.action1 = null;
-            this.action2 = null;
-            this.action3 = null;
+            this.notificacion = new Notificacion(context);
         }
 
         public Builder withTitle(String title){
-            this.title = title;
+            notificacion.setTitle(title);
             return this;
         }
 
         public Builder withMessage(String message){
-            this.message = message;
+            notificacion.setMessage(message);
             return this;
         }
 
         public Builder withAction1(String actionTitle, Function<CustomActivity, Boolean> action){
-            this.action1title = actionTitle;
-            this.action1 = action;
+            notificacion.setAction1(actionTitle, action);
             return this;
         }
 
         public Builder withAction2(String actionTitle, Function<CustomActivity, Boolean> action){
-            this.action2title = actionTitle;
-            this.action2 = action;
+            notificacion.setAction2(actionTitle, action);
             return this;
         }
 
         public Builder withAction3(String actionTitle, Function<CustomActivity, Boolean> action){
-            this.action3title = actionTitle;
-            this.action3 = action;
+            notificacion.setAction3(actionTitle, action);
             return this;
         }
 
-        public void build(){
-            actionsMap.clear();
-
-            if(action1 == null && action2 == null && action3 == null){
-                throw new IllegalArgumentException("Al menos una de las 3 opciones debe ser distinta de null");
-            }
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_iconobarranotificaciones)
-                    .setContentTitle(title)
-                    .setContentText(message)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-            UUID actionID1 = UUID.randomUUID();
-            UUID actionID2 = UUID.randomUUID();
-            UUID actionID3 = UUID.randomUUID();
-
-            if(action1 != null){
-                actionsMap.put(actionID1, action1);
-
-                Intent intent = new Intent(context, NotificationActionService.class);
-                intent.putExtra(ACTION_1_KEY_ID, actionID1);
-                PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-                builder.addAction(new NotificationCompat.Action(R.drawable.ic_icono_foreground, action1title, pendingIntent));
-            }
-            if(action2 != null){
-                actionsMap.put(actionID2, action2);
-
-                Intent intent = new Intent(context, NotificationActionService.class);
-                intent.putExtra(ACTION_2_KEY_ID, actionID2);
-                PendingIntent pendingIntent = PendingIntent.getService(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-                builder.addAction(new NotificationCompat.Action(R.drawable.ic_icono_foreground, action2title, pendingIntent));
-            }
-            if(action3 != null){
-                actionsMap.put(actionID3, action3);
-
-                Intent intent = new Intent(context, NotificationActionService.class);
-                intent.putExtra(ACTION_3_KEY_ID, actionID3);
-                PendingIntent pendingIntent = PendingIntent.getService(context, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-                builder.addAction(new NotificationCompat.Action(R.drawable.ic_icono_foreground, action3title, pendingIntent));
-            }
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-
-            // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(NOTIFICATION_ID, builder.build());
+        public Notificacion build(){
+            return notificacion;
         }
     }
 }
