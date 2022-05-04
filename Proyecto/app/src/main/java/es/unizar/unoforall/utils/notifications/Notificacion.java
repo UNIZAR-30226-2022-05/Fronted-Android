@@ -143,10 +143,10 @@ public class Notificacion{
     private void setButtonColor(Button button){
         String text = button.getText().toString();
         if(text.equalsIgnoreCase(Notificaciones.ACEPTAR_TEXT)){
-            button.setTextColor(Color.parseColor("#2EC322"));
+            button.setBackgroundColor(Color.parseColor("#2EC322"));
             button.setTextColor(Color.WHITE);
         }else if(text.equalsIgnoreCase(Notificaciones.CANCELAR_TEXT)){
-            button.setTextColor(Color.parseColor("#B61D1D"));
+            button.setBackgroundColor(Color.parseColor("#B61D1D"));
             button.setTextColor(Color.WHITE);
         }
     }
@@ -164,8 +164,12 @@ public class Notificacion{
         if(this.action1 != null){
             accion1Button.setText(this.action1title);
             setButtonColor(accion1Button);
-            accion1Button.setOnClickListener(view ->
-                action1.apply(BackendAPI.getCurrentActivity()));
+            /*accion1Button.setOnClickListener(view ->
+                action1.apply(BackendAPI.getCurrentActivity()));*/
+            accion1Button.setOnClickListener(view -> {
+                action1.apply(BackendAPI.getCurrentActivity());
+                System.err.println("BOTÓN 1 PULSADO");
+            });
         }else{
             accion1Button.setVisibility(View.GONE);
         }

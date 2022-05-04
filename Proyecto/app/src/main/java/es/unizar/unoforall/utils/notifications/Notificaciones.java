@@ -38,15 +38,14 @@ public class Notificaciones {
     }
 
     public static Notificacion createNotificacionSala(NotificacionSala notificacionSala){
-        CustomActivity activity = BackendAPI.getCurrentActivity();
-
-        NotificationManager.Builder builder = new NotificationManager.Builder(activity);
+        NotificationManager.Builder builder = new NotificationManager.Builder(BackendAPI.getCurrentActivity());
         builder
                 .withTitle("Nueva solicitud para unirse a una sala")
                 .withMessage("El usuario " + notificacionSala.getRemitente().getNombre() +
                         " te ha propuesto unirte a la sala " + notificacionSala.getSalaID())
                 .withAction1(CANCELAR_TEXT, customActivity -> {
                     BackendAPI.removeNotificacionSala(builder.build());
+                    CustomActivity activity = BackendAPI.getCurrentActivity();
                     if(activity instanceof NotificacionesActivity){
                         ((NotificacionesActivity) activity).refreshData();
                     }
@@ -65,9 +64,13 @@ public class Notificaciones {
                             return true;
                         case PRINCIPAL:
                         case AMIGOS:
+                        case NOTIFICACIONES:
+                        case PERFIL:
                         case CREAR_SALA:
                         case BUSCAR_SALA:
                             // Unirse a la sala correspondiente
+                            BackendAPI.removeNotificacionSala(builder.build());
+                            CustomActivity activity = BackendAPI.getCurrentActivity();
                             new BackendAPI(activity).unirseSala(notificacionSala.getSalaID(), exito -> {
                                 BackendAPI.removeNotificacionSala(builder.build());
                                 if(activity instanceof NotificacionesActivity){
@@ -78,6 +81,8 @@ public class Notificaciones {
                         case SALA:
                         case PARTIDA:
                             // Mostrar mensaje de error
+                            BackendAPI.removeNotificacionSala(builder.build());
+                            activity = BackendAPI.getCurrentActivity();
                             activity.mostrarMensaje("No puedes unirte a esa sala ahora mismo");
                             BackendAPI.removeNotificacionSala(builder.build());
                             if(activity instanceof NotificacionesActivity){

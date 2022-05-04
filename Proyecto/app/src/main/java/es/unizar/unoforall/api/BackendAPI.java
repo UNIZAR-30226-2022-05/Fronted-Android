@@ -41,6 +41,7 @@ import es.unizar.unoforall.utils.notifications.Notificaciones;
 import es.unizar.unoforall.utils.tasks.Task;
 
 public class BackendAPI{
+    private static final Object LOCK = new Object();
     private static final String VACIO = "VACIO";
 
     private static String sesionID = null;
@@ -56,10 +57,14 @@ public class BackendAPI{
 
     private static Sala salaActual = null;
     public static Sala getSalaActual(){
-        return salaActual;
+        synchronized(LOCK){
+            return salaActual;
+        }
     }
     public static void setSalaActual(Sala sala){
-        BackendAPI.salaActual = sala;
+        synchronized(LOCK){
+            BackendAPI.salaActual = sala;
+        }
     }
     private static UUID salaActualID = null;
     public static UUID getSalaActualID(){
@@ -71,13 +76,19 @@ public class BackendAPI{
 
     private static Set<Notificacion> notificacionesSala = new LinkedHashSet<>();
     public static void addNotificacionSala(Notificacion notificacion){
-        notificacionesSala.add(notificacion);
+        synchronized(LOCK){
+            notificacionesSala.add(notificacion);
+        }
     }
     public static void removeNotificacionSala(Notificacion notificacion){
-        notificacionesSala.remove(notificacion);
+        synchronized(LOCK){
+            notificacionesSala.remove(notificacion);
+        }
     }
     public static Set<Notificacion> getNotificacionesSala(){
-        return notificacionesSala;
+        synchronized(LOCK){
+            return notificacionesSala;
+        }
     }
 
     private static CustomActivity currentActivity = null;

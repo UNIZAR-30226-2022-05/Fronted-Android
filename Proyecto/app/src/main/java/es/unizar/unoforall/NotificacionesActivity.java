@@ -45,6 +45,12 @@ public class NotificacionesActivity extends CustomActivity {
         this.notificacionesAmigosTextView = findViewById(R.id.notificacionesAmigosTextView);
         this.notificacionesSalaTextView = findViewById(R.id.notificacionesSalaTextView);
 
+        notificacionesAmigosListView.setVisibility(View.GONE);
+        notificacionesSalaListView.setVisibility(View.GONE);
+        notificacionesAmigosTextView.setVisibility(View.GONE);
+        notificacionesSalaTextView.setVisibility(View.GONE);
+        noHayNotificacionesPendientesTextView.setVisibility(View.VISIBLE);
+
         refreshData();
     }
 
@@ -59,18 +65,26 @@ public class NotificacionesActivity extends CustomActivity {
                 notificacionesSalaTextView.setVisibility(View.GONE);
                 noHayNotificacionesPendientesTextView.setVisibility(View.VISIBLE);
             }else{
-                notificacionesAmigosListView.setVisibility(View.VISIBLE);
-                notificacionesSalaListView.setVisibility(View.VISIBLE);
-                notificacionesAmigosTextView.setVisibility(View.VISIBLE);
-                notificacionesSalaTextView.setVisibility(View.VISIBLE);
                 noHayNotificacionesPendientesTextView.setVisibility(View.GONE);
-
-                notificacionesSalaListView.setAdapter(new NotificacionesAdapter(this, notificacionesSala));
-
-                List<Notificacion> notificaciones = listaUsuarios.getUsuarios().stream()
-                        .map(usuarioVO -> Notificaciones.createNotificacionAmigo(usuarioVO))
-                        .collect(Collectors.toList());
-                notificacionesAmigosListView.setAdapter(new NotificacionesAdapter(this, notificaciones));
+                if(listaUsuarios.getUsuarios().isEmpty()){
+                    notificacionesAmigosListView.setVisibility(View.GONE);
+                    notificacionesAmigosTextView.setVisibility(View.GONE);
+                }else{
+                    notificacionesAmigosListView.setVisibility(View.VISIBLE);
+                    notificacionesAmigosTextView.setVisibility(View.VISIBLE);
+                    List<Notificacion> notificaciones = listaUsuarios.getUsuarios().stream()
+                            .map(Notificaciones::createNotificacionAmigo)
+                            .collect(Collectors.toList());
+                    notificacionesAmigosListView.setAdapter(new NotificacionesAdapter(this, notificaciones));
+                }
+                if(notificacionesSala.isEmpty()){
+                    notificacionesSalaListView.setVisibility(View.GONE);
+                    notificacionesSalaTextView.setVisibility(View.GONE);
+                }else{
+                    notificacionesSalaListView.setVisibility(View.VISIBLE);
+                    notificacionesSalaTextView.setVisibility(View.VISIBLE);
+                    notificacionesSalaListView.setAdapter(new NotificacionesAdapter(this, notificacionesSala));
+                }
             }
         });
     }
