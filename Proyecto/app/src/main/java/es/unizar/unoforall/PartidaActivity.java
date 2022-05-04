@@ -37,6 +37,7 @@ import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.Sala;
 import es.unizar.unoforall.utils.ActivityType;
+import es.unizar.unoforall.utils.AnimationManager;
 import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.ImageManager;
 import es.unizar.unoforall.utils.SalaReceiver;
@@ -236,14 +237,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             }
 
             ImageView imageView = emojisJugadores[jugadorIDmap.get(jugadorID)];
-            imageView.clearAnimation();
-            imageView.setAlpha(1.0f);
             ImageManager.setImagenEmoji(imageView, envioEmoji.getEmoji());
-            imageView.animate()
-                    .alpha(0.0f)
-                    .setDuration(3000)
-                    .setStartDelay(2000)
-                    .start();
+            AnimationManager.animateFadeOut(imageView);
         });
 
         TextView textViewVotacionPausa = findViewById(R.id.textViewVotacionPausa);
@@ -427,25 +422,13 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
                     }
 
                     // Mostrar animación de las cartas robadas
-                    for(int k=0;k<numCartasRobadas;k++){
-                        ImageView cartaRobada = new ImageView(this);
-                        ViewGroup viewGroup = (ViewGroup) mainView;
-                        viewGroup.addView(cartaRobada);
-                        cartaRobada.setX(mazoRobar.getX());
-                        cartaRobada.setY(mazoRobar.getY());
-                        cartaRobada.setLayoutParams(new FrameLayout.LayoutParams(150, -2));
-                        ImageManager.setImagenCarta(cartaRobada, null, defaultMode, true, false, false);
-                        cartaRobada.animate()
-                                .x(layoutJugadores[jugadorIDmap.get(jugadorID)].getX())
-                                .y(layoutJugadores[jugadorIDmap.get(jugadorID)].getY())
-                                .setDuration(1000)
-                                .withEndAction(() -> {
-                                    cartaRobada.setVisibility(View.GONE);
-                                    viewGroup.removeView(cartaRobada);
-                                })
-                                .setStartDelay(k * 500L)
-                                .start();
-                    }
+                    AnimationManager.Builder builder = new AnimationManager.Builder((ViewGroup) mainView);
+                    builder
+                            .withStartView(mazoRobar)
+                            .withEndView(layoutJugadores[jugadorIDmap.get(jugadorID)])
+                            .withDefaultMode(defaultMode)
+                            .withCartasRobo(numCartasRobadas)
+                            .start();
                 }
             }
             numCartasAnteriores[jugadorID] = numCartasAhora;
