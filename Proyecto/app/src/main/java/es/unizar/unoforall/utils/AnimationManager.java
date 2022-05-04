@@ -46,6 +46,10 @@ public class AnimationManager{
 
     private static void animateCardMovement(ViewGroup viewGroup, View startView, View endView,
                                             Carta carta, boolean isVisible, long startDelay, boolean defaultMode, Runnable endAction){
+        if(startView == endView){
+            return;
+        }
+        
         ImageView cartaView = new ImageView(viewGroup.getContext());
         viewGroup.addView(cartaView);
         cartaView.setX(startView.getX());
@@ -105,8 +109,8 @@ public class AnimationManager{
             return this;
         }
 
-        public Builder withCartas(List<Carta> cartas){
-            this.isVisible = true;
+        public Builder withCartas(List<Carta> cartas, boolean isVisible){
+            this.isVisible = isVisible;
             this.cartas = cartas;
             return this;
         }
