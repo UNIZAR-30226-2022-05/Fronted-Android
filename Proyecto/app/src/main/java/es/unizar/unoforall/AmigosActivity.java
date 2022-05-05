@@ -1,5 +1,6 @@
 package es.unizar.unoforall;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ListView;
 
@@ -48,6 +49,7 @@ public class AmigosActivity extends CustomActivity {
 
         api.obtenerAmigos(listaAmigos -> {
             api.obtenerPeticionesEnviadas(listaAmigosPendientes -> {
+                int numAmigosConfirmados = listaAmigos.getUsuarios().size();
                 listaAmigosPendientes.getUsuarios().forEach(usuarioVO -> {
                     // Indicar que la solicitud está pendiente
                     usuarioVO.setAspectoCartas(-1);
@@ -56,6 +58,17 @@ public class AmigosActivity extends CustomActivity {
 
                 AmigosAdapter adapter = new AmigosAdapter(this, listaAmigos);
                 amigosListView.setAdapter(adapter);
+                amigosListView.setOnItemClickListener((parent, view, position, id) -> {
+                    if(position >= numAmigosConfirmados){
+                        return;
+                    }
+
+                    // Mostrar la pantalla de perfil del usuario al hacer click en él
+                    PerfilActivity.setCurrentUser(listaAmigos.getUsuarios().get(position));
+                    Intent intent = new Intent(this, PerfilActivity.class);
+                    startActivityForResult(intent, 0);
+                });
+
                 pullToRefresh.setRefreshing(false);
             });
         });

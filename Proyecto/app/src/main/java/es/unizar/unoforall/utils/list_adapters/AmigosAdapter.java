@@ -54,13 +54,6 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
             // Si el usuario no está pendiente de aceptar la solicitud,
             //  se oculta el texto de solicitud pendiente
             solicitudPendienteTextView.setVisibility(View.GONE);
-
-            // Mostrar la pantalla de perfil del usuario al hacer click en él
-            view.setOnClickListener(__ -> {
-                PerfilActivity.setCurrentUser(usuarioVO);
-                Intent intent = new Intent(activity, PerfilActivity.class);
-                activity.startActivityForResult(intent, 0);
-            });
         }
 
         return view;
