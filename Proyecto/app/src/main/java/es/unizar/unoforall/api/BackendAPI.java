@@ -340,6 +340,7 @@ public class BackendAPI{
                             activity.mostrarMensaje("Te has unido a la sala");
                         }
 
+                        enviarSalaACK();
                         if(currentActivity instanceof SalaReceiver){
                             ((SalaReceiver) currentActivity).manageSala(sala);
                         }
@@ -352,6 +353,19 @@ public class BackendAPI{
                 consumer.accept(false);
             }
         });
+    }
+    private void enviarSalaACK(){
+        if(salaActual != null){
+            RestAPI api = new RestAPI(activity, "/api/ack");
+            api.addParameter("sesionID", sesionID);
+            api.addParameter("salaID", salaActualID);
+            api.openConnection();
+            api.setOnObjectReceived(Boolean.class, exito -> {
+                if(!exito){
+                    activity.mostrarMensaje("Se ha producido un error al enviar el ACK");
+                }
+            });
+        }
     }
     public void listoSala(){
         wsAPI.sendObject("/app/salas/listo/" + salaActualID, VACIO);
