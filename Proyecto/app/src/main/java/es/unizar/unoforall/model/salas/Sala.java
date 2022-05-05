@@ -12,7 +12,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-import es.unizar.unoforall.gestores.AlarmaACK;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.Partida;
 import es.unizar.unoforall.model.partidas.PartidaJugada;
@@ -107,6 +106,7 @@ public class Sala {
 	public boolean nuevoParticipante(UsuarioVO participante) {
 		synchronized (LOCK) {
 			if (isEnPausa()) {
+				participantesAck.putIfAbsent(participante.getId(), null);
 				return false;
 			}
 			
@@ -153,8 +153,9 @@ public class Sala {
 		}
 	}
 	
-	public void eliminarParticipante(UUID participanteID) {
+	public void eliminarParticipante(UUID participanteID) { 
 		synchronized (LOCK) {
+			participantesAck.remove(participanteID);
 			if (isEnPausa()) {
 				if(participantes_listos.containsKey(participanteID)
 							&& participantes_listos.get(participanteID)) {
