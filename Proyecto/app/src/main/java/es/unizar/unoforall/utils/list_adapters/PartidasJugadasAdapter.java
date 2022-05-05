@@ -55,13 +55,24 @@ public class PartidasJugadasAdapter extends ArrayAdapter<PartidaJugadaCompacta> 
                 view.findViewById(R.id.layoutPuesto3)
         };
 
-        System.err.println(partidaJugada.getParticipantes().size());
-        System.err.println(partidaJugada.getModoJuego().name() + "\n");
         switch(partidaJugada.getParticipantes().size()){
             case 2:
+                layoutsPuestos[0].setVisibility(View.VISIBLE);
+                layoutsPuestos[1].setVisibility(View.VISIBLE);
                 layoutsPuestos[2].setVisibility(View.GONE);
-            case 3:
                 layoutsPuestos[3].setVisibility(View.GONE);
+                break;
+            case 3:
+                layoutsPuestos[0].setVisibility(View.VISIBLE);
+                layoutsPuestos[1].setVisibility(View.VISIBLE);
+                layoutsPuestos[2].setVisibility(View.VISIBLE);
+                layoutsPuestos[3].setVisibility(View.GONE);
+                break;
+            case 4:
+                layoutsPuestos[0].setVisibility(View.VISIBLE);
+                layoutsPuestos[1].setVisibility(View.VISIBLE);
+                layoutsPuestos[2].setVisibility(View.VISIBLE);
+                layoutsPuestos[3].setVisibility(View.VISIBLE);
                 break;
         }
 
