@@ -1,6 +1,7 @@
 package es.unizar.unoforall.utils.list_adapters;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import es.unizar.unoforall.PerfilActivity;
 import es.unizar.unoforall.R;
 import es.unizar.unoforall.model.ListaUsuarios;
 import es.unizar.unoforall.model.UsuarioVO;
@@ -53,8 +55,12 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
             //  se oculta el texto de solicitud pendiente
             solicitudPendienteTextView.setVisibility(View.GONE);
 
-            // TO DO: Mostrar la pantalla de perfil del usuario al hacer click en él
-            //view.setOnClickListener(view -> mostrarPantallaPerfil(usuarioVO));
+            // Mostrar la pantalla de perfil del usuario al hacer click en él
+            view.setOnClickListener(__ -> {
+                PerfilActivity.setCurrentUser(usuarioVO);
+                Intent intent = new Intent(activity, PerfilActivity.class);
+                activity.startActivityForResult(intent, 0);
+            });
         }
 
         return view;
