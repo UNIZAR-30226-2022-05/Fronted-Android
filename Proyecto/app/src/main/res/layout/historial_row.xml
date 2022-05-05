@@ -12,14 +12,16 @@
         android:layout_marginTop="10dp">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:text="Modo de juego:"/>
+            android:text="Modo de juego:"
+            android:textSize="16sp"/>
         <TextView
             android:id="@+id/modoJuegoTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="\??????"/>
+            android:text="\??????"
+            android:textSize="16sp"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,14 +29,16 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:text="Fecha de inicio:"/>
+            android:text="Fecha de inicio:"
+            android:textSize="16sp"/>
         <TextView
             android:id="@+id/fechaInicioTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="\??/??/???? ??:??"/>
+            android:text="\??/??/???? ??:??"
+            android:textSize="16sp"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,14 +46,16 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:text="Fecha de fin:"/>
+            android:text="Fecha de fin:"
+            android:textSize="16sp"/>
         <TextView
             android:id="@+id/fechaFinTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="\??/??/???? ??:??"/>
+            android:text="\??/??/???? ??:??"
+            android:textSize="16sp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -64,14 +70,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1º"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:layout_margin="3dp"/>
 
         <ImageView
             android:id="@+id/imageViewPuesto0"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_margin="3dp"/>
 
@@ -80,7 +86,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nombreJugador1"
-            android:layout_margin="3dp"/>
+            android:layout_margin="3dp"
+            android:textSize="16sp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/layoutPuesto1"
@@ -94,14 +101,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2º"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:layout_margin="3dp"/>
 
         <ImageView
             android:id="@+id/imageViewPuesto1"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_margin="3dp"/>
 
@@ -110,7 +117,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nombreJugador2"
-            android:layout_margin="3dp"/>
+            android:layout_margin="3dp"
+            android:textSize="16sp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/layoutPuesto2"
@@ -124,14 +132,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="3º"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:layout_margin="3dp"/>
 
         <ImageView
             android:id="@+id/imageViewPuesto2"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_margin="3dp"/>
 
@@ -140,7 +148,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nombreJugador3"
-            android:layout_margin="3dp"/>
+            android:layout_margin="3dp"
+            android:textSize="16sp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/layoutPuesto3"
@@ -154,14 +163,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="4º"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:layout_margin="3dp"/>
 
         <ImageView
             android:id="@+id/imageViewPuesto3"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_iconoperfil"
             android:layout_margin="3dp"/>
 
@@ -170,7 +179,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nombreJugador4"
-            android:layout_margin="3dp"/>
+            android:layout_margin="3dp"
+            android:textSize="16sp"/>
     </LinearLayout>
 
 </LinearLayout>
