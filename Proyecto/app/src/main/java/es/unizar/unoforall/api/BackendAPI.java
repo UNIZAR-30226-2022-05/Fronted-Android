@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import es.unizar.unoforall.InicioActivity;
 import es.unizar.unoforall.PrincipalActivity;
@@ -19,6 +20,9 @@ import es.unizar.unoforall.model.RespuestaLogin;
 import es.unizar.unoforall.model.UsuarioVO;
 import es.unizar.unoforall.model.partidas.EnvioEmoji;
 import es.unizar.unoforall.model.partidas.Jugada;
+import es.unizar.unoforall.model.partidas.ListaPartidas;
+import es.unizar.unoforall.model.partidas.PartidaJugada;
+import es.unizar.unoforall.model.partidas.PartidaJugadaCompacta;
 import es.unizar.unoforall.model.partidas.RespuestaVotacionPausa;
 import es.unizar.unoforall.model.salas.ConfigSala;
 import es.unizar.unoforall.model.salas.NotificacionSala;
@@ -340,6 +344,7 @@ public class BackendAPI{
                             activity.mostrarMensaje("Te has unido a la sala");
                         }
 
+                        enviarSalaACK();
                         if(currentActivity instanceof SalaReceiver){
                             ((SalaReceiver) currentActivity).manageSala(sala);
                         }
@@ -352,6 +357,19 @@ public class BackendAPI{
                 consumer.accept(false);
             }
         });
+    }
+    private void enviarSalaACK(){
+        if(salaActual != null){
+            RestAPI api = new RestAPI(activity, "/api/ack");
+            api.addParameter("sesionID", sesionID);
+            api.addParameter("salaID", salaActualID);
+            api.openConnection();
+            api.setOnObjectReceived(Boolean.class, exito -> {
+                if(!exito){
+                    activity.mostrarMensaje("Se ha producido un error al enviar el ACK");
+                }
+            });
+        }
     }
     public void listoSala(){
         wsAPI.sendObject("/app/salas/listo/" + salaActualID, VACIO);
@@ -660,7 +678,6 @@ public class BackendAPI{
     //
     // PERSONALIZACION DE ASPECTO (avatar, cartas y fondo de pantalla)
     //
-
     public void cambiarPersonalizacionStepOne(){
         obtenerUsuarioVO(usuarioVO -> {
             ModifyAspectDialogBuilder builder = new ModifyAspectDialogBuilder(activity, usuarioVO);
@@ -685,6 +702,28 @@ public class BackendAPI{
                 login(usuario.getCorreo(), usuario.getContrasenna());
             }else{
                 activity.mostrarMensaje(error);
+            }
+        });
+    }
+
+    //
+    // HISTORIAL
+    //
+    public void obtenerHistorial(UsuarioVO usuarioVO, Consumer<List<PartidaJugadaCompacta>> consumer){
+        RestAPI api = new RestAPI(activity, "/api/sacarPartidasJugadas");
+        api.addParameter("sesionID", sesionID);
+        api.addParameter("usuarioID", usuarioVO.getId());
+        api.openConnection();
+        api.setOnObjectReceived(ListaPartidas.class, listaPartidas -> {
+            if(listaPartidas.isExpirado()){
+                activity.mostrarMensaje(listaPartidas.getError());
+            }else{
+                // Devuelve la lista de partidas jugadas en orden cronológico inverso
+                consumer.accept(listaPartidas.getPartidas().stream()
+                                .map(PartidaJugada::getPartidaJugadaCompacta)
+                                .sorted(((partidaJugadaCompacta1, partidaJugadaCompacta2) ->
+                                                partidaJugadaCompacta2.getFechaInicio().compareTo(partidaJugadaCompacta1.getFechaInicio())))
+                                .collect(Collectors.toList()));
             }
         });
     }

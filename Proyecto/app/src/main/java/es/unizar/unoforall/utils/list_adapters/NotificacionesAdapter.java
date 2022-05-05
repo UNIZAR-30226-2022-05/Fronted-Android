@@ -18,7 +18,7 @@ public class NotificacionesAdapter extends ArrayAdapter<Notificacion> {
     private final CustomActivity activity;
 
     public NotificacionesAdapter(CustomActivity activity, Collection<Notificacion> notificaciones){
-        super(activity, R.layout.salas_row, new ArrayList<>(notificaciones));
+        super(activity, R.layout.notification_view, new ArrayList<>(notificaciones));
         this.resourceLayout = R.layout.notification_view;
         this.activity = activity;
     }

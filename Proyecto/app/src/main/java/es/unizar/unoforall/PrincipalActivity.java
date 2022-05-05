@@ -103,8 +103,11 @@ public class PrincipalActivity extends CustomActivity {
             startActivityForResult(intent, 0);
         });
         imageViewPerfil.setOnClickListener(view -> {
-            Intent intent = new Intent(this, PerfilActivity.class);
-            startActivityForResult(intent, 0);
+            api.obtenerUsuarioVO(usuario -> {
+                PerfilActivity.setCurrentUser(usuario);
+                Intent intent = new Intent(this, PerfilActivity.class);
+                startActivityForResult(intent, 0);
+            });
         });
     }
     private void setButtonsEnabled(boolean enabled){
