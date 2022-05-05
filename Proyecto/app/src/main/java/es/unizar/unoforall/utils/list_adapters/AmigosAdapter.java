@@ -21,7 +21,7 @@ public class AmigosAdapter extends ArrayAdapter<UsuarioVO> {
     private final Activity activity;
 
     public AmigosAdapter(Activity activity, ListaUsuarios listaUsuarios){
-        super(activity, R.layout.salas_row, listaUsuarios.getUsuarios());
+        super(activity, R.layout.amigos_row, listaUsuarios.getUsuarios());
         this.resourceLayout = R.layout.amigos_row;
         this.activity = activity;
     }
