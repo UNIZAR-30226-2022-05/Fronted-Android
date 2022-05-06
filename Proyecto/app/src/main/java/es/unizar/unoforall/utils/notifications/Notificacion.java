@@ -33,7 +33,7 @@ public class Notificacion{
     private Function<CustomActivity, Boolean> action2;
     private Function<CustomActivity, Boolean> action3;
 
-    public Notificacion(Context context){
+    protected Notificacion(Context context){
         this.context = context;
     }
 
