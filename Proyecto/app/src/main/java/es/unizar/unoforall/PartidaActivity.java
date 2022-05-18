@@ -53,6 +53,8 @@ import es.unizar.unoforall.utils.tasks.Task;
 
 public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
+    private static final int MAX_CARTAS = 20;
+
     private static final int PAUSAR_ID = 0;
     private static final int ABANDONAR_ID = 1;
     private static final int VER_REGLAS_ID = 2;
@@ -613,6 +615,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void setNumCartas(int jugadorLayoutID, int numCartas){
+        if(numCartas >= MAX_CARTAS){
+            contadoresCartasJugadores[jugadorLayoutID].setTextColor(Color.RED);
+        }else{
+            contadoresCartasJugadores[jugadorLayoutID].setTextColor(Color.WHITE);
+        }
         contadoresCartasJugadores[jugadorLayoutID].setText(numCartas + "");
     }
 
