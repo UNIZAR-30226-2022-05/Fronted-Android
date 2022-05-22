@@ -93,6 +93,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     private int jugadorActualID = -1;
     private final int[] numCartasAnteriores = {-1, -1, -1, -1};
+    private boolean sentidoAnterior = false;
 
     // Relaciona los IDs de los jugadores con los layout IDs correspondientes
     private final Map<Integer, Integer> jugadorIDmap = new HashMap<>();
@@ -326,6 +327,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         Partida partida = sala.getPartida();
         if(sala.isEnPausa()){
             // Partida pausada
+            AnimationManager.cancelAnimation(sentido);
             Intent intent = new Intent(this, SalaActivity.class);
             this.startActivityForResult(intent,0);
             this.mostrarMensaje("Has vuelto a la sala");
@@ -555,6 +557,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
         // Finalización de partida
         if(!sala.isEnPartida()){
+            AnimationManager.cancelAnimation(sentido);
+
             api.cancelarSuscripcionCanalEmojis();
             partidaFinalizada = true;
             resetPorcentajes();
@@ -599,6 +603,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }else{
             sentido.setImageResource(R.drawable.ic_sentido_antihorario);
         }
+
+        AnimationManager.animateRotation(sentido, sentidoAnterior, sentidoHorario);
+        sentidoAnterior = sentidoHorario;
     }
 
     private void setImagenJugador(int jugadorLayoutID, int imageID){

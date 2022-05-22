@@ -2,6 +2,11 @@ package es.unizar.unoforall.utils;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -19,6 +24,16 @@ public class AnimationManager{
 
     private static final long CARD_MOVEMENT_START_DELAY = 500L;
     private static final long CARD_MOVEMENT_DURATION = 1000L;
+
+    private interface CustomAnimationListener extends Animation.AnimationListener {
+        @Override
+        default void onAnimationStart(Animation animation) {
+        }
+
+        @Override
+        default void onAnimationRepeat(Animation animation) {
+        }
+    }
 
     public static void cancelAnimation(View view){
         view.clearAnimation();
@@ -42,6 +57,49 @@ public class AnimationManager{
                 .setDuration(ALPHA_DURATION)
                 .setStartDelay(ALPHA_START_DELAY)
                 .start();
+    }
+
+    public static void animateRotation(View view, boolean sentidoAnterior, boolean sentidoActual){
+        if(sentidoAnterior == sentidoActual){
+            return;
+        }
+
+        cancelAnimation(view);
+
+        CustomAnimationListener cal;
+        int inicio = sentidoActual ? 0 : 360;
+        RotateAnimation sentidoAnimation = new RotateAnimation(inicio, 360 - inicio,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        sentidoAnimation.setDuration(6000);
+        sentidoAnimation.setRepeatCount(Animation.INFINITE);
+        sentidoAnimation.setInterpolator(new LinearInterpolator());
+
+        ScaleAnimation disminuir = new ScaleAnimation(1.5f, 1f, 1.5f, 1f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        disminuir.setDuration(250);
+        cal = animation -> view.startAnimation(sentidoAnimation);
+        disminuir.setAnimationListener(cal);
+
+        RotateAnimation rtRapida = new RotateAnimation(0, 720,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        rtRapida.setDuration(500);
+        rtRapida.setInterpolator(new LinearInterpolator());
+
+        ScaleAnimation agrandar = new ScaleAnimation(1f, 1.5f, 1f, 1.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        agrandar.setDuration(250);
+        cal = animation -> view.startAnimation(disminuir);
+        agrandar.setAnimationListener(cal);
+
+        AnimationSet animationSet = new AnimationSet(false);
+        animationSet.addAnimation(agrandar);
+        animationSet.addAnimation(rtRapida);
+
+        view.startAnimation(animationSet);
     }
 
     private static void animateCardMovement(ViewGroup viewGroup, View startView, View endView,
