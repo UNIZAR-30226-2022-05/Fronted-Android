@@ -34,6 +34,8 @@ public class Sala {
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantes_listos;
 	private HashMap<UUID, Object> participantesAck;
+	private HashMap<UUID, Integer> participantesAckFallidos;
+	private static final int MAX_FALLOS_ACK = 5;
 	
 	//Conjunto de participantes con el indicador de si están listos o no
 	private HashMap<UUID, Boolean> participantesVotoAbandono;
@@ -41,7 +43,7 @@ public class Sala {
 	
 	private final static int TIMEOUT_ACK = 1000;	//1 segundo
 	
-	private static final Object LOCK = new Object();
+	private final Object LOCK = new Object();
 	
 	private Sala() {
 		
@@ -52,6 +54,7 @@ public class Sala {
 		participantes_listos = new HashMap<>();
 		participantesVotoAbandono = new HashMap<>();
 		participantesAck = new HashMap<>();
+		participantesAckFallidos = new HashMap<>();
 		noExiste = true;
 		setError(mensajeError);
 		partida = null;
@@ -107,6 +110,7 @@ public class Sala {
 		synchronized (LOCK) {
 			if (isEnPausa()) {
 				participantesAck.putIfAbsent(participante.getId(), null);
+				participantesAckFallidos.putIfAbsent(participante.getId(), 0);
 				return false;
 			}
 			
@@ -114,6 +118,7 @@ public class Sala {
 				participantes.putIfAbsent(participante.getId(), participante);
 				participantes_listos.putIfAbsent(participante.getId(), false);
 				participantesAck.putIfAbsent(participante.getId(), null);
+				participantesAckFallidos.putIfAbsent(participante.getId(), 0);
 				return true;
 			} else {
 				return false;
@@ -126,6 +131,7 @@ public class Sala {
 		participantes_listos.remove(participanteID);
 		ack(participanteID);
 		participantesAck.remove(participanteID);
+		participantesAckFallidos.remove(participanteID);
 	}
 	
 	// Para eliminar un participante definitivamente mientras la partida está
@@ -156,6 +162,7 @@ public class Sala {
 	public void eliminarParticipante(UUID participanteID) { 
 		synchronized (LOCK) {
 			participantesAck.remove(participanteID);
+			participantesAckFallidos.remove(participanteID);
 			if (isEnPausa()) {
 				if(participantes_listos.containsKey(participanteID)
 							&& participantes_listos.get(participanteID)) {
@@ -287,16 +294,17 @@ public class Sala {
 	}
 
 	public void setEnPausa(boolean enPausa) {
-		if (this.enPausa != enPausa && this.enPartida) {
-			this.enPausa = enPausa;
-			
-			if (this.enPausa) {  // comienza una pausa
-				cancelTimer(salaID);
-				System.out.println("--- Comienza una pausa");
-				setEnPartida(false);
+		synchronized (LOCK) {
+			if (this.enPausa != enPausa && this.enPartida) {
+				this.enPausa = enPausa;
+				
+				if (this.enPausa) {  // comienza una pausa
+					cancelTimer(salaID);
+					System.out.println("--- Comienza una pausa");
+					setEnPartida(false);
+				}
 			}
 		}
-		
 	}
 	
 	
@@ -305,9 +313,11 @@ public class Sala {
 
 	@Override
 	public String toString() {
-		return "Sala [noExiste=" + noExiste + ", error=" + error + ", configuracion=" + configuracion + ", enPartida="
-				+ enPartida + ", partida=" + partida + ", participantes=" + participantes + ", participantes_listos="
-				+ participantes_listos + "]";
+		synchronized (LOCK) {
+			return "Sala [noExiste=" + noExiste + ", error=" + error + ", configuracion=" + configuracion + ", enPartida="
+					+ enPartida + ", partida=" + partida + ", participantes=" + participantes + ", participantes_listos="
+					+ participantes_listos + "]";
+		}
 	}
 
 	public boolean isNoExiste() {
@@ -319,7 +329,9 @@ public class Sala {
 	}
 
 	public void setError(String error) {
-		this.error = error;
+		synchronized (LOCK) {
+			this.error = error;
+		}
 	}
 
 	public Partida getPartida() {
@@ -363,7 +375,9 @@ public class Sala {
 	}
 
 	public void setUltimaPartidaJugada(PartidaJugada ultimaPartidaJugada) {
-		this.ultimaPartidaJugada = ultimaPartidaJugada;
+		synchronized (LOCK) {
+			this.ultimaPartidaJugada = ultimaPartidaJugada;
+		}
 	}
 
 	public UUID getSalaID() {
@@ -371,7 +385,9 @@ public class Sala {
 	}
 
 	public void setSalaID(UUID salaID) {
-		this.salaID = salaID;
+		synchronized (LOCK) {
+			this.salaID = salaID;
+		}
 	}
 
 	public void ack(UUID usuarioID) {
@@ -382,30 +398,63 @@ public class Sala {
 				timerAck.cancel();
 			
 			participantesAck.put(usuarioID, null);
+			
+			participantesAckFallidos.put(usuarioID, 0);
 		}
     	
     }
 	
-	public void initAckTimers() {
+	public void ack_fallido(UUID usuarioID) {
 		synchronized (LOCK) {
-			for (UUID usuario : participantesAck.keySet()) {
-				Object alarm = newAlarmaACK(this.salaID);
-				Timer t = new Timer();
-				t.schedule((TimerTask)alarm, TIMEOUT_ACK);
-				participantesAck.put(usuario, t);
+			if (participantesAckFallidos.containsKey(usuarioID)) {
+				int numFallosACK = participantesAckFallidos.get(usuarioID) + 1; 
+				participantesAckFallidos.put(usuarioID, numFallosACK);
+				
+				if (numFallosACK >= MAX_FALLOS_ACK) {
+					System.out.println("Cliente desconectado por desconexión");
+					desconectarUsuario(usuarioID);
+				}
 			}
 		}
 	}
 	
+	public void initAckTimers() {
+		synchronized (LOCK) {
+			for (UUID usuarioID : participantesAck.keySet()) {
+//				if(isEnPartida() && new Random().nextBoolean()) {
+//					SocketController.desconectarUsuario(usuarioID);
+//					return;
+//				}
+				
+				Object alarm = newAlarmaACK(this, usuarioID);
+				Timer t = new Timer();
+				t.schedule((TimerTask)alarm, TIMEOUT_ACK);
+				participantesAck.put(usuarioID, t);
+			}
+		}
+	}
+	
+	private static Method desconectarUsuario = null;
+	public static void desconectarUsuario(UUID usuarioID) {
+		try {
+			if(desconectarUsuario == null){
+				desconectarUsuario = Class.forName("es.unizar.unoforall.sockets.SocketController")
+						.getMethod("desconectarUsuario", UUID.class);
+			}
+			desconectarUsuario.invoke(null, usuarioID);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}
 	
 	private static Constructor newAlarmaACK = null;
-    public static Object newAlarmaACK(UUID salaID){
+    public static Object newAlarmaACK(Sala sala, UUID usuarioID){
         try{
             if(newAlarmaACK == null){
             	newAlarmaACK = Class.forName("es.unizar.unoforall.gestores.AlarmaACK")
-                        .getConstructor(UUID.class);
+                        .getConstructor(Sala.class, UUID.class);
             }
-            return newAlarmaACK.newInstance(salaID);
+            return newAlarmaACK.newInstance(sala, usuarioID);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

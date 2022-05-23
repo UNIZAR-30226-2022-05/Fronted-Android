@@ -53,6 +53,8 @@ import es.unizar.unoforall.utils.tasks.Task;
 
 public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
+    private static final int MAX_CARTAS = 20;
+
     private static final int PAUSAR_ID = 0;
     private static final int ABANDONAR_ID = 1;
     private static final int VER_REGLAS_ID = 2;
@@ -91,6 +93,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
     private int jugadorActualID = -1;
     private final int[] numCartasAnteriores = {-1, -1, -1, -1};
+    private boolean sentidoAnterior = false;
 
     // Relaciona los IDs de los jugadores con los layout IDs correspondientes
     private final Map<Integer, Integer> jugadorIDmap = new HashMap<>();
@@ -261,7 +264,18 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
         mazoRobar.setOnClickListener(view -> {
             if(esTurnoDelJugadorActual()){
-                api.enviarJugada(new Jugada());
+                Jugada jugada = new Jugada();
+                Sala sala = BackendAPI.getSalaActual();
+                if(sala != null){
+                    Partida partida = sala.getPartida();
+                    if(partida != null){
+                        if(partida.validarJugada(jugada)){
+                            api.enviarJugada(new Jugada());
+                        }else{
+                            mostrarMensaje("No puedes robar más cartas");
+                        }
+                    }
+                }
             }else{
                 mostrarMensaje("Espera tu turno");
             }
@@ -324,6 +338,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         Partida partida = sala.getPartida();
         if(sala.isEnPausa()){
             // Partida pausada
+            AnimationManager.cancelAnimation(sentido);
             Intent intent = new Intent(this, SalaActivity.class);
             this.startActivityForResult(intent,0);
             this.mostrarMensaje("Has vuelto a la sala");
@@ -553,6 +568,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
         // Finalización de partida
         if(!sala.isEnPartida()){
+            AnimationManager.cancelAnimation(sentido);
+
             api.cancelarSuscripcionCanalEmojis();
             partidaFinalizada = true;
             resetPorcentajes();
@@ -597,6 +614,9 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         }else{
             sentido.setImageResource(R.drawable.ic_sentido_antihorario);
         }
+
+        AnimationManager.animateRotation(sentido, sentidoAnterior, sentidoHorario);
+        sentidoAnterior = sentidoHorario;
     }
 
     private void setImagenJugador(int jugadorLayoutID, int imageID){
@@ -613,6 +633,11 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
     }
 
     private void setNumCartas(int jugadorLayoutID, int numCartas){
+        if(numCartas >= MAX_CARTAS){
+            contadoresCartasJugadores[jugadorLayoutID].setTextColor(Color.RED);
+        }else{
+            contadoresCartasJugadores[jugadorLayoutID].setTextColor(Color.WHITE);
+        }
         contadoresCartasJugadores[jugadorLayoutID].setText(numCartas + "");
     }
 

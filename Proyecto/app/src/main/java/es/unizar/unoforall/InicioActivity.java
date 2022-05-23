@@ -24,6 +24,9 @@ import es.unizar.unoforall.utils.ActivityType;
 
 public class InicioActivity extends CustomActivity {
 
+    private static final String AZURE_IP = "unoforall.westeurope.cloudapp.azure.com";
+    private static final boolean MODO_PRODUCCION = false;
+
     private static final int CAMBIAR_IP_ID = 0;
     private static final int REQUEST_DISABLE_BATTERY_OPTIMIZATION_INTENT = 123;
     private static final int DISABLE_OK = -1;
@@ -55,6 +58,11 @@ public class InicioActivity extends CustomActivity {
         NotificationManager.initialize(this);
 
         requestDisableBatteryOptimization();
+
+        if(MODO_PRODUCCION){
+            RestAPI.setServerIP(AZURE_IP);
+            WebSocketAPI.setServerIP(AZURE_IP);
+        }
     }
 
     private void requestDisableBatteryOptimization(){
@@ -105,6 +113,10 @@ public class InicioActivity extends CustomActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
+        if(MODO_PRODUCCION){
+            return super.onCreateOptionsMenu(menu);
+        }
+
         boolean result = super.onCreateOptionsMenu(menu);
         menu.add(Menu.NONE, CAMBIAR_IP_ID, Menu.NONE, "Cambiar IP del servidor");
         return result;
@@ -112,6 +124,10 @@ public class InicioActivity extends CustomActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
+        if(MODO_PRODUCCION){
+            return super.onOptionsItemSelected(item);
+        }
+
         String pkg=getPackageName();
         PowerManager pm=getSystemService(PowerManager.class);
         if (!pm.isIgnoringBatteryOptimizations(pkg)) {

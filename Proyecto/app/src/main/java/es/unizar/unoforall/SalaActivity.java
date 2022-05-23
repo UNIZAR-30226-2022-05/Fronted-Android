@@ -252,9 +252,15 @@ public class SalaActivity extends CustomActivity implements SalaReceiver {
     @Override
     public void onBackPressed(){
         Sala salaActual = BackendAPI.getSalaActual();
+        if(salaActual == null){
+            super.onBackPressed();
+            return;
+        }
+
         if(salaActual.isEnPausa()){
             UsuarioVO usuarioVO = BackendAPI.getUsuario();
-            if(salaActual.getParticipantes().get(usuarioVO)){
+            boolean usuarioListo = salaActual.getParticipantes().getOrDefault(usuarioVO, false);
+            if(usuarioListo){
                 salirSala();
             }else{
                 api.salirSala();
