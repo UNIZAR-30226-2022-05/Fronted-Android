@@ -179,9 +179,17 @@ public class AnimationManager{
         }
 
         public void start(){
-            for(int i=0; i<this.cartas.size(); i++){
+            int n = this.cartas.size();
+            for(int i=0; i<n; i++){
+                Runnable runnable;
+                if(i == n-1){
+                    runnable = this.endAction;
+                }else{
+                    runnable = () -> {};
+                }
+
                 animateCardMovement(viewGroup, startView, endView, this.cartas.get(i), isVisible,
-                        i * CARD_MOVEMENT_START_DELAY, defaultMode, endAction);
+                        i * CARD_MOVEMENT_START_DELAY, defaultMode, runnable);
             }
         }
     }
