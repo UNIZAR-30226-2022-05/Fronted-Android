@@ -264,7 +264,18 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
 
         mazoRobar.setOnClickListener(view -> {
             if(esTurnoDelJugadorActual()){
-                api.enviarJugada(new Jugada());
+                Jugada jugada = new Jugada();
+                Sala sala = BackendAPI.getSalaActual();
+                if(sala != null){
+                    Partida partida = sala.getPartida();
+                    if(partida != null){
+                        if(partida.validarJugada(jugada)){
+                            api.enviarJugada(new Jugada());
+                        }else{
+                            mostrarMensaje("No puedes robar más cartas");
+                        }
+                    }
+                }
             }else{
                 mostrarMensaje("Espera tu turno");
             }
