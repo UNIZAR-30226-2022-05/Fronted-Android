@@ -58,7 +58,7 @@
     <string name="activarEncadenar_2_4">Acumular efecto de +2 y +4</string>
     <string name="activarRedirigir_2_4">Redirigir efecto de +2 y +4</string>
     <string name="activarJugar_varias_cartas">Permite escalera y jugar varias del mismo número</string>
-    <string name="activarPenalizacion_4_color">Penaliza si última carta es +4 o cambio de color</string>
+    <string name="activarPenalizacion_4_color">Penaliza si tu última carta es +4 o cambio de color</string>
 
     <string name="mensajeInformacion">Por favor, introduzca el correo de la cuenta
                                         que quiere recuperar para que le mandemos
