@@ -25,7 +25,7 @@ import es.unizar.unoforall.utils.ActivityType;
 public class InicioActivity extends CustomActivity {
 
     private static final String AZURE_IP = "unoforall.westeurope.cloudapp.azure.com";
-    private static final boolean MODO_PRODUCCION = false;
+    private static final boolean MODO_PRODUCCION = true;
 
     private static final int CAMBIAR_IP_ID = 0;
     private static final int REQUEST_DISABLE_BATTERY_OPTIMIZATION_INTENT = 123;
