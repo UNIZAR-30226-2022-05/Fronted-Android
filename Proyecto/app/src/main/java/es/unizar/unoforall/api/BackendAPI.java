@@ -318,7 +318,20 @@ public class BackendAPI{
 
     public void unirseSalaPorID(){
         SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
-        builder.setPositiveButton(salaID -> unirseSala(salaID));
+        builder.setPositiveButton(salaID -> {
+            RestAPI api = new RestAPI(activity, "/api/buscarSalaID");
+            api.addParameter("sesionID", sesionID);
+            api.addParameter("salaID", salaID);
+            api.openConnection();
+            api.setOnObjectReceived(Sala.class, sala -> {
+                if(sala.isNoExiste()){
+                    builder.setError(sala.getError());
+                    builder.show();
+                }else{
+                    unirseSala(salaID);
+                }
+            });
+        });
         builder.setNegativeButton(() -> activity.mostrarMensaje("Búsqueda de sala por ID cancelada"));
         builder.show();
     }

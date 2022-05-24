@@ -28,8 +28,8 @@ public class SalaIDSearchDialogBuilder{
         this.negativeRunnable = () -> {};
     }
 
-    public void setError(String errror){
-        this.salaIDEditText.setError(errror);
+    public void setError(String error){
+        this.salaIDEditText.setError(error);
     }
 
     public void setPositiveButton(Consumer<UUID> consumer){
