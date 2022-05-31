@@ -6,7 +6,7 @@ import es.unizar.unoforall.utils.CustomActivity;
 import me.i2000c.web_utils.client.RestClient;
 
 public class RestAPI{
-    private static String SERVER_URL = "http://192.168.1.100";
+    protected static String SERVER_URL = "http://192.168.1.100";
 
     private final CustomActivity activity;
     private RestClient restClient;
@@ -40,7 +40,9 @@ public class RestAPI{
     }
 
     public <T> void receiveObject(Class<T> requestedClass, Consumer<T> consumer){
-        restClient.receiveObject(requestedClass, consumer);
+        restClient.receiveObject(requestedClass, object -> {
+            activity.runOnUiThread(() -> consumer.accept(object));
+        });
     }
 
     public void close(){
