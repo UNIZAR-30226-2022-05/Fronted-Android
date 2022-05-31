@@ -29,10 +29,6 @@ public class WebSocketAPI {
         client.openConnection(path);
     }
 
-    public <T> void subscribe(String topic, Class<T> expectedClass, Consumer<T> consumer) {
-        client.subscribe(topic, expectedClass, consumer);
-    }
-
     public <T> void subscribe(Activity activity, String topic, Class<T> expectedClass, Consumer<T> consumer){
         client.subscribe(topic, expectedClass, object -> {
             activity.runOnUiThread(() -> consumer.accept(object));

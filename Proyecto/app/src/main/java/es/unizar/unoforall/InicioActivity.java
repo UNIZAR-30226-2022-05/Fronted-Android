@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -21,11 +22,12 @@ import es.unizar.unoforall.utils.CustomActivity;
 import es.unizar.unoforall.utils.dialogs.SetIPDialogBuilder;
 import es.unizar.unoforall.utils.notifications.NotificationManager;
 import es.unizar.unoforall.utils.ActivityType;
+import me.i2000c.web_utils.multicast_utils.MulticastClient;
 
 public class InicioActivity extends CustomActivity {
 
     private static final String AZURE_IP = "unoforall.westeurope.cloudapp.azure.com";
-    private static final boolean MODO_PRODUCCION = true;
+    private static final boolean MODO_PRODUCCION = false;
 
     private static final int CAMBIAR_IP_ID = 0;
     private static final int REQUEST_DISABLE_BATTERY_OPTIMIZATION_INTENT = 123;
@@ -62,6 +64,8 @@ public class InicioActivity extends CustomActivity {
         if(MODO_PRODUCCION){
             RestAPI.setServerIP(AZURE_IP);
             WebSocketAPI.setServerIP(AZURE_IP);
+        }else{
+            scanServerIP();
         }
     }
 
@@ -165,5 +169,21 @@ public class InicioActivity extends CustomActivity {
         NotificationManager.close(this);
         BackendAPI.closeWebSocketAPI();
         super.onDestroy();
+    }
+
+    private void scanServerIP(){
+        mostrarMensaje("Buscando servidor...");
+        MulticastClient client = new MulticastClient();
+        client.startScan(ipPorts -> {
+            runOnUiThread(() -> {
+                if(ipPorts.isEmpty()){
+                    //mostrarMensaje("No se ha encontrado ningún servidor");
+                }else{
+                    String serverIP = ipPorts.get(0).toString();
+                    RestAPI.setServerIP(serverIP);
+                    mostrarMensaje("Servidor encontrado: " + serverIP);
+                }
+            });
+        });
     }
 }
