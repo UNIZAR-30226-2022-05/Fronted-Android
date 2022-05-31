@@ -43,6 +43,7 @@ import es.unizar.unoforall.utils.notifications.Notificacion;
 import es.unizar.unoforall.utils.notifications.Notificaciones;
 import es.unizar.unoforall.utils.tasks.Task;
 import me.i2000c.web_utils.client.RestClient;
+import me.i2000c.web_utils.serialize.Serialize;
 
 public class BackendAPI{
     private static final Object LOCK = new Object();
@@ -115,11 +116,21 @@ public class BackendAPI{
     //  LOGIN, REGISTRO Y RECUPERACIÓN DE CONTRASEÑA
     //
     public void login(String correo, String contrasennaHash){
-        RestAPI api = new RestAPI(activity);
-        api.addParameter("correo", correo);
-        api.addParameter("contrasenna", contrasennaHash);
-        api.openConnection("/api/login");
-        api.receiveObject(RespuestaLogin.class, respuestaLogin -> {
+        wsAPI = new WebSocketAPI();
+        wsAPI.setOnError(ex -> {
+            activity.runOnUiThread(() -> {
+                activity.mostrarMensaje(ex.getMessage());
+            });
+            ex.printStackTrace();
+            closeWebSocketAPI();
+        });
+        wsAPI.openConnection("/topic");
+
+        RestClient client = wsAPI.getRestClient();
+        client.addParameter("correo", correo);
+        client.addParameter("contrasenna", contrasennaHash);
+        client.openConnection("/api/login");
+        client.receiveObject(RespuestaLogin.class, respuestaLogin -> {
             if(respuestaLogin.isExito()){
                 Cursor cursor = usuarioDbAdapter.buscarUsuario(correo);
                 if(cursor == null){
@@ -129,52 +140,36 @@ public class BackendAPI{
                     usuarioDbAdapter.modificarUsuario(usuarioID, correo, contrasennaHash);
                 }
 
-                wsAPI = new WebSocketAPI();
-                wsAPI.setOnError(ex -> {
-                    activity.mostrarMensaje(ex.getMessage());
-                    ex.printStackTrace();
-                    closeWebSocketAPI();
-                });
-                wsAPI.openConnection("/topic");
-                loginPaso2(respuestaLogin.getClaveInicio());
+                loginPaso2();
             }else{
                 activity.mostrarMensaje(respuestaLogin.getErrorInfo());
             }
         });
     }
-    private void loginPaso2(UUID claveInicio){
-        wsAPI.subscribe(activity, "/topic/conectarse/" + claveInicio, String.class, sesionID -> {
-            wsAPI.unsubscribe("/topic/conectarse/" + claveInicio);
-            //BackendAPI.sesionID = sesionID;
+    private void loginPaso2(){
+        notificacionesSala.clear();
 
-            notificacionesSala.clear();
+        obtenerUsuarioVO(usuarioVO -> {
+            // Suscribirse a las notificaciones de sala
+            wsAPI.subscribe(activity, "/topic/notifSala/" + usuarioVO.getId(),
+                    NotificacionSala.class, notificacionSala ->
+                        Notificaciones.mostrarNotificacionSala(notificacionSala));
 
-            obtenerUsuarioVO(usuarioVO -> {
-                // Suscribirse a las notificaciones de sala
-                wsAPI.subscribe(activity, "/topic/notifSala/" + usuarioVO.getId(),
-                        NotificacionSala.class, notificacionSala ->
-                            Notificaciones.mostrarNotificacionSala(notificacionSala));
+            // Suscribirse a las notificaciones de amigos
+            wsAPI.subscribe(activity, "/topic/notifAmistad/" + usuarioVO.getId(),
+                    UsuarioVO.class, usuarioVO2 -> {
+                        if(usuarioVO2 != null){
+                            Notificaciones.mostrarNotificacionAmigo(usuarioVO2);
+                        }
+                    });
 
-                // Suscribirse a las notificaciones de amigos
-                wsAPI.subscribe(activity, "/topic/notifAmistad/" + usuarioVO.getId(),
-                        UsuarioVO.class, usuarioVO2 -> {
-                            if(usuarioVO2 != null){
-                                Notificaciones.mostrarNotificacionAmigo(usuarioVO2);
-                            }
-                        });
+            usuario = usuarioVO;
+            activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
 
-                usuario = usuarioVO;
-                activity.mostrarMensaje("Hola " + usuarioVO.getNombre() + ", has iniciado sesión correctamente");
-
-                // Iniciar la actividad principal
-                Intent intent = new Intent(activity, PrincipalActivity.class);
-                activity.startActivityForResult(intent, 0);
-            });
+            // Iniciar la actividad principal
+            Intent intent = new Intent(activity, PrincipalActivity.class);
+            activity.startActivityForResult(intent, 0);
         });
-
-        RestClient client = wsAPI.getRestClient();
-        client.openConnection("/app/conectarse");
-        client.receiveObject(String.class, null);
     }
 
     public void register(String nombreUsuario, String correo, String contrasennaHash){
@@ -279,12 +274,14 @@ public class BackendAPI{
         RestClient client = wsAPI.getRestClient();
         client.openConnection("/api/sacarUsuarioVO");
         client.receiveObject(UsuarioVO.class, usuarioVO -> {
-            if(usuarioVO.isExito()){
-                usuario = usuarioVO;
-                consumer.accept(usuarioVO);
-            }else{
-                activity.mostrarMensaje("Se ha producido un error al obtener el usuario");
-            }
+            activity.runOnUiThread(() -> {
+                if(usuarioVO.isExito()){
+                    usuario = usuarioVO;
+                    consumer.accept(usuarioVO);
+                }else{
+                    activity.mostrarMensaje("Se ha producido un error al obtener el usuario");
+                }
+            });
         });
     }
     public void buscarUsuarioVO(String correo, Consumer<UsuarioVO> consumer){
@@ -292,11 +289,13 @@ public class BackendAPI{
         client.addParameter("amigo", correo);
         client.openConnection("/api/buscarAmigo");
         client.receiveObject(ListaUsuarios.class, listaUsuarios -> {
-            if(listaUsuarios.isExpirado() || (listaUsuarios.getError() != null && !listaUsuarios.getError().equals("null"))){
-                activity.mostrarMensaje(listaUsuarios.getError());
-            }else{
-                consumer.accept(listaUsuarios.getUsuarios().get(0));
-            }
+            activity.runOnUiThread(() -> {
+                if(listaUsuarios.isExpirado() || (listaUsuarios.getError() != null && !listaUsuarios.getError().equals("null"))){
+                    activity.mostrarMensaje(listaUsuarios.getError());
+                }else{
+                    consumer.accept(listaUsuarios.getUsuarios().get(0));
+                }
+            });
         });
     }
 
@@ -308,12 +307,14 @@ public class BackendAPI{
         client.addParameter("configuracion", configSala);
         client.openConnection("/api/crearSala");
         client.receiveObject(RespuestaSala.class, respuestaSala -> {
-            if(respuestaSala.isExito()){
-                // No ha habido errores
-                unirseSala(respuestaSala.getSalaID());
-            }else{
-                activity.mostrarMensaje(respuestaSala.getErrorInfo());
-            }
+            activity.runOnUiThread(() -> {
+                if(respuestaSala.isExito()){
+                    // No ha habido errores
+                    unirseSala(respuestaSala.getSalaID());
+                }else{
+                    activity.mostrarMensaje(respuestaSala.getErrorInfo());
+                }
+            });
         });
     }
 
@@ -324,15 +325,18 @@ public class BackendAPI{
             api.addParameter("salaID", salaID);
             api.openConnection("/api/buscarSalaID");
             api.receiveObject(Sala.class, sala -> {
-                if(sala.isNoExiste()){
-                    builder.setError(sala.getError());
-                    builder.show();
-                }else{
-                    unirseSala(salaID);
-                }
+                activity.runOnUiThread(() -> {
+                    if(sala.isNoExiste()){
+                        builder.setError(sala.getError());
+                        builder.show();
+                    }else{
+                        unirseSala(salaID);
+                    }
+                });
             });
         });
-        builder.setNegativeButton(() -> activity.mostrarMensaje("Búsqueda de sala por ID cancelada"));
+        builder.setNegativeButton(() ->
+                activity.runOnUiThread(() -> activity.mostrarMensaje("Búsqueda de sala por ID cancelada")));
         builder.show();
     }
 
@@ -341,37 +345,39 @@ public class BackendAPI{
     }
     public void unirseSala(UUID salaID, Consumer<Boolean> consumer){
         comprobarUnirseSala(salaID, sePuedeUnir -> {
-            if(sePuedeUnir){
-                wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
-                    if(sala.isNoExiste()){
-                        // Se ha producido un error
-                        activity.mostrarMensaje(sala.getError());
-                        wsAPI.unsubscribe("/topic/salas/" + salaID);
-                        activity.finish();
-                    }else{
-                        salaActual = sala;
-                        if(salaActualID == null){
-                            salaActualID = salaID;
-                            Intent intent = new Intent(activity, SalaActivity.class);
-                            activity.startActivityForResult(intent,0);
-                            activity.mostrarMensaje("Te has unido a la sala");
-                        }
+            activity.runOnUiThread(() -> {
+                if(sePuedeUnir){
+                    wsAPI.subscribe(activity,"/topic/salas/" + salaID, Sala.class, sala -> {
+                        if(sala.isNoExiste()){
+                            // Se ha producido un error
+                            activity.mostrarMensaje(sala.getError());
+                            wsAPI.unsubscribe("/topic/salas/" + salaID);
+                            activity.finish();
+                        }else{
+                            salaActual = sala;
+                            if(salaActualID == null){
+                                salaActualID = salaID;
+                                Intent intent = new Intent(activity, SalaActivity.class);
+                                activity.startActivityForResult(intent,0);
+                                activity.mostrarMensaje("Te has unido a la sala");
+                            }
 
-                        enviarSalaACK();
-                        if(currentActivity instanceof SalaReceiver){
-                            ((SalaReceiver) currentActivity).manageSala(sala);
+                            enviarSalaACK();
+                            if(currentActivity instanceof SalaReceiver){
+                                ((SalaReceiver) currentActivity).manageSala(sala);
+                            }
                         }
-                    }
-                });
+                    });
 
-                RestClient client = wsAPI.getRestClient();
-                client.openConnection("/app/salas/unirse/" + salaID);
-                client.receiveObject(String.class, null);
-                consumer.accept(true);
-            }else{
-                activity.mostrarMensaje("No puedes unirte a esa sala ahora mismo");
-                consumer.accept(false);
-            }
+                    RestClient client = wsAPI.getRestClient();
+                    client.openConnection("/app/salas/unirse/" + salaID);
+                    client.receiveObject(String.class, null);
+                    consumer.accept(true);
+                }else{
+                    activity.mostrarMensaje("No puedes unirte a esa sala ahora mismo");
+                    consumer.accept(false);
+                }
+            });
         });
     }
     private void enviarSalaACK(){
@@ -380,9 +386,11 @@ public class BackendAPI{
             client.addParameter("salaID", salaActualID);
             client.openConnection("/api/ack");
             client.receiveObject(Boolean.class, exito -> {
-                if(!exito){
-                    activity.mostrarMensaje("Se ha producido un error al enviar el ACK");
-                }
+                activity.runOnUiThread(() -> {
+                    if(!exito){
+                        activity.mostrarMensaje("Se ha producido un error al enviar el ACK");
+                    }
+                });
             });
         }
     }
@@ -392,51 +400,57 @@ public class BackendAPI{
         client.receiveObject(String.class, null);
     }
     public void salirSala(){
-        if(salaActual == null){
-            activity.mostrarMensaje("La sala no puede ser null");
-        }else{
-            cancelarSuscripcionCanalEmojis();
-            cancelarSuscripcionCanalVotacionPausa();
-            wsAPI.unsubscribe("/topic/salas/" + salaActualID);
-            RestClient client = wsAPI.getRestClient();
-            client.openConnection("/app/salas/salir/" + salaActualID);
-            client.receiveObject(String.class, null);
-            activity.mostrarMensaje("Has salido de la sala");
-            salaActual = null;
-            salaActualID = null;
-            Intent intent = new Intent(activity, PrincipalActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            activity.startActivityForResult(intent, 0);
-        }
+        activity.runOnUiThread(() -> {
+            if(salaActual == null){
+                activity.mostrarMensaje("La sala no puede ser null");
+            }else{
+                cancelarSuscripcionCanalEmojis();
+                cancelarSuscripcionCanalVotacionPausa();
+                wsAPI.unsubscribe("/topic/salas/" + salaActualID);
+                RestClient client = wsAPI.getRestClient();
+                client.openConnection("/app/salas/salir/" + salaActualID);
+                client.receiveObject(String.class, null);
+                activity.mostrarMensaje("Has salido de la sala");
+                salaActual = null;
+                salaActualID = null;
+                Intent intent = new Intent(activity, PrincipalActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                activity.startActivityForResult(intent, 0);
+            }
+        });
     }
     public void salirSalaDefinitivo(){
-        if(salaActual == null){
-            activity.mostrarMensaje("La sala no puede ser null");
-        }else{
-            cancelarSuscripcionCanalEmojis();
-            cancelarSuscripcionCanalVotacionPausa();
-            wsAPI.unsubscribe("/topic/salas/" + salaActualID);
-            RestClient client = wsAPI.getRestClient();
-            client.openConnection("/app/salas/salirDefinitivo/" + salaActualID);
-            client.receiveObject(String.class, null);
-            activity.mostrarMensaje("Has salido de la sala");
-            salaActual = null;
-            salaActualID = null;
-            Intent intent = new Intent(activity, PrincipalActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            activity.startActivityForResult(intent, 0);
-        }
+        activity.runOnUiThread(() -> {
+            if(salaActual == null){
+                activity.mostrarMensaje("La sala no puede ser null");
+            }else{
+                cancelarSuscripcionCanalEmojis();
+                cancelarSuscripcionCanalVotacionPausa();
+                wsAPI.unsubscribe("/topic/salas/" + salaActualID);
+                RestClient client = wsAPI.getRestClient();
+                client.openConnection("/app/salas/salirDefinitivo/" + salaActualID);
+                client.receiveObject(String.class, null);
+                activity.mostrarMensaje("Has salido de la sala");
+                salaActual = null;
+                salaActualID = null;
+                Intent intent = new Intent(activity, PrincipalActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                activity.startActivityForResult(intent, 0);
+            }
+        });
     }
 
     public void comprobarPartidaPausada(Consumer<Sala> consumer){
         RestClient client = wsAPI.getRestClient();
         client.openConnection("/api/comprobarPartidaPausada");
         client.receiveObject(Sala.class, sala -> {
-            if(sala.isNoExiste()){
-                consumer.accept(null);
-            }else{
-                consumer.accept(sala);
-            }
+            activity.runOnUiThread(() -> {
+                if(sala.isNoExiste()){
+                    consumer.accept(null);
+                }else{
+                    consumer.accept(sala);
+                }
+            });
         });
     }
 
@@ -444,14 +458,14 @@ public class BackendAPI{
         RestClient client = wsAPI.getRestClient();
         client.addParameter("salaID", salaID);
         client.openConnection("/api/comprobarUnirseSala");
-        client.receiveObject(Boolean.class, consumer);
+        client.receiveObject(Boolean.class, b -> activity.runOnUiThread(() -> consumer.accept(b)));
     }
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
         RestClient client = wsAPI.getRestClient();
         client.addParameter("configuracion", filtro);
         client.openConnection("/api/filtrarSalas");
-        client.receiveObject(RespuestaSalas.class, consumer);
+        client.receiveObject(RespuestaSalas.class, respSalas -> activity.runOnUiThread(() -> consumer.accept(respSalas)));
     }
 
     //
@@ -461,20 +475,22 @@ public class BackendAPI{
         RestClient client = wsAPI.getRestClient();
         client.openConnection("/api/sacarUsuarioVO");
         client.receiveObject(UsuarioVO.class, usuarioVO -> {
-            ModifyAccountDialogBuilder builder = new ModifyAccountDialogBuilder(activity);
-            builder.setNombreUsuario(usuarioVO.getNombre());
-            builder.setCorreo(usuarioVO.getCorreo());
-            builder.setPositiveButton((nombreUsuario, correo, contrasenna) -> {
-                if(contrasenna == null){
-                    // Si no se ha cambiado la contraseña,
-                    //   se envía la anterior
-                    modificarCuentaPaso2(nombreUsuario, correo, usuarioVO.getContrasenna(), builder);
-                }else{
-                    modificarCuentaPaso2(nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
-                }
+            activity.runOnUiThread(() -> {
+                ModifyAccountDialogBuilder builder = new ModifyAccountDialogBuilder(activity);
+                builder.setNombreUsuario(usuarioVO.getNombre());
+                builder.setCorreo(usuarioVO.getCorreo());
+                builder.setPositiveButton((nombreUsuario, correo, contrasenna) -> {
+                    if(contrasenna == null){
+                        // Si no se ha cambiado la contraseña,
+                        //   se envía la anterior
+                        modificarCuentaPaso2(nombreUsuario, correo, usuarioVO.getContrasenna(), builder);
+                    }else{
+                        modificarCuentaPaso2(nombreUsuario, correo, HashUtils.cifrarContrasenna(contrasenna), builder);
+                    }
+                });
+                builder.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
+                builder.show();
             });
-            builder.setNegativeButton(() -> activity.mostrarMensaje("Operación cancelada"));
-            builder.show();
         });
     }
     private void modificarCuentaPaso2(String nombreUsuario, String correo, String contrasennaHash,
@@ -485,16 +501,18 @@ public class BackendAPI{
         client.addParameter("contrasenna", contrasennaHash);
         client.openConnection("/api/actualizarCuentaStepOne");
         client.receiveObject(String.class, error -> {
-            if(error == null){
-                // Si no ha habido error
-                CodeConfirmDialogBuilder builder2 = new CodeConfirmDialogBuilder(activity);
-                builder2.setPositiveButton(codigo -> modificarCuentaPaso3(codigo, correo, contrasennaHash, builder2));
-                builder2.setNegativeButton(() -> cancelModificarCuenta());
-                builder2.show();
-            }else{
-                activity.mostrarMensaje(error);
-                builder.show();
-            }
+            activity.runOnUiThread(() -> {
+                if(error == null){
+                    // Si no ha habido error
+                    CodeConfirmDialogBuilder builder2 = new CodeConfirmDialogBuilder(activity);
+                    builder2.setPositiveButton(codigo -> modificarCuentaPaso3(codigo, correo, contrasennaHash, builder2));
+                    builder2.setNegativeButton(() -> cancelModificarCuenta());
+                    builder2.show();
+                }else{
+                    activity.mostrarMensaje(error);
+                    builder.show();
+                }
+            });
         });
     }
     private void modificarCuentaPaso3(int codigo,
@@ -504,23 +522,26 @@ public class BackendAPI{
         client.addParameter("codigo", codigo);
         client.openConnection("/api/actualizarCuentaStepTwo");
         client.receiveObject(String.class, error -> {
-            if(error == null){
-                // Cerrar sesión y volverla a iniciar
-                closeWebSocketAPI();
-                login(correo, contrasennaHash);
-            }else{
-                activity.mostrarMensaje(error);
-                if(!error.equals("SESION_EXPIRADA")){
-                    builder.setError("Código incorrecto");
-                    builder.show();
+            activity.runOnUiThread(() -> {
+                if(error == null){
+                    // Cerrar sesión y volverla a iniciar
+                    closeWebSocketAPI();
+                    login(correo, contrasennaHash);
+                }else{
+                    activity.mostrarMensaje(error);
+                    if(!error.equals("SESION_EXPIRADA")){
+                        builder.setError("Código incorrecto");
+                        builder.show();
+                    }
                 }
-            }
+            });
         });
     }
     private void cancelModificarCuenta(){
         RestClient client = wsAPI.getRestClient();
         client.openConnection("/api/actualizarCancel");
-        client.receiveObject(String.class, error -> activity.mostrarMensaje("Operación cancelada"));
+        client.receiveObject(String.class, error ->
+                activity.runOnUiThread(() -> activity.mostrarMensaje("Operación cancelada")));
     }
 
     //
@@ -533,17 +554,19 @@ public class BackendAPI{
                 RestClient client = wsAPI.getRestClient();
                 client.openConnection("/api/borrarCuenta");
                 client.receiveObject(String.class, error -> {
-                    if(error == null || error.equals("BORRADA")){
-                        // No ha habido error
-                        usuarioDbAdapter.deleteUsuario(usuarioVO.getCorreo());
-                        activity.mostrarMensaje("Cuenta borrada");
-                        BackendAPI.closeWebSocketAPI();
-                        Intent intent = new Intent(activity, InicioActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        activity.startActivityForResult(intent, 0);
-                    }else{
-                        activity.mostrarMensaje(error);
-                    }
+                    activity.runOnUiThread(() -> {
+                        if(error == null || error.equals("BORRADA")){
+                            // No ha habido error
+                            usuarioDbAdapter.deleteUsuario(usuarioVO.getCorreo());
+                            activity.mostrarMensaje("Cuenta borrada");
+                            BackendAPI.closeWebSocketAPI();
+                            Intent intent = new Intent(activity, InicioActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            activity.startActivityForResult(intent, 0);
+                        }else{
+                            activity.mostrarMensaje(error);
+                        }
+                    });
                 });
             });
             builder.show();
@@ -557,33 +580,39 @@ public class BackendAPI{
         RestClient client = wsAPI.getRestClient();
         client.openConnection("/api/sacarAmigos");
         client.receiveObject(ListaUsuarios.class, listaUsuarios -> {
-            if(listaUsuarios.isExpirado()){
-                activity.mostrarMensaje(listaUsuarios.getError());
-            }else{
-                consumer.accept(listaUsuarios);
-            }
+            activity.runOnUiThread(() -> {
+                if(listaUsuarios.isExpirado()){
+                    activity.mostrarMensaje(listaUsuarios.getError());
+                }else{
+                    consumer.accept(listaUsuarios);
+                }
+            });
         });
     }
     public void obtenerPeticionesRecibidas(Consumer<ListaUsuarios> consumer){
         RestClient client = wsAPI.getRestClient();
         client.openConnection("/api/sacarPeticionesRecibidas");
         client.receiveObject(ListaUsuarios.class, listaUsuarios -> {
-            if(listaUsuarios.isExpirado()){
-                activity.mostrarMensaje(listaUsuarios.getError());
-            }else{
-                consumer.accept(listaUsuarios);
-            }
+            activity.runOnUiThread(() -> {
+                if(listaUsuarios.isExpirado()){
+                    activity.mostrarMensaje(listaUsuarios.getError());
+                }else{
+                    consumer.accept(listaUsuarios);
+                }
+            });
         });
     }
     public void obtenerPeticionesEnviadas(Consumer<ListaUsuarios> consumer){
         RestClient client = wsAPI.getRestClient();
         client.openConnection("/api/sacarPeticionesEnviadas");
         client.receiveObject(ListaUsuarios.class, listaUsuarios -> {
-            if(listaUsuarios.isExpirado()){
-                activity.mostrarMensaje(listaUsuarios.getError());
-            }else{
-                consumer.accept(listaUsuarios);
-            }
+            activity.runOnUiThread(() -> {
+                if(listaUsuarios.isExpirado()){
+                    activity.mostrarMensaje(listaUsuarios.getError());
+                }else{
+                    consumer.accept(listaUsuarios);
+                }
+            });
         });
     }
 
@@ -591,12 +620,14 @@ public class BackendAPI{
         PeticionAmistadDialogBuilder builder = new PeticionAmistadDialogBuilder(activity);
         builder.setPositiveButton(correo -> {
             obtenerUsuarioVO(usuarioPrincipal -> {
-                if(correo.equals(usuarioPrincipal.getCorreo())){
-                    builder.setError("No puedes enviarte una solicitud a ti mismo");
-                    builder.show();
-                }else{
-                    enviarPeticion2(correo, runnable);
-                }
+                activity.runOnUiThread(() -> {
+                    if(correo.equals(usuarioPrincipal.getCorreo())){
+                        builder.setError("No puedes enviarte una solicitud a ti mismo");
+                        builder.show();
+                    }else{
+                        enviarPeticion2(correo, runnable);
+                    }
+                });
             });
         });
         builder.setNegativeButton(() -> activity.mostrarMensaje("Envío de solicitud cancelado"));
@@ -604,10 +635,12 @@ public class BackendAPI{
     }
     private void enviarPeticion2(String correo, Runnable runnable){
         buscarUsuarioVO(correo, usuarioVO -> {
-            RestClient client = wsAPI.getRestClient();
-            client.openConnection("/app/notifAmistad/" + usuarioVO.getId());
-            client.receiveObject(String.class, null);
-            Task.runDelayedTask(() -> runnable.run(), 300);
+            activity.runOnUiThread(() -> {
+                RestClient client = wsAPI.getRestClient();
+                client.openConnection("/app/notifAmistad/" + usuarioVO.getId());
+                client.receiveObject(String.class, null);
+                Task.runDelayedTask(() -> runnable.run(), 300);
+            });
         });
     }
 
@@ -616,11 +649,13 @@ public class BackendAPI{
         client.addParameter("amigo", usuario.getId());
         client.openConnection("/api/aceptarPeticionAmistad");
         client.receiveObject(String.class, error -> {
-            if(error != null){
-                activity.mostrarMensaje(error);
-            }else{
-                activity.mostrarMensaje("Petición aceptada");
-            }
+            activity.runOnUiThread(() -> {
+                if(error != null){
+                    activity.mostrarMensaje(error);
+                }else{
+                    activity.mostrarMensaje("Petición aceptada");
+                }
+            });
         });
     }
     public void rechazarPeticion(UsuarioVO usuario){
@@ -628,11 +663,13 @@ public class BackendAPI{
         client.addParameter("amigo", usuario.getId());
         client.openConnection("/api/cancelarPeticionAmistad");
         client.receiveObject(String.class, error -> {
-            if(error != null){
-                activity.mostrarMensaje(error);
-            }else{
-                activity.mostrarMensaje("Petición rechazada");
-            }
+            activity.runOnUiThread(() -> {
+                if(error != null){
+                    activity.mostrarMensaje(error);
+                }else{
+                    activity.mostrarMensaje("Petición rechazada");
+                }
+            });
         });
     }
 
@@ -640,11 +677,13 @@ public class BackendAPI{
         SeleccionAmigoDialogBuilder builder = new SeleccionAmigoDialogBuilder(activity);
         builder.setPositiveButton(correo -> {
             buscarUsuarioVO(correo, usuarioVO -> {
-                RestClient client = wsAPI.getRestClient();
-                client.addParameter("salaID", salaActualID);
-                client.openConnection("/app/notifSala/" + usuarioVO.getId());
-                client.receiveObject(String.class, null);
-                activity.mostrarMensaje("Invitación enviada");
+                activity.runOnUiThread(() -> {
+                    RestClient client = wsAPI.getRestClient();
+                    client.addParameter("salaID", salaActualID);
+                    client.openConnection("/app/notifSala/" + usuarioVO.getId());
+                    client.receiveObject(String.class, null);
+                    activity.mostrarMensaje("Invitación enviada");
+                });
             });
         });
         builder.show();
@@ -686,7 +725,7 @@ public class BackendAPI{
         wsAPI.subscribe(activity, "/topic/salas/" + salaActualID + "/votaciones",
                 RespuestaVotacionPausa.class, respuestaVotacionPausa -> {
                     if(respuestaVotacionPausa != null){
-                        consumer.accept(respuestaVotacionPausa);
+                        activity.runOnUiThread(() -> consumer.accept(respuestaVotacionPausa));
                     }
                 });
     }
@@ -719,13 +758,15 @@ public class BackendAPI{
         client.addParameter("aspectoCartas", aspectoCartas);
         client.openConnection("/api/cambiarAvatar");
         client.receiveObject(String.class, error -> {
-            if(error == null){
-                // Cerrar sesión y volverla a iniciar
-                closeWebSocketAPI();
-                login(usuario.getCorreo(), usuario.getContrasenna());
-            }else{
-                activity.mostrarMensaje(error);
-            }
+            activity.runOnUiThread(() -> {
+                if(error == null){
+                    // Cerrar sesión y volverla a iniciar
+                    closeWebSocketAPI();
+                    login(usuario.getCorreo(), usuario.getContrasenna());
+                }else{
+                    activity.mostrarMensaje(error);
+                }
+            });
         });
     }
 
@@ -737,16 +778,18 @@ public class BackendAPI{
         client.addParameter("usuarioID", usuarioVO.getId());
         client.openConnection("/api/sacarPartidasJugadas");
         client.receiveObject(ListaPartidas.class, listaPartidas -> {
-            if(listaPartidas.isExpirado()){
-                activity.mostrarMensaje(listaPartidas.getError());
-            }else{
-                // Devuelve la lista de partidas jugadas en orden cronológico inverso
-                consumer.accept(listaPartidas.getPartidas().stream()
-                                .map(PartidaJugada::getPartidaJugadaCompacta)
-                                .sorted(((partidaJugadaCompacta1, partidaJugadaCompacta2) ->
-                                                partidaJugadaCompacta2.getFechaInicio().compareTo(partidaJugadaCompacta1.getFechaInicio())))
-                                .collect(Collectors.toList()));
-            }
+            activity.runOnUiThread(() -> {
+                if(listaPartidas.isExpirado()){
+                    activity.mostrarMensaje(listaPartidas.getError());
+                }else{
+                    // Devuelve la lista de partidas jugadas en orden cronológico inverso
+                    consumer.accept(listaPartidas.getPartidas().stream()
+                            .map(PartidaJugada::getPartidaJugadaCompacta)
+                            .sorted(((partidaJugadaCompacta1, partidaJugadaCompacta2) ->
+                                    partidaJugadaCompacta2.getFechaInicio().compareTo(partidaJugadaCompacta1.getFechaInicio())))
+                            .collect(Collectors.toList()));
+                }
+            });
         });
     }
 

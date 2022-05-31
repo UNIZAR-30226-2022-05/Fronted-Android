@@ -2,6 +2,7 @@ package es.unizar.unoforall.api;
 
 import android.app.Activity;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import me.i2000c.web_utils.client.RestClient;
@@ -14,15 +15,16 @@ public class WebSocketAPI {
         client.setOnError(onError);
     }
 
-    public static void setServerIP(String serverIP){
-    }
-
     public WebSocketAPI(){
         this.client = new WebsocketClient(RestAPI.SERVER_URL);
         this.client.setOnError(ex -> {
             ex.printStackTrace();
             close();
         });
+    }
+
+    public UUID getSessionID(){
+        return client.getSessionID();
     }
 
     public void openConnection(String path){
