@@ -16,8 +16,8 @@ import java.net.URL;
 
 import es.unizar.unoforall.api.RestAPI;
 import es.unizar.unoforall.api.WebSocketAPI;
-import ua.naiksoftware.stomp.Stomp;
-import ua.naiksoftware.stomp.StompClient;
+//import ua.naiksoftware.stomp.Stomp;
+//import ua.naiksoftware.stomp.StompClient;
 
 public class PruebaClienteSpring {
     private static class Empleado {
@@ -67,7 +67,7 @@ public class PruebaClienteSpring {
         //probarRestAPI();
         probarRestAPI2();
         //probarWebSockets();
-        probarWebSockets2();
+        ////probarWebSockets2();
     }
 
     private static void probarRestAPI2(){
@@ -116,7 +116,7 @@ public class PruebaClienteSpring {
     }
 
 
-    private static void probarWebSockets2(){
+    /*private static void probarWebSockets2(){
         WebSocketAPI api = new WebSocketAPI();
         api.setOnError((t, errorType) -> {
             System.err.println("Se ha producido un error: " + errorType);
@@ -142,5 +142,5 @@ public class PruebaClienteSpring {
 
         Gson gson = new Gson();
         client.send("/app/hello", gson.toJson(new Empleado("a", "b", 555), Empleado.class)).subscribe();
-    }
+    }*/
 }
