@@ -3,7 +3,6 @@ package es.unizar.unoforall.api;
 import android.content.Intent;
 import android.database.Cursor;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -115,11 +114,11 @@ public class BackendAPI{
     //  LOGIN, REGISTRO Y RECUPERACIÓN DE CONTRASEÑA
     //
     public void login(String correo, String contrasennaHash){
-        RestAPI api = new RestAPI(activity,"/api/login");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("correo", correo);
         api.addParameter("contrasenna", contrasennaHash);
-        api.openConnection();
-        api.setOnObjectReceived(RespuestaLogin.class, respuestaLogin -> {
+        api.openConnection("/api/login");
+        api.receiveObject(RespuestaLogin.class, respuestaLogin -> {
             if(respuestaLogin.isExito()){
                 Cursor cursor = usuarioDbAdapter.buscarUsuario(correo);
                 if(cursor == null){
@@ -174,12 +173,12 @@ public class BackendAPI{
     }
 
     public void register(String nombreUsuario, String correo, String contrasennaHash){
-        RestAPI api = new RestAPI(activity, "/api/registerStepOne");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("correo", correo);
         api.addParameter("contrasenna", contrasennaHash);
         api.addParameter("nombre", nombreUsuario);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, resp -> {
+        api.openConnection("/api/registerStepOne");
+        api.receiveObject(String.class, resp -> {
             if(resp == null){
                 //Si no ha habido error
                 CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(activity);
@@ -192,11 +191,11 @@ public class BackendAPI{
         });
     }
     private void registerPaso2(String correo, int codigo, String contrasennaHash, CodeConfirmDialogBuilder builder){
-        RestAPI api = new RestAPI(activity, "/api/registerStepTwo");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("correo", correo);
         api.addParameter("codigo", codigo);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/registerStepTwo");
+        api.receiveObject(String.class, error -> {
             if(error == null){
                 //Si no ha habido error, hacer login
                 login(correo, contrasennaHash);
@@ -209,18 +208,18 @@ public class BackendAPI{
         });
     }
     private void registerCancel(String correo){
-        RestAPI api = new RestAPI(activity, "/api/registerCancel");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("correo", correo);
-        api.openConnection();
-        api.setOnObjectReceived(Boolean.class, exito -> activity.mostrarMensaje("Registro cancelado"));
+        api.openConnection("/api/registerCancel");
+        api.receiveObject(Boolean.class, exito -> activity.mostrarMensaje("Registro cancelado"));
     }
 
     public void restablecerContrasenna(String correo){
-        RestAPI api = new RestAPI(activity,"/api/reestablecerContrasennaStepOne");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("correo", correo);
-        api.openConnection();
+        api.openConnection("/api/reestablecerContrasennaStepOne");
 
-        api.setOnObjectReceived(String.class, resp -> {
+        api.receiveObject(String.class, resp -> {
             if(resp == null){
                 //Si no ha habido error
                 CodeConfirmDialogBuilder builder = new CodeConfirmDialogBuilder(activity);
@@ -233,11 +232,11 @@ public class BackendAPI{
         });
     }
     private void restablecerContrasennaPaso2(String correo, int codigo, CodeConfirmDialogBuilder builder){
-        RestAPI api = new RestAPI(activity, "/api/reestablecerContrasennaStepTwo");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("correo", correo);
         api.addParameter("codigo", codigo);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/reestablecerContrasennaStepTwo");
+        api.receiveObject(String.class, error -> {
             if(error == null){
                 // Si no ha habido error
                 ResetPasswordDialogBuilder builder2 = new ResetPasswordDialogBuilder(activity);
@@ -253,11 +252,11 @@ public class BackendAPI{
     }
     private void restablecerContrasennaPaso3(String correo, String contrasenna){
         String contrasennaHash = HashUtils.cifrarContrasenna(contrasenna);
-        RestAPI api = new RestAPI(activity, "/api/reestablecerContrasennaStepThree");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("correo", correo);
         api.addParameter("contrasenna", contrasennaHash);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/reestablecerContrasennaStepThree");
+        api.receiveObject(String.class, error -> {
             if(error == null){
                 //Si no ha habido error
                 activity.mostrarMensaje("Contraseña cambiada correctamente");
@@ -272,10 +271,10 @@ public class BackendAPI{
     //  OBTENCIÓN DE USUARIOS
     //
     public void obtenerUsuarioVO(Consumer<UsuarioVO> consumer){
-        RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
+        api.openConnection("/api/sacarUsuarioVO");
+        api.receiveObject(UsuarioVO.class, usuarioVO -> {
             if(usuarioVO.isExito()){
                 usuario = usuarioVO;
                 consumer.accept(usuarioVO);
@@ -285,11 +284,11 @@ public class BackendAPI{
         });
     }
     public void buscarUsuarioVO(String correo, Consumer<UsuarioVO> consumer){
-        RestAPI api = new RestAPI(activity, "/api/buscarAmigo");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("amigo", correo);
-        api.openConnection();
-        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+        api.openConnection("/api/buscarAmigo");
+        api.receiveObject(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado() || (listaUsuarios.getError() != null && !listaUsuarios.getError().equals("null"))){
                 activity.mostrarMensaje(listaUsuarios.getError());
             }else{
@@ -302,11 +301,11 @@ public class BackendAPI{
     //  GESTIÓN DE SALAS
     //
     public void crearSala(ConfigSala configSala){
-        RestAPI api = new RestAPI(activity, "/api/crearSala");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("configuracion", configSala);
-        api.openConnection();
-        api.setOnObjectReceived(RespuestaSala.class, respuestaSala -> {
+        api.openConnection("/api/crearSala");
+        api.receiveObject(RespuestaSala.class, respuestaSala -> {
             if(respuestaSala.isExito()){
                 // No ha habido errores
                 unirseSala(respuestaSala.getSalaID());
@@ -319,11 +318,11 @@ public class BackendAPI{
     public void unirseSalaPorID(){
         SalaIDSearchDialogBuilder builder = new SalaIDSearchDialogBuilder(activity);
         builder.setPositiveButton(salaID -> {
-            RestAPI api = new RestAPI(activity, "/api/buscarSalaID");
+            RestAPI api = new RestAPI(activity);
             api.addParameter("sesionID", sesionID);
             api.addParameter("salaID", salaID);
-            api.openConnection();
-            api.setOnObjectReceived(Sala.class, sala -> {
+            api.openConnection("/api/buscarSalaID");
+            api.receiveObject(Sala.class, sala -> {
                 if(sala.isNoExiste()){
                     builder.setError(sala.getError());
                     builder.show();
@@ -373,11 +372,11 @@ public class BackendAPI{
     }
     private void enviarSalaACK(){
         if(salaActual != null){
-            RestAPI api = new RestAPI(activity, "/api/ack");
+            RestAPI api = new RestAPI(activity);
             api.addParameter("sesionID", sesionID);
             api.addParameter("salaID", salaActualID);
-            api.openConnection();
-            api.setOnObjectReceived(Boolean.class, exito -> {
+            api.openConnection("/api/ack");
+            api.receiveObject(Boolean.class, exito -> {
                 if(!exito){
                     activity.mostrarMensaje("Se ha producido un error al enviar el ACK");
                 }
@@ -421,10 +420,10 @@ public class BackendAPI{
     }
 
     public void comprobarPartidaPausada(Consumer<Sala> consumer){
-        RestAPI api = new RestAPI(activity, "/api/comprobarPartidaPausada");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(Sala.class, sala -> {
+        api.openConnection("/api/comprobarPartidaPausada");
+        api.receiveObject(Sala.class, sala -> {
             if(sala.isNoExiste()){
                 consumer.accept(null);
             }else{
@@ -434,29 +433,29 @@ public class BackendAPI{
     }
 
     public void comprobarUnirseSala(UUID salaID, Consumer<Boolean> consumer){
-        RestAPI api = new RestAPI(activity, "/api/comprobarUnirseSala");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("salaID", salaID);
-        api.openConnection();
-        api.setOnObjectReceived(Boolean.class, consumer);
+        api.openConnection("/api/comprobarUnirseSala");
+        api.receiveObject(Boolean.class, consumer);
     }
 
     public void obtenerSalasFiltro(ConfigSala filtro, Consumer<RespuestaSalas> consumer) {
-        RestAPI api = new RestAPI(activity, "/api/filtrarSalas");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("configuracion", filtro);
-        api.openConnection();
-        api.setOnObjectReceived(RespuestaSalas.class, consumer);
+        api.openConnection("/api/filtrarSalas");
+        api.receiveObject(RespuestaSalas.class, consumer);
     }
 
     //
     //  MODIFICACIÓN DE CUENTA
     //
     public void modificarCuenta(){
-        RestAPI api = new RestAPI(activity, "/api/sacarUsuarioVO");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(UsuarioVO.class, usuarioVO -> {
+        api.openConnection("/api/sacarUsuarioVO");
+        api.receiveObject(UsuarioVO.class, usuarioVO -> {
             ModifyAccountDialogBuilder builder = new ModifyAccountDialogBuilder(activity);
             builder.setNombreUsuario(usuarioVO.getNombre());
             builder.setCorreo(usuarioVO.getCorreo());
@@ -475,13 +474,13 @@ public class BackendAPI{
     }
     private void modificarCuentaPaso2(String nombreUsuario, String correo, String contrasennaHash,
                                       ModifyAccountDialogBuilder builder){
-        RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepOne");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("correoNuevo", correo);
         api.addParameter("nombre", nombreUsuario);
         api.addParameter("contrasenna", contrasennaHash);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/actualizarCuentaStepOne");
+        api.receiveObject(String.class, error -> {
             if(error == null){
                 // Si no ha habido error
                 CodeConfirmDialogBuilder builder2 = new CodeConfirmDialogBuilder(activity);
@@ -497,11 +496,11 @@ public class BackendAPI{
     private void modificarCuentaPaso3(int codigo,
                                       String correo, String contrasennaHash,
                                       CodeConfirmDialogBuilder builder){
-        RestAPI api = new RestAPI(activity, "/api/actualizarCuentaStepTwo");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("codigo", codigo);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/actualizarCuentaStepTwo");
+        api.receiveObject(String.class, error -> {
             if(error == null){
                 // Cerrar sesión y volverla a iniciar
                 closeWebSocketAPI();
@@ -516,10 +515,10 @@ public class BackendAPI{
         });
     }
     private void cancelModificarCuenta(){
-        RestAPI api = new RestAPI(activity, "/api/actualizarCancel");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> activity.mostrarMensaje("Operación cancelada"));
+        api.openConnection("/api/actualizarCancel");
+        api.receiveObject(String.class, error -> activity.mostrarMensaje("Operación cancelada"));
     }
 
     //
@@ -529,10 +528,10 @@ public class BackendAPI{
         obtenerUsuarioVO(usuarioVO -> {
             DeleteAccountDialogBuilder builder = new DeleteAccountDialogBuilder(activity);
             builder.setPositiveRunnable(() -> {
-                RestAPI api = new RestAPI(activity, "/api/borrarCuenta");
+                RestAPI api = new RestAPI(activity);
                 api.addParameter("sesionID", sesionID);
-                api.openConnection();
-                api.setOnObjectReceived(String.class, error -> {
+                api.openConnection("/api/borrarCuenta");
+                api.receiveObject(String.class, error -> {
                     if(error == null || error.equals("BORRADA")){
                         // No ha habido error
                         usuarioDbAdapter.deleteUsuario(usuarioVO.getCorreo());
@@ -554,10 +553,10 @@ public class BackendAPI{
     //  GESTIÓN DE AMIGOS
     //
     public void obtenerAmigos(Consumer<ListaUsuarios> consumer){
-        RestAPI api = new RestAPI(activity, "/api/sacarAmigos");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+        api.openConnection("/api/sacarAmigos");
+        api.receiveObject(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado()){
                 activity.mostrarMensaje(listaUsuarios.getError());
             }else{
@@ -566,10 +565,10 @@ public class BackendAPI{
         });
     }
     public void obtenerPeticionesRecibidas(Consumer<ListaUsuarios> consumer){
-        RestAPI api = new RestAPI(activity, "/api/sacarPeticionesRecibidas");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+        api.openConnection("/api/sacarPeticionesRecibidas");
+        api.receiveObject(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado()){
                 activity.mostrarMensaje(listaUsuarios.getError());
             }else{
@@ -578,10 +577,10 @@ public class BackendAPI{
         });
     }
     public void obtenerPeticionesEnviadas(Consumer<ListaUsuarios> consumer){
-        RestAPI api = new RestAPI(activity, "/api/sacarPeticionesEnviadas");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
-        api.openConnection();
-        api.setOnObjectReceived(ListaUsuarios.class, listaUsuarios -> {
+        api.openConnection("/api/sacarPeticionesEnviadas");
+        api.receiveObject(ListaUsuarios.class, listaUsuarios -> {
             if(listaUsuarios.isExpirado()){
                 activity.mostrarMensaje(listaUsuarios.getError());
             }else{
@@ -613,11 +612,11 @@ public class BackendAPI{
     }
 
     public void aceptarPeticion(UsuarioVO usuario){
-        RestAPI api = new RestAPI(activity, "/api/aceptarPeticionAmistad");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("amigo", usuario.getId());
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/aceptarPeticionAmistad");
+        api.receiveObject(String.class, error -> {
             if(error != null){
                 activity.mostrarMensaje(error);
             }else{
@@ -626,11 +625,11 @@ public class BackendAPI{
         });
     }
     public void rechazarPeticion(UsuarioVO usuario){
-        RestAPI api = new RestAPI(activity, "/api/cancelarPeticionAmistad");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("amigo", usuario.getId());
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/cancelarPeticionAmistad");
+        api.receiveObject(String.class, error -> {
             if(error != null){
                 activity.mostrarMensaje(error);
             }else{
@@ -702,13 +701,13 @@ public class BackendAPI{
     }
 
     public void cambiarPersonalizacionStepTwo(int avatar, int aspectoFondo, int aspectoCartas){
-        RestAPI api = new RestAPI(activity, "/api/cambiarAvatar");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("avatar", avatar);
         api.addParameter("aspectoFondo", aspectoFondo);
         api.addParameter("aspectoCartas", aspectoCartas);
-        api.openConnection();
-        api.setOnObjectReceived(String.class, error -> {
+        api.openConnection("/api/cambiarAvatar");
+        api.receiveObject(String.class, error -> {
             if(error == null){
                 // Cerrar sesión y volverla a iniciar
                 closeWebSocketAPI();
@@ -723,11 +722,11 @@ public class BackendAPI{
     // HISTORIAL
     //
     public void obtenerHistorial(UsuarioVO usuarioVO, Consumer<List<PartidaJugadaCompacta>> consumer){
-        RestAPI api = new RestAPI(activity, "/api/sacarPartidasJugadas");
+        RestAPI api = new RestAPI(activity);
         api.addParameter("sesionID", sesionID);
         api.addParameter("usuarioID", usuarioVO.getId());
-        api.openConnection();
-        api.setOnObjectReceived(ListaPartidas.class, listaPartidas -> {
+        api.openConnection("/api/sacarPartidasJugadas");
+        api.receiveObject(ListaPartidas.class, listaPartidas -> {
             if(listaPartidas.isExpirado()){
                 activity.mostrarMensaje(listaPartidas.getError());
             }else{
