@@ -747,6 +747,8 @@ public class BackendAPI{
     public static synchronized void closeWebSocketAPI(){
         if(wsAPI != null){
             wsAPI.close();
+            salaActual = null;
+            salaActualID = null;
         }
     }
     @Override
