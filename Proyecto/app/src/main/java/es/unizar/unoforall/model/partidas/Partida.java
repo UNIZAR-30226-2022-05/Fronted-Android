@@ -1,6 +1,5 @@
 package es.unizar.unoforall.model.partidas;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -317,7 +316,7 @@ public class Partida {
 						roboAcumulado+=4;
 					}
 				} else {
-					robarCartaJugador(siguienteJugador(), 2);
+					robarCartaJugador(siguienteJugador(), 4);
 					esSalto=true;
 				}
 				break;
@@ -335,13 +334,13 @@ public class Partida {
 						List<Carta> mano = j.getMano();
 						Collections.shuffle(mano);
 						boolean hecho = false;
-						int carta = 0;
-						while(!hecho && carta<mano.size()) {
+						for (int carta = 0; carta < mano.size() && !hecho; carta++) {
 							if(!mano.get(carta).isVisiblePor(turno)) {
 								mano.get(carta).marcarVisible(turno);
 								hecho = true;
 							}
 						}
+						System.out.println("Termina el computo del rayos X");
 					}
 				}
 				break;
@@ -512,7 +511,7 @@ public class Partida {
 	public boolean ejecutarJugadaJugador(Jugada jugada, UUID jugadorID) {
 		synchronized (LOCK) {
 			if (validarJugada(jugada) && 
-					this.jugadores.get(turno).getJugadorID() != null &&
+					!this.jugadores.get(turno).isEsIA() &&
 					this.jugadores.get(turno).getJugadorID().equals(jugadorID)) {
 				ejecutarJugada(jugada);
 				return true;
@@ -619,17 +618,21 @@ public class Partida {
 	
 	//Cuando un jugador se pasa del tiempo de turno
 	public void saltarTurno() {
-		ejecutarJugada(new Jugada());
-		if (modoJugarCartaRobada) {
-			modoJugarCartaRobada = false;
-			avanzarTurno();
+		synchronized (LOCK) {
+			ejecutarJugada(new Jugada());
+			if (modoJugarCartaRobada) {
+				modoJugarCartaRobada = false;
+				avanzarTurno();
+			}
 		}
 		
 	}
 	
 	
 	public boolean turnoDeIA() {
-		return this.jugadores.get(turno).isEsIA();
+		synchronized (LOCK) {
+			return this.jugadores.get(turno).isEsIA();
+		}
 	}
 	
 	public void expulsarJugador(UUID jugadorID) {
@@ -660,33 +663,33 @@ public class Partida {
 		}
 	}
 	
-	public void pulsarBotonUNOInterno(int jugador) { 
-		synchronized (LOCK) {
-			Jugador j = jugadores.get(jugador);
-			if ((jugador == turno 
-				 && compruebaPuedeJugar(jugador))
-					|| j.getMano().size()==1) { 
-				//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
-				j.setProtegido_UNO(true);
-			}
-			
-			for (Jugador j2 : this.jugadores) {
-				if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
-					robarCartaJugador(j2, 2);
-					j2.setPenalizado_UNO(true);
-				}	
-			}
+	private void pulsarBotonUNOInterno(int jugador) { 
+		Jugador j = jugadores.get(jugador);
+		if ((jugador == turno 
+			 && compruebaPuedeJugar(jugador))
+				|| j.getMano().size()==1) { 
+			//Si es su turno y puede jugar la penultima carta, o solo tiene una, se protege
+			j.setProtegido_UNO(true);
+		}
+		
+		for (Jugador j2 : this.jugadores) {
+			if(!j2.isProtegido_UNO() && j2.getMano().size()==1) { //Pillado, roba dos cartas.
+				robarCartaJugador(j2, 2);
+				j2.setPenalizado_UNO(true);
+			}	
 		}
 	}
 	
 	public int getNumIAs() {
-		int numIAs = 0;
-		for (Jugador j : this.jugadores) {
-			if (j.isEsIA()) {
-				numIAs++;
+		synchronized (LOCK) {
+			int numIAs = 0;
+			for (Jugador j : this.jugadores) {
+				if (j.isEsIA()) {
+					numIAs++;
+				}
 			}
+			return numIAs;
 		}
-		return numIAs;
 	}
 	
 	
@@ -722,7 +725,9 @@ public class Partida {
 	}
 
 	public void setSentidoHorario(boolean sentidoHorario) {
-		this.sentidoHorario = sentidoHorario;
+		synchronized (LOCK) {
+			this.sentidoHorario = sentidoHorario;
+		}
 	}
 
 	
@@ -813,7 +818,7 @@ public class Partida {
 		return hayError;
 	}
 
-	public void setHayError(boolean hayError) {
+	private void setHayError(boolean hayError) {
 		this.hayError = hayError;
 	}
 
@@ -862,7 +867,9 @@ public class Partida {
 	}
 
 	public void setModoAcumulandoRobo(boolean modoAcumulandoRobo) {
-		this.modoAcumulandoRobo = modoAcumulandoRobo;
+		synchronized (LOCK) {
+			this.modoAcumulandoRobo = modoAcumulandoRobo;
+		}
 	}
 
 	public boolean isModoJugarCartaRobada() {
@@ -870,7 +877,9 @@ public class Partida {
 	}
 
 	public void setModoJugarCartaRobada(boolean modoJugarCartaRobada) {
-		this.modoJugarCartaRobada = modoJugarCartaRobada;
+		synchronized (LOCK) {
+			this.modoJugarCartaRobada = modoJugarCartaRobada;
+		}
 	}
 
 	
@@ -879,48 +888,52 @@ public class Partida {
 	}
 
 	public void setCartaRobada(Carta cartaRobada) {
-		this.cartaRobada = cartaRobada;
+		synchronized (LOCK) {
+			this.cartaRobada = cartaRobada;
+		}
 	}
 
 	public Partida getPartidaAEnviar() {
-		Partida partidaResumida = new Partida();
-		
-		partidaResumida.hayError = hayError;
-		partidaResumida.error = error;
-		
-		partidaResumida.mazo = null;
-		
-		if (cartasJugadas != null && !cartasJugadas.isEmpty()) {
-			partidaResumida.cartasJugadas = this.cartasJugadas.subList(this.cartasJugadas.size()-1, this.cartasJugadas.size());
-		} else {
-			partidaResumida.cartasJugadas = this.cartasJugadas;
+		synchronized (LOCK) {
+			Partida partidaResumida = new Partida();
+			
+			partidaResumida.hayError = hayError;
+			partidaResumida.error = error;
+			
+			partidaResumida.mazo = null;
+			
+			if (cartasJugadas != null && !cartasJugadas.isEmpty()) {
+				partidaResumida.cartasJugadas = this.cartasJugadas.subList(this.cartasJugadas.size()-1, this.cartasJugadas.size());
+			} else {
+				partidaResumida.cartasJugadas = this.cartasJugadas;
+			}
+			
+			partidaResumida.ultimaJugada = this.ultimaJugada;
+			partidaResumida.turnoUltimaJugada = this.turnoUltimaJugada;
+			
+			
+			partidaResumida.jugadores = jugadores;
+			partidaResumida.turno = turno;
+			partidaResumida.sentidoHorario = sentidoHorario;
+			
+			partidaResumida.configuracion = configuracion;
+			partidaResumida.terminada = terminada;	
+			
+			//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
+			partidaResumida.fechaInicio = fechaInicio; 
+			
+			//Variables para extraer resultados de efectos
+			partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
+			partidaResumida.roboAcumulado = roboAcumulado;
+			partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
+			partidaResumida.cartaRobada = cartaRobada;
+			
+			partidaResumida.repeticionTurno = repeticionTurno;
+			
+			partidaResumida.salaID = null;
+			
+			return partidaResumida;
 		}
-		
-		partidaResumida.ultimaJugada = this.ultimaJugada;
-		partidaResumida.turnoUltimaJugada = this.turnoUltimaJugada;
-		
-		
-		partidaResumida.jugadores = jugadores;
-		partidaResumida.turno = turno;
-		partidaResumida.sentidoHorario = sentidoHorario;
-		
-		partidaResumida.configuracion = configuracion;
-		partidaResumida.terminada = terminada;	
-		
-		//Fecha de inicio de la partida (Ya en formato sql porque no la necesita el frontend en este punto). 
-		partidaResumida.fechaInicio = fechaInicio; 
-		
-		//Variables para extraer resultados de efectos
-		partidaResumida.modoAcumulandoRobo = modoAcumulandoRobo;
-		partidaResumida.roboAcumulado = roboAcumulado;
-		partidaResumida.modoJugarCartaRobada = modoJugarCartaRobada;
-		partidaResumida.cartaRobada = cartaRobada;
-		
-		partidaResumida.repeticionTurno = repeticionTurno;
-		
-		partidaResumida.salaID = null;
-		
-		return partidaResumida;
 	}
 
 	public UUID getSalaID() {
@@ -928,7 +941,9 @@ public class Partida {
 	}
 
 	public void setSalaID(UUID salaID) {
-		this.salaID = salaID;
+		synchronized (LOCK) {
+			this.salaID = salaID;
+		}
 	}
 	
 	
@@ -937,7 +952,9 @@ public class Partida {
 	}
 
 	public void setRepeticionTurno(boolean repeticionTurno) {
-		this.repeticionTurno = repeticionTurno;
+		synchronized (LOCK) {
+			this.repeticionTurno = repeticionTurno;
+		}
 	}
 
 	public int getRoboAcumulado() {
@@ -953,6 +970,8 @@ public class Partida {
 	}
 	
 	public void resetUltimaJugada() {
-		this.ultimaJugada = null;
+		synchronized (LOCK) {
+			this.ultimaJugada = null;
+		}
 	}
 }

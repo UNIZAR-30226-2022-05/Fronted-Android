@@ -116,7 +116,9 @@ public class BackendAPI{
     public void login(String correo, String contrasennaHash){
         wsAPI = new WebSocketAPI();
         wsAPI.setOnError(ex -> {
+            activity.runOnUiThread(() -> {
                 activity.mostrarMensaje(ex.getMessage());
+            });
             ex.printStackTrace();
             closeWebSocketAPI();
         });

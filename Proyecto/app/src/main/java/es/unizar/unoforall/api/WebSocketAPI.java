@@ -34,10 +34,18 @@ public class WebSocketAPI {
     }
 
     public void openConnection(String path){
+        if(isClosed()){
+            gotoPantallaInicial();
+        }
+
         client.openConnection(path);
     }
 
     public <T> void subscribe(Activity activity, String topic, Class<T> expectedClass, Consumer<T> consumer){
+        if(isClosed()){
+            gotoPantallaInicial();
+        }
+
         if(consumer == null){
             return;
         }
@@ -48,11 +56,25 @@ public class WebSocketAPI {
     }
 
     public void unsubscribe(String topic){
+        if(isClosed()){
+            gotoPantallaInicial();
+        }
+
         client.unsubscribe(topic);
     }
 
     public RestAPI getRestAPI() {
-        RestAPI api = new RestAPI(activity, client.getRestClient());
+        if(isClosed()){
+            gotoPantallaInicial();
+        }
+
+        RestClient restClient = client.getRestClient();
+        if(restClient == null){
+            restClient = new RestClient("");
+            restClient.close();
+        }
+
+        RestAPI api = new RestAPI(activity, restClient);
         if(isClosed()){
             api.close();
         }
@@ -65,5 +87,12 @@ public class WebSocketAPI {
 
     public void close(){
         client.close();
+    }
+
+    private void gotoPantallaInicial(){
+        Intent intent = new Intent(activity, InicioActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activity.startActivityForResult(intent, 0);
+        activity.mostrarMensaje("La sesión ha caducado");
     }
 }
