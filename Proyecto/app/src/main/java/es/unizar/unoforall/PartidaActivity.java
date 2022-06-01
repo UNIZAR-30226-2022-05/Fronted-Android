@@ -338,6 +338,8 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
         Partida partida = sala.getPartida();
         if(sala.isEnPausa()){
             // Partida pausada
+            api.cancelarSuscripcionCanalVotacionPausa();
+            api.cancelarSuscripcionCanalEmojis();
             AnimationManager.cancelAnimation(sentido);
             Intent intent = new Intent(this, SalaActivity.class);
             this.startActivityForResult(intent,0);
@@ -571,6 +573,7 @@ public class PartidaActivity extends CustomActivity implements SalaReceiver {
             AnimationManager.cancelAnimation(sentido);
 
             api.cancelarSuscripcionCanalEmojis();
+            api.cancelarSuscripcionCanalVotacionPausa();
             partidaFinalizada = true;
             resetPorcentajes();
             Snackbar.make(this, botonUNO, "PARTIDA FINALIZADA", BaseTransientBottomBar.LENGTH_INDEFINITE).show();

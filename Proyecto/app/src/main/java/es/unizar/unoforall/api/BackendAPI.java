@@ -141,6 +141,7 @@ public class BackendAPI{
                 loginPaso2();
             }else{
                 activity.mostrarMensaje(respuestaLogin.getErrorInfo());
+                closeWebSocketAPI();
             }
         });
     }
