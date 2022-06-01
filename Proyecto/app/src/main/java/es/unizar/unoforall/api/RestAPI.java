@@ -16,8 +16,8 @@ public class RestAPI{
     }
 
     public RestAPI(CustomActivity activity){
-        this.restClient = new RestClient(SERVER_URL);
         this.activity = activity;
+        this.restClient = new RestClient(SERVER_URL);
 
         restClient.setOnError(ex -> {
             ex.printStackTrace();
@@ -25,6 +25,10 @@ public class RestAPI{
             activity.runOnUiThread(() ->
                     activity.mostrarMensaje("RestAPI: Se ha producido un error de conexión"));
         });
+    }
+    protected RestAPI(CustomActivity activity, RestClient restClient){
+        this.activity = activity;
+        this.restClient = restClient;
     }
 
     public void setOnError(Consumer<Exception> onError){
@@ -40,6 +44,10 @@ public class RestAPI{
     }
 
     public <T> void receiveObject(Class<T> requestedClass, Consumer<T> consumer){
+        if(consumer == null){
+            return;
+        }
+
         restClient.receiveObject(requestedClass, object -> {
             activity.runOnUiThread(() -> consumer.accept(object));
         });

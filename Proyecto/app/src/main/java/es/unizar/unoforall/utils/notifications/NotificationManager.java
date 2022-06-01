@@ -35,8 +35,10 @@ public class NotificationManager {
 
     public static void close(Context context){
         NotificationManagerCompat.from(context).cancelAll();
-        actionsMap.clear();
-        actionsMap = null;
+        if(actionsMap != null){
+            actionsMap.clear();
+            actionsMap = null;
+        }
     }
 
     private static void createNotificationChannel(Context context) {
